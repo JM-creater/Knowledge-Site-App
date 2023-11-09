@@ -1,0 +1,80 @@
+﻿/* Material UI icons definitions */
+.material-symbols-outlined {
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+
+/* Media definitions */
+@media (max-height: 1080px) {
+    .table-container {
+        display: flex;
+        background-color: #efebe0;
+        padding: 10vh;
+        margin: 25vh 20vh 0;
+    }
+
+    .thead-dark {
+        font-weight: 700;
+        font-size: 15px;
+    }
+
+    td {
+        overflow: hidden;
+        font-weight: 400;
+        font-size: 12pt;
+        text-align: center;
+        text-wrap: balance;
+    }
+}
+
+@media (max-height: 768px) {
+    .table-container {
+        display: flex;
+        background-color: #efebe0;
+        padding: 10vh;
+        margin: 12.5vh 10vh 0;
+    }
+
+    .thead-dark {
+        font-weight: 600;
+        font-size: 12.5px;
+    }
+
+    td {
+        overflow: hidden;
+        font-weight: 400;
+        font-size: 11pt;
+        text-align: center;
+        text-wrap: balance;
+    }
+}
+
+/* Table definitions */
+.clickable-action {
+    background-color: inherit;
+    border: none;
+    color: #862b0d;
+}
+
+    .clickable-action:hover {
+        background-color: #ffc95f;
+        color: #862b0d;
+    }
+
+.table {
+    border: 3px solid #ffc95f;
+    color: #862b0d;
+}
+
+.header {
+    border: 2px solid #ffc95f;
+}
+
+th {
+    text-align: center;
+    font-weight: 600;
+    font-size: 15pt;
+}
+
+tr {
+    border-color: transparent;
+}

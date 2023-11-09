@@ -2,9 +2,11 @@
 using KnowledgeSiteApp.Backend.Core.Context;
 using KnowledgeSiteApp.Backend.Core.Dto;
 using KnowledgeSiteApp.Backend.Core.Enum;
+using KnowledgeSiteApp.Models.Dto;
 using KnowledgeSiteApp.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace KnowledgeSiteApp.Backend.Service
 {
@@ -18,27 +20,16 @@ namespace KnowledgeSiteApp.Backend.Service
             mapper = Imapper;
         }
 
+        public async Task<User> GetById(int id)
+    => await context.Users
+                    .Where(u => u.Id == id)
+                    .FirstOrDefaultAsync();
+
         public async Task<bool> GetExistingUser(RegisterUserDto dto)
             => await context.Users
                             .Where(u => u.Username == dto.Username || u.Email == dto.Email)
                             .AnyAsync();
 
-        public void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
-        {
-            using (var hmac = new HMACSHA512())
-            {
-                passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));  
-            }
-        }
-        public bool VerifyPassword(string password, byte[] storedHash, byte[] storedSalt)
-        {
-            using (var hmac = new HMACSHA512(storedSalt))
-            {
-                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-                return CryptographicOperations.FixedTimeEquals(computedHash, storedHash);
-            }
-        }
         public async Task<string?> booksImages(IFormFile? imageFile)
         {
             if (imageFile == null || imageFile.Length == 0)
@@ -99,22 +90,22 @@ namespace KnowledgeSiteApp.Backend.Service
         {
             try
             {
-                if (await GetExistingUser(dto))
-                    throw new InvalidOperationException("Username or Email already exists");
+                //if (await GetExistingUser(dto))
+                //    throw new InvalidOperationException("Username or Email already exists");
 
-                var bookImagePath = await booksImages(dto.BooksImages);
-                var profileImagePath = await profileImages(dto.ProfileImage);
-
-                byte[] passwordHash, passwordSalt;
-                CreatePasswordHash(dto.Password, out passwordHash, out passwordSalt);
-
+                //var profileImagePath = await profileImages(dto.ProfileImage);
+                var newPassword = EncryptPassword(dto.Password);
                 var newUser = mapper.Map<User>(dto);
-                newUser.PasswordHash = passwordHash;
-                newUser.PasswordSalt = passwordSalt;
-                newUser.BooksImages = bookImagePath;
-                newUser.ProfileImage = profileImagePath;
+
+                newUser.Password = newPassword;
+                newUser.FirstName = dto.FirstName;
+                newUser.LastName = dto.LastName;
+                newUser.Email = dto.Email;
+                //newUser.ProfileImage = profileImagePath;
 
                 newUser.Role = (int)UserRole.Admin;
+                newUser.IsActive = true;
+                newUser.IsValidate = true;
 
                 await context.AddAsync(newUser);
                 await context.SaveChangesAsync();
@@ -132,14 +123,20 @@ namespace KnowledgeSiteApp.Backend.Service
             try
             {
 
-                var user = await context.Users
-                                        .Where(u => u.Username == dto.Username &&
-                                        u.Email == dto.Email)
+                User user = await context.Users
+                                        .Where(u => u.Username == dto.UsernameOrEmail || u.Email == dto.UsernameOrEmail)
                                         .FirstOrDefaultAsync();
+                if (user == null)
+                {
+                    user = await context.Users
+                                        .Where(u => u.Username == dto.UsernameOrEmail || u.Email == dto.UsernameOrEmail)
+                                        .FirstOrDefaultAsync();
+                }
+
                 if (user == null)
                     throw new InvalidOperationException("Admin not found");
 
-                if (!VerifyPassword(dto.Password, user.PasswordHash, user.PasswordSalt))
+                if (!VerifyPassword(dto.Password, EncryptPassword(dto.Password)))
                     throw new InvalidOperationException("Invalid password");
 
                 return mapper.Map<User>(user);
@@ -183,7 +180,7 @@ namespace KnowledgeSiteApp.Backend.Service
                 if (user == null)
                     throw new Exception("Admin not found");
 
-                user.ProfileImage = newProfilePicture;
+                //user.ProfileImage = newProfilePicture;
                 context.Users.Update(user);
                 await context.SaveChangesAsync();
 
@@ -206,11 +203,9 @@ namespace KnowledgeSiteApp.Backend.Service
                 if (existingUser == null)
                     throw new InvalidOperationException("Admin not found");
 
-                byte[] newPasswordHash, newPasswordSalt;
-                CreatePasswordHash(dto.Password, out newPasswordHash, out newPasswordSalt);
+                var newPassword = EncryptPassword(dto.Password);
 
-                existingUser.PasswordHash = newPasswordHash;
-                existingUser.PasswordSalt = newPasswordSalt;
+                existingUser.Password = newPassword;
 
                 await context.SaveChangesAsync();
 
@@ -250,28 +245,28 @@ namespace KnowledgeSiteApp.Backend.Service
             }
         }
 
-        public async Task<User> UpdateDetails(string userName, UpdateUserDetailsDto dto)
+        public async Task<User> UpdateDetails(int id, UpdateUserDetailsDto dto)
         {
             try
             {
                 var user = await context.Users
-                                        .Where(u => u.Username == userName)
+                                        .Where(u => u.Id == id)
                                         .FirstOrDefaultAsync();
 
                 if (user == null)
                     throw new InvalidOperationException("User not found");
 
-                var updateImage = await booksImages(dto.BooksImages);
+                var encryptedPassword = EncryptPassword(dto.Password);
 
-                byte[] newPasswordHash, newPasswordSalt;
-                CreatePasswordHash(dto.Password, out newPasswordHash, out newPasswordSalt);
+                mapper.Map(dto, user);
+                user.FirstName = dto.FirstName;
+                user.LastName = dto.LastName;
+                user.Email = dto.Email;
+                user.Password = encryptedPassword;
 
-                var updateUser = mapper.Map<User>(dto);
-                updateUser.PasswordHash = newPasswordHash;
-                updateUser.PasswordSalt = newPasswordSalt;
-                updateUser.BooksImages = updateImage;
+                user.Role = (int)UserRole.Admin;
 
-                context.Update(updateUser);
+                context.Users.Update(user);
                 await context.SaveChangesAsync();
 
                 return user;
@@ -303,6 +298,64 @@ namespace KnowledgeSiteApp.Backend.Service
             {
                 throw new Exception(e.Message);
             }
+        }
+
+        public async Task<User> ActivateUser(int id)
+        {
+            try
+            {
+                var user = await context.Users
+                                        .Where(u => u.Id == id)
+                                        .FirstOrDefaultAsync();
+                if (user == null)
+                    throw new InvalidOperationException("User not found");
+
+                user.IsActive = true;
+
+                context.Users.Update(user);
+                await context.SaveChangesAsync();
+
+                return user;
+            }
+            catch (Exception e)
+            {
+                throw new ArgumentException(e.Message);
+            }
+        }
+
+        public async Task<User> DeactivateUser(int id)
+        {
+            try
+            {
+                var user = await context.Users
+                                        .Where(u => u.Id == id)
+                                        .FirstOrDefaultAsync();
+                if (user == null)
+                    throw new InvalidOperationException("User not found");
+
+                user.IsActive = false;
+
+                context.Users.Update(user);
+                await context.SaveChangesAsync();
+
+                return user;
+            }
+            catch (Exception e)
+            {
+                throw new ArgumentException(e.Message);
+            }
+        }
+
+        public static string EncryptPassword(string password)
+        {
+            var hashedBytes = SHA256.HashData(Encoding.UTF8.GetBytes(password));
+            return Convert.ToBase64String(hashedBytes);
+        }
+
+        public static bool VerifyPassword(string enteredPassword, string storedHash)
+        {
+            var enteredHash = EncryptPassword(enteredPassword);
+            return string.Equals(enteredHash, storedHash, StringComparison.Ordinal);
         }
 
     }

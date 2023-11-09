@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KnowledgeSiteApp.Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231104053723_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20231109034442_Login")]
+    partial class Login
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
