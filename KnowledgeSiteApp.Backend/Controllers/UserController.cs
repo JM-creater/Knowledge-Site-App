@@ -1,6 +1,7 @@
 ﻿using KnowledgeSiteApp.Backend.Core.Dto;
 using KnowledgeSiteApp.Backend.Core.Enum;
 using KnowledgeSiteApp.Backend.Service;
+using KnowledgeSiteApp.Models.Dto;
 using Microsoft.AspNetCore.Mvc;
 
 namespace KnowledgeSiteApp.Backend.Controllers
@@ -14,8 +15,8 @@ namespace KnowledgeSiteApp.Backend.Controllers
             service = userService;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> RegisterUser([FromForm] RegisterUserDto dto)
+        [HttpPost("add")]
+        public async Task<IActionResult> RegisterUser([FromBody] RegisterUserDto dto)
         {
             try
             {
@@ -77,6 +78,21 @@ namespace KnowledgeSiteApp.Backend.Controllers
             }
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetByIdAdmin(int id)
+        {
+            try
+            {
+                var user = await service.GetById(id);
+
+                return Ok(user);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
         [HttpPut("update-password")]
         public async Task<IActionResult> Update(UpdatePasswordDto dto)
         {
@@ -121,12 +137,12 @@ namespace KnowledgeSiteApp.Backend.Controllers
             }
         }
 
-        [HttpPut("updateDetails")]
-        public async Task<IActionResult> UpdateUserDetails(string userName, [FromForm] UpdateUserDetailsDto dto)
+        [HttpPut("updateDetails/{id}")]
+        public async Task<IActionResult> UpdateUserDetails(int id, [FromBody] UpdateUserDetailsDto dto)
         {
             try
             {
-                var user = await service.UpdateDetails(userName, dto);
+                var user = await service.UpdateDetails(id, dto);
 
                 return Ok(user);
             }
@@ -144,6 +160,36 @@ namespace KnowledgeSiteApp.Backend.Controllers
                 var user = await service.Delete(userName);
 
                 return Ok("Sucessfully Deleted a Author");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPut("activate/{id}")]
+        public async Task<IActionResult> ActivationUser(int id)
+        {
+            try
+            {
+                var user = await service.ActivateUser(id);
+
+                return Ok(user);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPut("deactivate/{id}")]
+        public async Task<IActionResult> DeactivationUser(int id)
+        {
+            try
+            {
+                var user = await service.DeactivateUser(id);
+
+                return Ok(user);
             }
             catch (Exception e)
             {

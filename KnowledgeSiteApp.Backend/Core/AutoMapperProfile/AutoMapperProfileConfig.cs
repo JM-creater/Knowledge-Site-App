@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using KnowledgeSiteApp.Backend.Core.Dto;
+using KnowledgeSiteApp.Models.Dto;
 using KnowledgeSiteApp.Models.Entities;
 
 namespace KnowledgeSiteApp.Backend.Core.AutoMapperProfile

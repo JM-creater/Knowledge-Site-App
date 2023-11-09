@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KnowledgeSiteApp.Backend", "KnowledgeSiteApp.Backend.csproj", "{16784ADF-F895-42D4-8493-E7F91B7DA579}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KnowledgeSiteApp.Backend", "KnowledgeSiteApp.Backend.csproj", "{16784ADF-F895-42D4-8493-E7F91B7DA579}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KnowledgeSiteApp.Frontend", "..\KnowledgeSiteApp.Frontend\KnowledgeSiteApp.Frontend.csproj", "{B96720F8-874B-45D7-BD87-D7816C823A1A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KnowledgeSiteApp.Frontend", "..\KnowledgeSiteApp.Frontend\KnowledgeSiteApp.Frontend.csproj", "{B96720F8-874B-45D7-BD87-D7816C823A1A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KnowledgeSiteApp.Models", "..\KnowledgeSiteApp.Models\KnowledgeSiteApp.Models.csproj", "{F59F9103-9CEB-4EBB-8535-7BAE3A1EFB6E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KnowledgeSiteApp.Models", "..\KnowledgeSiteApp.Models\KnowledgeSiteApp.Models.csproj", "{F59F9103-9CEB-4EBB-8535-7BAE3A1EFB6E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

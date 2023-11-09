@@ -1,9 +1,103 @@
-﻿@page "/"
+﻿@page "/index"
+@inject HttpClient http
+@inject IJSRuntime js
+@inject NavigationManager navigate
+@inherits IndexLayout
 
-<PageTitle>Index</PageTitle>
+<link href="css/main.css" rel="stylesheet" />
+<link href="css/users-stylesheet.css" rel="stylesheet" />
 
-<h1>Hello, world!</h1>
+<h3>Main</h3>
+<div class="actions-container">
+    <button class="btn btn-primary" @onclick="NavigateToCreateAdmin">Create New Admin</button>
+</div>
 
-Welcome to your new app.
+<div class="table-container">
+    <table class="table">
+        <thead class="thead-dark">
+            <tr class="header">
+                <th scope="col">Name</th>
+                <th scope="col">Username</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (User userItem in user)
+            {
+                <tr>
+                    <td>@userItem.FirstName</td>
+                    <td>@userItem.Username</td>
+                    <td>
+                        <button class="clickable-action">
+                            <a class="fas fa-edit" href="editadmin/@userItem.Id"></a>
+                        </button>
+                        <button @onclick="() => ActivateDeactivateUser(userItem.Id)" class="clickable-action" style="background-color: @(userItem.IsActive ? "green" : "red")">
+                            @if (userItem.IsActive)
+                            {
+                                <i class="fas fa-toggle-on"></i>
+                            }
+                            else
+                            {
+                                <i class="fas fa-toggle-off"></i>
+                            }
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+
+@code {
+    private User[] user { get; set; } = Array.Empty<User>();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        try
+        {
+            user = await http.GetFromJsonAsync<User[]>("https://localhost:7095/api/User") ?? Array.Empty<User>();
+        }
+        catch (Exception e)
+        {
+            await js.InvokeVoidAsync("alert", e.Message);
+        }
+    }
+
+    private void NavigateToCreateAdmin()
+    {
+        navigate.NavigateTo("/createadmin");
+    }
+
+    private async Task ActivateDeactivateUser(int id)
+    {
+        var userStatus = user.FirstOrDefault(u => u.Id == id);
+
+        if (userStatus == null)
+        {
+            throw new InvalidOperationException("User not found");
+        }
+
+        var confirmationMessage = userStatus.IsActive ?
+            $"Do you want to deactivate {userStatus.FirstName}'s ({userStatus.Id}) record?" :
+            $"Do you want to activate {userStatus.FirstName}'s ({userStatus.Id}) record?";
+
+        if (await js.InvokeAsync<bool>("confirm", confirmationMessage))
+        {
+            userStatus.IsActive = !userStatus.IsActive;
+            var endpoint = userStatus.IsActive ? $"api/User/activate/{id}" : $"api/User/deactivate/{id}";
+            var response = await http.PutAsync($"https://localhost:7095/{endpoint}", null);
+            if (response.IsSuccessStatusCode)
+            {
+                StateHasChanged();
+            }
+            else
+            {
+                userStatus.IsActive = !userStatus.IsActive;
+                await js.InvokeVoidAsync("alert", "Failed to update user status.");
+            }
+        }
+    }
+
+
+}

@@ -15,12 +15,8 @@ public class User
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public string Email { get; set; }
-    public string ProfileImage { get; set; }
-    public string WebsiteUrl { get; set; }
-    public string ArticlesUrl { get; set; }
-    public string BooksImages { get; set; }
-    public byte[] PasswordHash { get; set; }
-    public byte[] PasswordSalt { get; set; }
+    //public string ProfileImage { get; set; }
+    public string Password { get; set; }
     public int Role { get; set; }
     public bool IsActive { get; set; } 
     public bool IsValidate { get; set; } 
