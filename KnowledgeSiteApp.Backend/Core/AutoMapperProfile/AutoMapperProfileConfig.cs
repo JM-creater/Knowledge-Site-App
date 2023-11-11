@@ -23,6 +23,10 @@ namespace KnowledgeSiteApp.Backend.Core.AutoMapperProfile
             // Topic
             CreateMap<TopicCreateDto, Topic>();
             CreateMap<TopicUpdateDto, Topic>();
+
+            // Category
+            CreateMap<TrainingCategoryCreateDto, TrainingCategory>();
+            CreateMap<TrainingCategoryUpdateDto, TrainingCategory>();
         }
     }
 }

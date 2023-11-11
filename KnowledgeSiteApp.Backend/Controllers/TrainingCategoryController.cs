@@ -1,4 +1,5 @@
-﻿using KnowledgeSiteApp.Backend.Service;
+﻿using KnowledgeSiteApp.Backend.Core.Dto;
+using KnowledgeSiteApp.Backend.Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace KnowledgeSiteApp.Backend.Controllers
@@ -12,12 +13,12 @@ namespace KnowledgeSiteApp.Backend.Controllers
             service = _service;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateCategory(string categoryName)
+        [HttpPost("add")]
+        public async Task<IActionResult> CreateCategory(TrainingCategoryCreateDto dto)
         {
             try
             {
-                var trainingCategory = await service.Create(categoryName);
+                var trainingCategory = await service.Create(dto);
 
                 return Ok(trainingCategory);
             }
@@ -57,12 +58,56 @@ namespace KnowledgeSiteApp.Backend.Controllers
             }
         }
 
-        [HttpPut("update/{id}/{name}")]
-        public async Task<IActionResult> UpdateCategory(int id, string name)
+        [HttpGet("search")]
+        public async Task<IActionResult> Search(string searchTerm)
         {
             try
             {
-                var category = await service.Update(id, name);
+                var categories = await service.SearchCategory(searchTerm);
+                return Ok(categories);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPut("update/{id}")]
+        public async Task<IActionResult> UpdateCategory(int id, TrainingCategoryUpdateDto dto)
+        {
+            try
+            {
+                var category = await service.Update(id, dto);
+
+                return Ok(category);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPut("activate/{id}")]
+        public async Task<IActionResult> Activation(int id)
+        {
+            try
+            {
+                var category = await service.Activate(id);
+
+                return Ok(category);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPut("deactivate/{id}")]
+        public async Task<IActionResult> Deactivation(int id)
+        {
+            try
+            {
+                var category = await service.Deactivate(id);
 
                 return Ok(category);
             }
