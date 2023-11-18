@@ -1,0 +1,193 @@
+﻿body {
+    background-color: #efebe0;
+    font-family: "Montserrat", sans-serif;
+    overflow: auto;
+    color: #862b0d;
+}
+
+/* Add Topic */
+.container-full {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5em;
+    height: 100vh;
+    gap: 3em;
+}
+
+.container-half {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: min(50%, 1000px);
+    height: 100%;
+}
+
+.container-upload {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: dashed 5px;
+    border-radius: 20px;
+    height: 80%;
+}
+
+/* File upload */
+.form-control:focus {
+    border-color: #ffc95f;
+    box-shadow: 0 0 0 0.2rem rgba(255, 202, 97, 0.25);
+}
+
+/* Clear button */
+.btn-clear {
+    background-color: #862b0d;
+    color: white;
+}
+
+    .btn-clear:not(:disabled):not(.disabled):active,
+    .btn-clear:not(:disabled):not(.disabled):hover,
+    .btn-clear:not(:disabled):not(.disabled):focus {
+        background-color: #862b0d;
+        color: white;
+    }
+
+/* All textboxes */
+input[type="text"] {
+    background: transparent;
+    border: transparent;
+    border-bottom: 2px solid #333333;
+    outline: none;
+    padding: 5px 10px;
+}
+
+.topic,
+.description {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 2em;
+}
+
+/* Buttons */
+.btn-add,
+.btn-update {
+    width: min(35%, 200px);
+    height: 50px;
+    border-radius: 10px;
+    display: inline-block;
+    margin: 15px auto;
+    color: white;
+    font-weight: 600;
+}
+
+    .btn-add:hover,
+    .btn-update:hover,
+    .btn-add:not(:disabled):not(.disabled):focus,
+    .btn-update:not(:disabled):not(.disabled):focus,
+    .btn-add:not(:disabled):not(.disabled):active,
+    .btn-update:not(:disabled):not(.disabled):active {
+        color: white;
+    }
+
+/* Topic View */
+
+/* Table */
+.table {
+    width: 80%;
+    border: 3px solid #ffc95f;
+    color: #862b0d;
+}
+
+.dropdown {
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+    .dropdown i {
+        transition: transform 0.3s ease;
+    }
+
+    .dropdown.open i {
+        transform: rotate(90deg);
+    }
+
+.sub-topics {
+    display: none;
+}
+
+    .sub-topics.show {
+        display: block;
+    }
+
+.inner-row {
+    display: flex;
+    justify-content: space-between;
+    list-style-type: disc;
+}
+
+a {
+    color: #862b0d;
+    text-decoration: none;
+}
+
+.icon-click {
+    color: #862b0d;
+    outline: none;
+    border: none;
+    margin: 0;
+    background-color: transparent;
+}
+
+    .icon-click:hover,
+    .dropdown:hover {
+        color: #ffc95f;
+    }
+
+/* Responsive */
+
+@media (max-width: 50em) {
+    .container-full {
+        height: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .container-half {
+        width: 100%;
+    }
+
+    .container-upload {
+        padding: 1em;
+    }
+
+    .btn-add,
+    .btn-update {
+        width: 50%;
+    }
+
+    .upload-group {
+        width: 100%;
+    }
+}
+
+@media (max-width: 70em) {
+    .btn-add,
+    .btn-update {
+        width: 55%;
+    }
+}
+
+@media (max-width: 80em) {
+    .table {
+        width: 100%;
+    }
+
+    .container-full {
+        padding: 3em;
+    }
+
+    .icons {
+        display: flex;
+        flex-direction: column;
+    }
+}
