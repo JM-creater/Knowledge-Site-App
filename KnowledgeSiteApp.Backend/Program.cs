@@ -1,3 +1,4 @@
+using KnowledgeSiteApp.Backend.Attributes;
 using KnowledgeSiteApp.Backend.Authentication;
 using KnowledgeSiteApp.Backend.Core.AutoMapperProfile;
 using KnowledgeSiteApp.Backend.Core.Context;
@@ -28,13 +29,11 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Knowledege Site API", Version = "v1" });
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n 
-                      Enter 'Bearer' [space] and then your token in the text input below.
-                      \r\n\r\nExample: 'Bearer 12345abcdef'",
+        Description = "Authorization header using the Api Key Scheme.",
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
+        Scheme = "ApiKeyScheme"
     });
     c.AddSecurityRequirement(new OpenApiSecurityRequirement()
     {
@@ -44,10 +43,8 @@ builder.Services.AddSwaggerGen(c =>
                 Reference = new OpenApiReference
                 {
                     Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
+                    Id = "X-API-KEY"
                 },
-                Scheme = "oauth2",
-                Name = "Bearer",
                 In = ParameterLocation.Header,
             },
             new List<string>()
@@ -116,6 +113,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+//app.UseMiddleware<ApiKeyAttribute>();
 
 app.UseHttpsRedirection();
 

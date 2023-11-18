@@ -1,4 +1,5 @@
-﻿using KnowledgeSiteApp.Backend.Core.Dto;
+﻿using KnowledgeSiteApp.Backend.Attributes;
+using KnowledgeSiteApp.Backend.Core.Dto;
 using KnowledgeSiteApp.Backend.Service;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,6 +15,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPost]
+        [ApiKey]
         public async Task<IActionResult> Submit(RatingCreateDto dto)
         {
             try
