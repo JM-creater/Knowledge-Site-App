@@ -10,15 +10,14 @@ namespace KnowledgeSiteApp.Backend.Core.AutoMapperProfile
         public AutoMapperProfileConfig()
         {
             // User
-            CreateMap<RegisterUserDto, User>();
+            CreateMap<Dto.RegisterUserDto, User>();
             CreateMap<LoginUserDto, User>();
             CreateMap<UpdatePasswordDto, User>();
             CreateMap<ValidateUserDto, User>();
-            CreateMap<User, GetByAuthorDto>();
             CreateMap<UpdateUserDetailsDto, User>();
 
             // Training 
-            CreateMap<TrainingCreateDto, Training>();
+            CreateMap<Dto.TrainingCreateDto, Training>();
 
             // Topic
             CreateMap<TopicCreateDto, Topic>();

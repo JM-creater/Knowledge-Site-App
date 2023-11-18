@@ -1,5 +1,4 @@
-﻿@page "/trainingmain"
-@inherits TrainingMainLayout
+﻿@inherits TrainingMainLayout
 @inject HttpClient http
 @inject IJSRuntime js
 @inject NavigationManager navigate
@@ -83,7 +82,7 @@
                     </div>
                     <div class="form-group form-group-element">
                         <select class="form-control-override" id="category" style="width: 50vh; color: #862b0d" @bind="selectedCategory">
-                            <option value="" disabled hidden selected>Select Category</option>
+                            <option value="" disabled hidden>Select Category</option>
                             @foreach (var category in getCategory)
                             {
                                 <option value="@category.Id">@category.CategoryName</option>
@@ -114,19 +113,11 @@
     private TrainingCategory[] getCategory { get; set; } = Array.Empty<TrainingCategory>();
     private string uploadedImage = string.Empty;
     private string errorMessage = string.Empty;
-    private int? selectedCategory = null;
 
     private async Task HandleAddTraining()
     {
         try
         {
-            if (!selectedCategory.HasValue || selectedCategory.Value == 0)
-            {
-                errorMessage = "Please select a category.";
-                return;
-            }
-
-            training.CategoryId = selectedCategory.Value;
             var response = await http.PostAsJsonAsync("https://localhost:7095/api/Training", training);
 
             if (response.IsSuccessStatusCode)

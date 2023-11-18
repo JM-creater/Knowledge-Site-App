@@ -38,7 +38,7 @@ namespace KnowledgeSiteApp.Backend.Service
 
         public Task<List<TrainingCategory>> GetAll()
             => context.TrainingCategories
-                      .OrderByDescending(c => c.CreateAt)
+                      .OrderByDescending(c => c.DateCreated)
                       .ToListAsync();
 
         public async Task<List<TrainingCategory>> GetById(int id)

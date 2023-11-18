@@ -1,5 +1,4 @@
 ﻿using KnowledgeSiteApp.Backend.Core.Dto;
-using KnowledgeSiteApp.Backend.Core.Enum;
 using KnowledgeSiteApp.Backend.Service;
 using KnowledgeSiteApp.Models.Dto;
 using Microsoft.AspNetCore.Mvc;
@@ -16,12 +15,12 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPost("add")]
-        public async Task<IActionResult> RegisterUser([FromBody] RegisterUserDto dto)
+        public async Task<IActionResult> RegisterUser([FromBody] Core.Dto.RegisterUserDto dto)
         {
             try
             {
                 var user = await service.Register(dto);
-                return Ok("Successfully Registered");
+                return Ok(user);
             }
             catch (Exception e)
             {
@@ -36,7 +35,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
             {
                 var user = await service.Login(dto);
                 
-                return Ok("Successfully Login");
+                return Ok(user);
             }
             catch (InvalidOperationException e)
             {
@@ -49,11 +48,11 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
             try
             {
-                var user = service.GetAllUser();
+                var user = await service.GetAllUser();
 
                 return Ok(user);
             }

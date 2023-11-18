@@ -4,6 +4,7 @@ using KnowledgeSiteApp.Backend.Core.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KnowledgeSiteApp.Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231117224903_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -115,45 +118,6 @@ namespace KnowledgeSiteApp.Backend.Migrations
                     b.ToTable("Ratings");
                 });
 
-            modelBuilder.Entity("KnowledgeSiteApp.Models.Entities.SubTopic", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Resource")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("TopicId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Video")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("YouTubeUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TopicId");
-
-                    b.ToTable("SubTopics");
-                });
-
             modelBuilder.Entity("KnowledgeSiteApp.Models.Entities.Topic", b =>
                 {
                     b.Property<int>("TopicId")
@@ -175,14 +139,6 @@ namespace KnowledgeSiteApp.Backend.Migrations
 
                     b.Property<int>("TrainingId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Video")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("YouTubeUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("TopicId");
 
@@ -437,15 +393,6 @@ namespace KnowledgeSiteApp.Backend.Migrations
                         .IsRequired();
 
                     b.Navigation("Training");
-                });
-
-            modelBuilder.Entity("KnowledgeSiteApp.Models.Entities.SubTopic", b =>
-                {
-                    b.HasOne("KnowledgeSiteApp.Models.Entities.Topic", "Topic")
-                        .WithMany()
-                        .HasForeignKey("TopicId");
-
-                    b.Navigation("Topic");
                 });
 
             modelBuilder.Entity("KnowledgeSiteApp.Models.Entities.Topic", b =>
