@@ -8,10 +8,10 @@ using MimeKit.Text;
 namespace KnowledgeSiteApp.Backend.Controllers
 {
     [ApiController, Route("api/[controller]")]
+    [ApiKey]
     public class EmailController : ControllerBase
     {
         [HttpPost]
-        [ApiKey]
         public async Task<IActionResult> SendEmail(string body)
         {
             var email = new MimeMessage();

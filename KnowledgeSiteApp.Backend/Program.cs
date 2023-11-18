@@ -2,6 +2,7 @@ using KnowledgeSiteApp.Backend.Attributes;
 using KnowledgeSiteApp.Backend.Authentication;
 using KnowledgeSiteApp.Backend.Core.AutoMapperProfile;
 using KnowledgeSiteApp.Backend.Core.Context;
+using KnowledgeSiteApp.Backend.Core.ErrorHandlingMiddleware;
 using KnowledgeSiteApp.Backend.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -26,7 +27,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Knowledege Site API", Version = "v1" });
     c.AddSecurityDefinition("X-API-KEY", new OpenApiSecurityScheme
     {
         Name = "X-API-KEY",
@@ -112,9 +112,8 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseMiddleware<ErrorHandlingConfig>();
 }
-
-//app.UseMiddleware<ApiKeyAttribute>();
 
 app.UseHttpsRedirection();
 

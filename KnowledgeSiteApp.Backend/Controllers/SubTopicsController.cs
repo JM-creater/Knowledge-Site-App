@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace KnowledgeSiteApp.Backend.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
+    [ApiController, Route("api/[controller]")]
+    [ApiKey]
     public class SubTopicsController : ControllerBase
     {
         private readonly ISubTopicService service;
@@ -18,7 +18,6 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPost]
-        [ApiKey]
         public async Task<IActionResult> Create(CreateSubTopicDto dto)
         {
             try
@@ -34,7 +33,6 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPost("SaveSubTopicResources/{id}")]
-        [ApiKey]
         public async Task<IActionResult> SaveSubTopicResources(int id, [FromForm] SubTopicResourcesDto dto)
         {
             try
@@ -49,7 +47,6 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPost("SaveSubTopicVideo/{id}")]
-        [ApiKey]
         public async Task<IActionResult> SaveSubTopicVideo(int id, [FromForm] SubTopicVideoDto dto)
         {
             try

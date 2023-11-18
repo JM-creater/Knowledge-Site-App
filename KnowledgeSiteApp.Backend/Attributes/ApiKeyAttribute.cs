@@ -21,6 +21,6 @@ namespace KnowledgeSiteApp.Backend.Attributes
                 context.HttpContext.Response.StatusCode = 401;
                 await context.HttpContext.Response.WriteAsync("Unauthorized client");
             }
+
         }
     }
-}

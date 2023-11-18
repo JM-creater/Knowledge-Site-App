@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace KnowledgeSiteApp.Backend.Controllers
 {
     [ApiController, Route("api/[controller]")]
+    [ApiKey]
     public class TrainingController : ControllerBase
     {
         private readonly ITrainingService service;
@@ -15,7 +16,6 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPost]
-        [ApiKey]
         public async Task<IActionResult> CreateTraining([FromBody] TrainingCreateDto dto)
         {
             try
@@ -31,7 +31,6 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPost("SaveTrainingImage/{id}")]
-        [ApiKey]
         public async Task<IActionResult> SaveTrainingImage(int id, [FromForm] ImageCreateDto dto)
         {
             try
@@ -46,7 +45,6 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpGet]
-        [ApiKey]
         public async Task<IActionResult> GetAllTraining()
         {
             try
@@ -62,7 +60,6 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpGet("{id}")]
-        [ApiKey]
         public async Task<IActionResult> GetByIdTraining([FromRoute] int id)
         {
             try
@@ -78,7 +75,6 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPut("{id}")]
-        [ApiKey]
         public async Task<IActionResult> UpdateTraining(int id, [FromForm] TrainingUpdateDto dto)
         {
             try
@@ -94,7 +90,6 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPut("activate/{id}")]
-        [ApiKey]
         public async Task<IActionResult> Activation(int id)
         {
             try
@@ -110,7 +105,6 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPut("deactivate/{id}")]
-        [ApiKey]
         public async Task<IActionResult> Deactivation(int id)
         {
             try
@@ -126,7 +120,6 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpDelete("{id}")]
-        [ApiKey]
         public async Task<IActionResult> DeleteByIdTraining(int id)
         {
             try

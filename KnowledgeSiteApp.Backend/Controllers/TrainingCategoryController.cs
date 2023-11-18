@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace KnowledgeSiteApp.Backend.Controllers
 {
     [ApiController, Route("api/[controller]")]
+    [ApiKey]
     public class TrainingCategoryController : ControllerBase
     {
         private readonly ITrainingCategoryService service;
@@ -15,39 +16,22 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPost("add")]
-        [ApiKey]
         public async Task<IActionResult> CreateCategory(TrainingCategoryCreateDto dto)
         {
-            try
-            {
-                var trainingCategory = await service.Create(dto);
+            var trainingCategory = await service.Create(dto);
 
-                return Ok(trainingCategory);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+            return Ok(trainingCategory);
         }
 
         [HttpGet]
-        [ApiKey]
         public async Task<IActionResult> GetByAllCategory()
         {
-            try
-            {
-                var category = await service.GetAll();
+            var category = await service.GetAll();
 
-                return Ok(category);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+            return Ok(category);
         }
 
         [HttpGet("{id}")]
-        [ApiKey]
         public async Task<IActionResult> GetByIdCategory(int id)
         {
             try
@@ -63,7 +47,6 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpGet("search")]
-        [ApiKey]
         public async Task<IActionResult> Search(string searchTerm)
         {
             try
@@ -78,7 +61,6 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPut("update/{id}")]
-        [ApiKey]
         public async Task<IActionResult> UpdateCategory(int id, TrainingCategoryUpdateDto dto)
         {
             try
@@ -94,7 +76,6 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPut("activate/{id}")]
-        [ApiKey]
         public async Task<IActionResult> Activation(int id)
         {
             try
@@ -110,7 +91,6 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPut("deactivate/{id}")]
-        [ApiKey]
         public async Task<IActionResult> Deactivation(int id)
         {
             try
@@ -126,7 +106,6 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPut("{id}")]
-        [ApiKey]
         public async Task<IActionResult> DeleteCategory(int id)
         {
             try
