@@ -1,4 +1,5 @@
-﻿using KnowledgeSiteApp.Backend.Core.Dto;
+﻿using KnowledgeSiteApp.Backend.Attributes;
+using KnowledgeSiteApp.Backend.Core.Dto;
 using KnowledgeSiteApp.Backend.Service;
 using KnowledgeSiteApp.Models.Dto;
 using Microsoft.AspNetCore.Http;
@@ -17,6 +18,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPost]
+        [ApiKey]
         public async Task<IActionResult> Create(CreateSubTopicDto dto)
         {
             try
@@ -32,6 +34,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPost("SaveSubTopicResources/{id}")]
+        [ApiKey]
         public async Task<IActionResult> SaveSubTopicResources(int id, [FromForm] SubTopicResourcesDto dto)
         {
             try
@@ -46,6 +49,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPost("SaveSubTopicVideo/{id}")]
+        [ApiKey]
         public async Task<IActionResult> SaveSubTopicVideo(int id, [FromForm] SubTopicVideoDto dto)
         {
             try

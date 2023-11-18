@@ -1,4 +1,5 @@
-﻿using KnowledgeSiteApp.Backend.Core.Dto;
+﻿using KnowledgeSiteApp.Backend.Attributes;
+using KnowledgeSiteApp.Backend.Core.Dto;
 using KnowledgeSiteApp.Backend.Service;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,6 +30,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpGet]
+        [ApiKey]
         public async Task<IActionResult> GetAllTopic()
         {
             try
@@ -44,6 +46,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpGet("{id}")]
+        [ApiKey]
         public async Task<IActionResult> GetByIdTopic([FromRoute] int id)
         {
             try
@@ -59,6 +62,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPut("{id}")]
+        [ApiKey]
         public async Task<IActionResult> UpdateTopic([FromRoute] int id, [FromBody] TopicUpdateDto dto)
         {
             try
@@ -74,6 +78,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpDelete("{id}")]
+        [ApiKey]
         public async Task<IActionResult> DeleteTopic([FromRoute] int id)
         {
             try
@@ -87,7 +92,5 @@ namespace KnowledgeSiteApp.Backend.Controllers
                 return BadRequest(e.Message);
             }
         }
-
-
     }
 }
