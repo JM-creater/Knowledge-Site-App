@@ -150,13 +150,10 @@ namespace KnowledgeSiteApp.Backend.Service
         public IEnumerable<User> GetAllUser()
             => context.Users.AsEnumerable();
 
-        public async Task<IEnumerable<GetByAuthorDto>> GetByAuthor()
-        {
-            try
-            {
-                var user = await context.Users
-                                        .Where(u => u.Role == (int)UserRole.Admin)
-                                        .ToListAsync();
+        public async Task<List<User>> GetAllByAdmin()
+           => await context.Users
+                           .Where(u => u.Role == (int)UserRole.Admin)
+                           .ToListAsync();
 
                 var getUser = mapper.Map<IEnumerable<GetByAuthorDto>>(user);
 

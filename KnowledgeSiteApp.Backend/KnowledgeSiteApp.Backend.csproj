@@ -26,6 +26,9 @@
   <ItemGroup>
     <Folder Include="Images\BooksImages\" />
     <Folder Include="Images\CoverImage\" />
+    <Folder Include="Images\SubTopicVideo\" />
+    <Folder Include="Images\ResourcesImages\" />
+    <Folder Include="Images\TrainingImages\" />
     <Folder Include="Images\ProfileImage\" />
   </ItemGroup>
 

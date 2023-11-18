@@ -53,6 +53,8 @@
     private RegisterUserDto newUser = new RegisterUserDto();
     private string errorMessage;
 
+
+
     private async Task HandleValidSubmit()
     {
         var response = await http.PostAsJsonAsync("https://localhost:7095/api/User/add", newUser);

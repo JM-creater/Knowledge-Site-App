@@ -15,6 +15,7 @@ namespace KnowledgeSiteApp.Backend.Core.Context
         public DbSet<Topic> Topics { get; set; }
         public DbSet<Training> Trainings { get; set; }
         public DbSet<Rating> Ratings { get; set; }
+        public DbSet<SubTopic> SubTopics { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

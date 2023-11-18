@@ -50,6 +50,45 @@ namespace KnowledgeSiteApp.Backend.Migrations
                     b.ToTable("Ratings");
                 });
 
+            modelBuilder.Entity("KnowledgeSiteApp.Models.Entities.SubTopic", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Resource")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("TopicId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Video")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("YouTubeUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TopicId");
+
+                    b.ToTable("SubTopics");
+                });
+
             modelBuilder.Entity("KnowledgeSiteApp.Models.Entities.Topic", b =>
                 {
                     b.Property<int>("TopicId")
@@ -68,6 +107,14 @@ namespace KnowledgeSiteApp.Backend.Migrations
 
                     b.Property<int>("TrainingId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Video")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("YouTubeUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("TopicId");
 
@@ -189,6 +236,15 @@ namespace KnowledgeSiteApp.Backend.Migrations
                         .IsRequired();
 
                     b.Navigation("Training");
+                });
+
+            modelBuilder.Entity("KnowledgeSiteApp.Models.Entities.SubTopic", b =>
+                {
+                    b.HasOne("KnowledgeSiteApp.Models.Entities.Topic", "Topic")
+                        .WithMany()
+                        .HasForeignKey("TopicId");
+
+                    b.Navigation("Topic");
                 });
 
             modelBuilder.Entity("KnowledgeSiteApp.Models.Entities.Topic", b =>

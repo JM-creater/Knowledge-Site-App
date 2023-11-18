@@ -22,7 +22,8 @@ namespace KnowledgeSiteApp.Backend.Service
             {
                 var addCategory = mapper.Map<TrainingCategory>(dto);
 
-                addCategory.CreateAt = DateTime.UtcNow;
+                addCategory.IsActive = true;
+                addCategory.DateCreated = DateTime.Now;
 
                 context.TrainingCategories.Add(addCategory);
                 await context.SaveChangesAsync();

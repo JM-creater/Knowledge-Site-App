@@ -13,6 +13,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITrainingService, TrainingService>();
 builder.Services.AddScoped<ITrainingCategoryService, TrainingCategoryService>();
 builder.Services.AddScoped<ITopicService, TopicService>();
+builder.Services.AddScoped<ISubTopicService, SubTopicService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

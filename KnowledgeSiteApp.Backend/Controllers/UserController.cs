@@ -63,12 +63,12 @@ namespace KnowledgeSiteApp.Backend.Controllers
             }
         }
 
-        [HttpGet("getAuthors")]
-        public async Task<IActionResult> GetByAuthors()
+        [HttpGet("getAllAdmins")]
+        public async Task<IActionResult> GetAdmins()
         {
             try
             {
-                var user = await service.GetByAuthor();
+                var user = await service.GetAllByAdmin();
 
                 return Ok(user);
             }
