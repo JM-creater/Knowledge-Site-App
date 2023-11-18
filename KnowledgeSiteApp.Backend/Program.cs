@@ -26,17 +26,15 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Knowledege Site API", Version = "v1" });
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    c.AddSecurityDefinition("X-API-KEY", new OpenApiSecurityScheme
     {
-        Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n 
-                      Enter 'Bearer' [space] and then your token in the text input below.
-                      \r\n\r\nExample: 'Bearer 12345abcdef'",
-        Name = "Authorization",
-        In = ParameterLocation.Header,
+        Name = "X-API-KEY",
         Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
+        Scheme = "ApiKeyScheme",
+        In = ParameterLocation.Header,
+        Description = "ApiKey must appear in header"
     });
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
             new OpenApiSecurityScheme
@@ -46,11 +44,9 @@ builder.Services.AddSwaggerGen(c =>
                     Type = ReferenceType.SecurityScheme,
                     Id = "Bearer"
                 },
-                Scheme = "oauth2",
-                Name = "Bearer",
-                In = ParameterLocation.Header,
+                In = ParameterLocation.Header
             },
-            new List<string>()
+            new string[]{}
         }
     });
 });
