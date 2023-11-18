@@ -1,3 +1,4 @@
+using KnowledgeSiteApp.Backend.Attributes;
 using KnowledgeSiteApp.Backend.Authentication;
 using KnowledgeSiteApp.Backend.Core.AutoMapperProfile;
 using KnowledgeSiteApp.Backend.Core.Context;
@@ -42,7 +43,7 @@ builder.Services.AddSwaggerGen(c =>
                 Reference = new OpenApiReference
                 {
                     Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
+                    Id = "X-API-KEY"
                 },
                 In = ParameterLocation.Header
             },
@@ -112,6 +113,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+//app.UseMiddleware<ApiKeyAttribute>();
 
 app.UseHttpsRedirection();
 

@@ -1,4 +1,5 @@
-﻿using KnowledgeSiteApp.Backend.Core.Dto;
+﻿using KnowledgeSiteApp.Backend.Attributes;
+using KnowledgeSiteApp.Backend.Core.Dto;
 using KnowledgeSiteApp.Backend.Service;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,6 +15,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPost("add")]
+        [ApiKey]
         public async Task<IActionResult> CreateCategory(TrainingCategoryCreateDto dto)
         {
             try
@@ -29,6 +31,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpGet]
+        [ApiKey]
         public async Task<IActionResult> GetByAllCategory()
         {
             try
@@ -44,6 +47,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpGet("{id}")]
+        [ApiKey]
         public async Task<IActionResult> GetByIdCategory(int id)
         {
             try
@@ -59,6 +63,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpGet("search")]
+        [ApiKey]
         public async Task<IActionResult> Search(string searchTerm)
         {
             try
@@ -73,6 +78,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPut("update/{id}")]
+        [ApiKey]
         public async Task<IActionResult> UpdateCategory(int id, TrainingCategoryUpdateDto dto)
         {
             try
@@ -88,6 +94,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPut("activate/{id}")]
+        [ApiKey]
         public async Task<IActionResult> Activation(int id)
         {
             try
@@ -103,6 +110,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPut("deactivate/{id}")]
+        [ApiKey]
         public async Task<IActionResult> Deactivation(int id)
         {
             try
@@ -118,6 +126,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPut("{id}")]
+        [ApiKey]
         public async Task<IActionResult> DeleteCategory(int id)
         {
             try

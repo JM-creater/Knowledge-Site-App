@@ -1,4 +1,5 @@
-﻿using KnowledgeSiteApp.Backend.Core.Dto;
+﻿using KnowledgeSiteApp.Backend.Attributes;
+using KnowledgeSiteApp.Backend.Core.Dto;
 using KnowledgeSiteApp.Backend.Service;
 using KnowledgeSiteApp.Models.Dto;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +16,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPost("add")]
+        [ApiKey]
         public async Task<IActionResult> RegisterUser([FromBody] Core.Dto.RegisterUserDto dto)
         {
             try
@@ -29,6 +31,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPost("Login")]
+        [ApiKey]
         public async Task<IActionResult> LoginUser([FromBody] LoginUserDto dto)
         {
             try
@@ -48,6 +51,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpGet]
+        [ApiKey]
         public async Task<IActionResult> GetAll()
         {
             try
@@ -63,6 +67,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpGet("getAllAdmins")]
+        [ApiKey]
         public async Task<IActionResult> GetAdmins()
         {
             try
@@ -78,6 +83,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpGet("{id}")]
+        [ApiKey]
         public async Task<IActionResult> GetByIdAdmin(int id)
         {
             try
@@ -93,6 +99,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPut("update-password")]
+        [ApiKey]
         public async Task<IActionResult> Update(UpdatePasswordDto dto)
         {
             try
@@ -108,6 +115,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPut("{id}/profile-pic")]
+        [ApiKey]
         public async Task<IActionResult> UpdateProfilePic(int userId, string newProfilePicture)
         {
             try
@@ -123,6 +131,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPut("validate")]
+        [ApiKey]
         public async Task<IActionResult> ValidateUser(string userName, ValidateUserDto dto)
         {
             try
@@ -137,6 +146,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPut("updateDetails/{id}")]
+        [ApiKey]
         public async Task<IActionResult> UpdateUserDetails(int id, [FromBody] UpdateUserDetailsDto dto)
         {
             try
@@ -152,6 +162,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpDelete]
+        [ApiKey]
         public async Task<IActionResult> DeleteUser(string userName)
         {
             try
@@ -167,6 +178,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPut("activate/{id}")]
+        [ApiKey]
         public async Task<IActionResult> ActivationUser(int id)
         {
             try
@@ -182,6 +194,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPut("deactivate/{id}")]
+        [ApiKey]
         public async Task<IActionResult> DeactivationUser(int id)
         {
             try
