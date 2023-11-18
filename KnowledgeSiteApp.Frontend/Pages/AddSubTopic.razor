@@ -1,0 +1,262 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.Http;
+@using System.Net.Http.Headers;
+@inject HttpClient http
+@inject IJSRuntime js
+@inject NavigationManager navigate
+@inherits AddSubTopicLayout
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Add Topic</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet"
+          type="text/css"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet"
+          type="text/css"
+          href="css/topics-stylesheet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet" />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+</head>
+<body>
+    <div class="container-full">
+        <!-- Add Video -->
+        <div class="container-half">
+            <h3 style="font-weight: 700; margin-bottom: 20px">Add Video</h3>
+            <div class="container-upload">
+                <i class="fa fa-cloud-upload"
+                   style="color: #ffc95f; font-size: 8em; margin-bottom: 30px"
+                   aria-hidden="true"></i>
+                <div class="input-group upload-group" style="width: 70%">
+                    <input class="form-control"
+                           type="file"
+                           id="vid-upload"
+                           accept="video/*" 
+                           />
+                    <button type="button" class="btn btn-clear" id="clear-video">
+                        Clear
+                    </button>
+                </div>
+            </div>
+            <h6 style="text-align: center; margin: 1.5em 0">
+                ----------- or -----------
+            </h6>
+            <div style="text-align: center">
+                <label for="vid-link" style="font-weight: 600; font-size: 17px">Youtube Link:</label>
+                <input type="text" id="vid-link" @bind="newSubTopic.YouTubeUrl"/>
+            </div>
+        </div>
+        <!-- Topic Title & Description -->
+        <div class="container-half">
+            <div class="topic">
+                <label for="topic" style="font-weight: 600; font-size: 20px">Topic</label>
+                <input type="text" id="topic" @bind="newSubTopic.Title"/>
+            </div>
+            <div class="description">
+                <label for="description" style="font-weight: 600; font-size: 20px">Description</label>
+                <input type="text" id="description" @bind="newSubTopic.Description"/>
+            </div>
+            <label for="files-upload" style="font-weight: 600; font-size: 20px">Upload resources/activities:</label>
+            <div class="input-group upload-group"
+                 style="width: 100%; margin: 10px 0 50px">
+                <InputFile class="form-control"
+                       type="file"
+                       id="files-upload"
+                       accept=".xlsx,.xls,.doc, .docx,.ppt, .pptx,.txt,.pdf"
+                           OnChange="@HandleFileSelected" />
+                <button type="button" class="btn btn-clear" id="clear-files">
+                    Clear
+                </button>
+            </div>
+            <button class="btn btn-add" style="background-color: #862b0d" onclick="@HandleButtonCreate">
+                Add Sub-topics
+            </button>
+            <button class="btn btn-update" style="background-color: #898989">
+                Update Topic
+            </button>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    @* <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+            crossorigin="anonymous"></script> *@
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+    <!-- Video upload clear-->
+    <script>
+        document.getElementById("clear-video").addEventListener(
+            "click",
+            function (event) {
+                document.getElementById("vid-upload").value = "";
+            },
+            false
+        );
+    </script>
+    <!-- Files upload clear -->
+    <script>
+        document.getElementById("clear-files").addEventListener(
+            "click",
+            function (event) {
+                document.getElementById("files-upload").value = "";
+            },
+            false
+        );
+    </script>
+    <!-- Only lets user input youtube link OR file upload -->
+    @* <script>
+        document
+            .getElementById("vid-upload")
+            .addEventListener("change", handleFileSelect, false);
+        document
+            .getElementById("vid-link")
+            .addEventListener("input", handleLinkInput, false);
+
+        function handleFileSelect(event) {
+            document.getElementById("vid-link").value = "";
+        }
+
+        function handleLinkInput(event) {
+            document.getElementById("vid-upload").value = "";
+        }
+    </script> *@
+</body>
+</html>
+
+@code {
+    private CreateSubTopicDto newSubTopic = new CreateSubTopicDto();
+    private string uploadedImage = string.Empty;
+    private string uploadedVideo = string.Empty;
+    private string errorMessage = string.Empty;
+    private string uploadedFileContent; // This will hold the base64 string
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+
+        if (file != null)
+        {
+            using var stream = file.OpenReadStream();
+            using var memoryStream = new MemoryStream();
+            await stream.CopyToAsync(memoryStream);
+
+            byte[] fileBytes = memoryStream.ToArray();
+            uploadedFileContent = Convert.ToBase64String(fileBytes);
+
+            // Optionally, include the file's MIME type as part of the content
+            uploadedFileContent = $"data:{file.ContentType};base64,{uploadedFileContent}";
+        }
+    }
+
+
+    private async Task HandleButtonCreate()
+    {
+        var response = await http.PostAsJsonAsync("https://localhost:7095/api/SubTopics", newSubTopic);
+        if (response.IsSuccessStatusCode)
+        {
+            var createdSubTopic = await response.Content.ReadFromJsonAsync<SubTopic>();
+            if (createdSubTopic != null && !string.IsNullOrWhiteSpace(uploadedImage))
+            {
+                await UploadResourceFile(createdSubTopic.Id);
+                // await UploadVideo(createdSubTopic.Id);
+            }
+
+            await js.InvokeVoidAsync("alert", "Subtopic created successfully");
+        }
+        else
+        {
+            var errorResponse = await response.Content.ReadFromJsonAsync<ValidationErrorResponse>();
+            errorMessage = String.Join(" ", errorResponse?.Errors.SelectMany(err => err.Value));
+        }
+    }
+
+    private async Task UploadResourceFile(int subTopicId)
+    {
+        try
+        {
+            // Assuming 'uploadedFileContent' is a base64 string of the file to be uploaded
+            var fileContentParts = uploadedFileContent.Split(',');
+            var bytes = Convert.FromBase64String(fileContentParts[1]);
+
+            using var formData = new MultipartFormDataContent();
+            var fileContent = new ByteArrayContent(bytes);
+
+            // Determine the correct file name and content type
+            var fileName = "your_document.docx"; // Replace with the actual file name
+            var contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"; // This is for .docx files
+
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue(contentType);
+            formData.Add(fileContent, "file", fileName);
+
+            var response = await http.PostAsync($"https://localhost:7095/api/SubTopics/SaveSubTopicResources/{subTopicId}", formData);
+
+            // Handle the response as needed
+            // For example, check response.IsSuccessStatusCode
+        }
+        catch (Exception e)
+        {
+            errorMessage = "An unexpected error occurred: " + e.Message;
+            // Consider logging the error or taking additional action
+        }
+    }
+
+
+    // private async Task UploadVideo(int subTopicId)
+    // {
+    //     try
+    //     {
+    //         using var imageFile = new MultipartFormDataContent();
+    //         var bytes = Convert.FromBase64String(uploadedVideo.Split(',')[1]);
+    //         imageFile.Add(new ByteArrayContent(bytes), "video", "upload.mp4");
+
+    //         var response = await http.PostAsync($"https://localhost:7095/api/SubTopics/SaveSubTopicVideo{subTopicId}", imageFile);
+    //     }
+    //     catch (Exception e)
+    //     {
+    //         errorMessage = "An unexpected error occurred: " + e.Message;
+    //     }
+    // }
+
+    private async Task UploadImage(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file != null)
+        {
+            var format = "file/docx";
+            using var stream = file.OpenReadStream();
+            var buffer = new byte[file.Size];
+            await stream.ReadAsync(buffer);
+            uploadedImage = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
+        }
+        else
+        {
+            uploadedImage = string.Empty;
+        }
+    }
+
+    private async Task UploadVideo(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file != null)
+        {
+            var format = "video/mp4";
+            using var stream = file.OpenReadStream();
+            var buffer = new byte[file.Size];
+            await stream.ReadAsync(buffer);
+            uploadedVideo = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
+        }
+        else
+        {
+            uploadedVideo = string.Empty;
+        }
+    }
+
+    public class ValidationErrorResponse
+    {
+        public Dictionary<string, string[]> Errors { get; set; }
+    }
+
+}

@@ -1,4 +1,5 @@
-﻿@inherits TrainingMainLayout
+﻿@page "/"
+@inherits TrainingMainLayout
 @inject HttpClient http
 @inject IJSRuntime js
 @inject NavigationManager navigate
@@ -69,7 +70,7 @@
                                id="username"
                                aria-describedby="training-title"
                                placeholder="Training Title"
-                               @bind="training.Title"/>
+                        @bind="training.Title" />
                     </div>
                     <div class="form-group form-group-element">
                         <input type="text"
@@ -77,8 +78,8 @@
                                id="username"
                                aria-describedby="description"
                                placeholder="Description"
-                               style="width: 50vh; color: #862b0d" 
-                               @bind="training.Description" />
+                               style="width: 50vh; color: #862b0d"
+                        @bind="training.Description" />
                     </div>
                     <div class="form-group form-group-element">
                         <select class="form-control-override" id="category" style="width: 50vh; color: #862b0d" @bind="selectedCategory">
@@ -113,11 +114,13 @@
     private TrainingCategory[] getCategory { get; set; } = Array.Empty<TrainingCategory>();
     private string uploadedImage = string.Empty;
     private string errorMessage = string.Empty;
+    private int selectedCategory;
 
     private async Task HandleAddTraining()
     {
         try
         {
+            training.CategoryId = selectedCategory;
             var response = await http.PostAsJsonAsync("https://localhost:7095/api/Training", training);
 
             if (response.IsSuccessStatusCode)
@@ -127,10 +130,7 @@
                 {
                     await UploadTrainingImage(createdTraining.Id);
                 }
-
                 await js.InvokeVoidAsync("alert", "Training created successfully");
-
-                ResetForm();
             }
             else
             {
@@ -187,18 +187,6 @@
             await stream.ReadAsync(buffer);
             uploadedImage = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
         }
-        else
-        {
-            uploadedImage = string.Empty;
-        }
-    }
-
-    private void ResetForm()
-    {
-        training = new TrainingCreateDto();
-        uploadedImage = string.Empty;
-        selectedCategory = null;
-        errorMessage = string.Empty;
     }
 
     public class ValidationErrorResponse
