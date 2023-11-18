@@ -8,7 +8,7 @@ namespace KnowledgeSiteApp.Backend.Service
         public Task<User> Register(Core.Dto.RegisterUserDto dto);
         public Task<string> Login(LoginUserDto dto);
         public Task<List<User>> GetAllUser();
-        public Task<List<User>> GetByAdmin();
+        public Task<List<User>> GetAllByAdmin();
         public Task<User> GetById(int id);
         public Task<User> ResetPassword(UpdatePasswordDto dto);
         public Task<User> UpdateProfilePic(int userId, string newProfilePicture);

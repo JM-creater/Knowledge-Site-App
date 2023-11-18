@@ -152,7 +152,7 @@ namespace KnowledgeSiteApp.Backend.Service
            => await context.Users
                            .ToListAsync();
 
-        public async Task<List<User>> GetByAdmin()
+        public async Task<List<User>> GetAllByAdmin()
            => await context.Users
                            .Where(u => u.Role == (int)UserRole.Admin)
                            .ToListAsync();
