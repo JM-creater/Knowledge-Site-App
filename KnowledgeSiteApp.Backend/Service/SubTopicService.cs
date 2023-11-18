@@ -21,73 +21,52 @@ namespace KnowledgeSiteApp.Backend.Service
 
         public async Task<SubTopic> Create(CreateSubTopicDto dto)
         {
-            try
-            {
-                var subTopic = await context.SubTopics
-                                         .Where(t => t.Title == dto.Title)
-                                         .FirstOrDefaultAsync();
+            var subTopic = await context.SubTopics
+                                        .Where(t => t.Title == dto.Title)
+                                        .FirstOrDefaultAsync();
 
-                if (subTopic != null)
-                    throw new InvalidOperationException("Topic is already exists");
+            if (subTopic != null)
+                throw new InvalidOperationException("Topic is already exists");
 
-                var newSubTopic = mapper.Map<SubTopic>(dto);
+            var newSubTopic = mapper.Map<SubTopic>(dto);
 
-                newSubTopic.DateCreated = DateTime.Now;
+            newSubTopic.DateCreated = DateTime.Now;
 
-                context.SubTopics.Add(newSubTopic);
-                await context.SaveChangesAsync();
+            context.SubTopics.Add(newSubTopic);
+            await context.SaveChangesAsync();
 
-                return newSubTopic;
-            }
-            catch (Exception e)
-            {
-                throw new ArgumentException(e.Message);
-            }
+            return newSubTopic;
         }
 
         public async Task<SubTopic> SaveSubTopicResources(int id, SubTopicResourcesDto dto)
         {
-            try
-            {
-                var subTopic = await context.SubTopics.FindAsync(id);
+            var subTopic = await context.SubTopics.FindAsync(id);
 
-                if (subTopic == null)
-                    throw new InvalidOperationException("Sub Topic not found");
+            if (subTopic == null)
+                throw new InvalidOperationException("Sub Topic not found");
 
-                var uploadTrainingImage = await new ImagePathConfig().resourceImages(dto.Resource);
+            var uploadTrainingImage = await new ImagePathConfig().resourceImages(dto.Resource);
 
-                subTopic.Resource = uploadTrainingImage;
+            subTopic.Resource = uploadTrainingImage;
 
-                await context.SaveChangesAsync();
+            await context.SaveChangesAsync();
 
-                return subTopic;
-            }
-            catch (Exception e)
-            {
-                throw new ArgumentException(e.Message);
-            }
+            return subTopic;
         }
         public async Task<SubTopic> SaveSubTopicVideo(int id, SubTopicVideoDto dto)
         {
-            try
-            {
-                var subTopic = await context.SubTopics.FindAsync(id);
+            var subTopic = await context.SubTopics.FindAsync(id);
 
-                if (subTopic == null)
-                    throw new InvalidOperationException("Sub Topic not found");
+            if (subTopic == null)
+                throw new InvalidOperationException("Sub Topic not found");
 
-                var uploadTrainingImage = await new ImagePathConfig().subTopicVideo(dto.Video);
+            var uploadTrainingImage = await new ImagePathConfig().subTopicVideo(dto.Video);
 
-                subTopic.Video = uploadTrainingImage;
+            subTopic.Video = uploadTrainingImage;
 
-                await context.SaveChangesAsync();
+            await context.SaveChangesAsync();
 
-                return subTopic;
-            }
-            catch (Exception e)
-            {
-                throw new ArgumentException(e.Message);
-            }
+            return subTopic;
         }
     }
 }

@@ -14,25 +14,18 @@ namespace KnowledgeSiteApp.Backend.Service
 
         public async Task<Rating> SubmitRating(RatingCreateDto dto)
         {
-            try
+            var rating = new Rating
             {
-                var rating = new Rating
-                {
-                    TrainingId = dto.TrainingId,
-                    Stars = dto.Stars,
-                    Comment = dto.Comment,
-                    DateCreated = DateTime.Now
-                };
+                TrainingId = dto.TrainingId,
+                Stars = dto.Stars,
+                Comment = dto.Comment,
+                DateCreated = DateTime.Now
+            };
 
-                context.Ratings.Add(rating);
-                await context.SaveChangesAsync();
+            context.Ratings.Add(rating);
+            await context.SaveChangesAsync();
 
-                return rating;
-            }
-            catch (Exception e)
-            {
-                throw new ArgumentException(e.Message);
-            }
+            return rating;
         }
     }
 }

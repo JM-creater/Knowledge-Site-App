@@ -19,52 +19,38 @@ namespace KnowledgeSiteApp.Backend.Service
 
         public async Task<Training> Create(TrainingCreateDto dto)
         {
-            try
-            {
-                var existingTraining = await context.Trainings
-                                                    .Where(t => t.Title == dto.Title)
-                                                    .FirstOrDefaultAsync();
+            var existingTraining = await context.Trainings
+                                                .Where(t => t.Title == dto.Title)
+                                                .FirstOrDefaultAsync();
 
-                if (existingTraining != null)
-                    throw new InvalidOperationException("Training with the same title already exists");
+            if (existingTraining != null)
+                throw new InvalidOperationException("Training with the same title already exists");
 
-                var newTraining = mapper.Map<Training>(dto);
-                //newTraining.AdminId = dto.AdminId;
-                newTraining.IsActive = true;
-                newTraining.DateCreated = DateTime.Now;
+            var newTraining = mapper.Map<Training>(dto);
+            //newTraining.AdminId = dto.AdminId;
+            newTraining.IsActive = true;
+            newTraining.DateCreated = DateTime.Now;
 
-                context.Trainings.Add(newTraining);
-                await context.SaveChangesAsync();
+            context.Trainings.Add(newTraining);
+            await context.SaveChangesAsync();
 
-                return newTraining;
-            }
-            catch (Exception e)
-            {
-                throw new ArgumentException(e.Message);
-            }
+            return newTraining;
         }
 
         public async Task<Training> SaveTrainingImage(int id, ImageCreateDto dto)
         {
-            try
-            {
-                var training = await context.Trainings.FindAsync(id);
+            var training = await context.Trainings.FindAsync(id);
 
-                if (training == null)
-                    throw new InvalidOperationException("Training not found");
+            if (training == null)
+                throw new InvalidOperationException("Training not found");
 
-                var uploadTrainingImage = await new ImagePathConfig().trainingImages(dto.image);
+            var uploadTrainingImage = await new ImagePathConfig().trainingImages(dto.image);
 
-                training.Image = uploadTrainingImage;
+            training.Image = uploadTrainingImage;
 
-                await context.SaveChangesAsync();
+            await context.SaveChangesAsync();
 
-                return training;
-            }
-            catch (Exception e)
-            {
-                throw new ArgumentException(e.Message);
-            }
+            return training;
         }
 
         public async Task<List<Training>> GetAll()
@@ -82,101 +68,73 @@ namespace KnowledgeSiteApp.Backend.Service
 
         public async Task<Training> Update(int id, TrainingUpdateDto dto)
         {
-            try
-            {
-                var training = await context.Trainings
-                                            .Where(t => t.Id == id)
-                                            .FirstOrDefaultAsync();
+            var training = await context.Trainings
+                                        .Where(t => t.Id == id)
+                                        .FirstOrDefaultAsync();
 
-                if (training == null)
-                    throw new InvalidOperationException("Training does not exist");
+            if (training == null)
+                throw new InvalidOperationException("Training does not exist");
 
-                var newCoverImagePath = await new ImagePathConfig().trainingImages(dto.Image);
+            var newCoverImagePath = await new ImagePathConfig().trainingImages(dto.Image);
 
-                training.Title = dto.Title;
-                training.Description = dto.Description;
-                training.Image = newCoverImagePath;
-                training.CategoryId = dto.CategoryId;
+            training.Title = dto.Title;
+            training.Description = dto.Description;
+            training.Image = newCoverImagePath;
+            training.CategoryId = dto.CategoryId;
 
-                context.Trainings.Update(training);
-                await context.SaveChangesAsync();
+            context.Trainings.Update(training);
+            await context.SaveChangesAsync();
 
-                return training;
-            }
-            catch (Exception e)
-            {
-                throw new ArgumentException(e.Message);
-            }
+            return training;
         }
 
         public async Task<Training> Activate(int id)
         {
-            try
-            {
-                var training = await context.Trainings
-                                            .Where(t => t.Id == id)
-                                            .FirstOrDefaultAsync();
+            var training = await context.Trainings
+                                        .Where(t => t.Id == id)
+                                        .FirstOrDefaultAsync();
 
-                if (training == null)
-                    throw new InvalidOperationException("Training not found");
+            if (training == null)
+                throw new InvalidOperationException("Training not found");
 
-                training.IsActive = true;
+            training.IsActive = true;
 
-                context.Trainings.Update(training);
-                await context.SaveChangesAsync();
+            context.Trainings.Update(training);
+            await context.SaveChangesAsync();
 
-                return training;
-            }
-            catch (Exception e)
-            {
-                throw new ArgumentException(e.Message);
-            }
+            return training;
         }
 
         public async Task<Training> Deactivate(int id)
         {
-            try
-            {
-                var training = await context.Trainings
-                                            .Where(t => t.Id == id)
-                                            .FirstOrDefaultAsync();
+            var training = await context.Trainings
+                                        .Where(t => t.Id == id)
+                                        .FirstOrDefaultAsync();
 
-                if (training == null)
-                    throw new InvalidOperationException("Training not found");
+            if (training == null)
+                throw new InvalidOperationException("Training not found");
 
-                training.IsActive = false;
+            training.IsActive = false;
 
-                context.Trainings.Update(training);
-                await context.SaveChangesAsync();
+            context.Trainings.Update(training);
+            await context.SaveChangesAsync();
 
-                return training;
-            }
-            catch (Exception e)
-            {
-                throw new ArgumentException(e.Message);
-            }
+            return training;
         }
 
         public async Task<Training> Delete(int id)
         {
-            try
-            {
-                var training = await context.Trainings
-                                            .Where(t => t.Id == id)
-                                            .FirstOrDefaultAsync();
+            var training = await context.Trainings
+                                        .Where(t => t.Id == id)
+                                        .FirstOrDefaultAsync();
 
-                if (training == null)
-                    throw new InvalidOperationException("Training not found");
+            if (training == null)
+                throw new InvalidOperationException("Training not found");
 
-                context.Trainings.Remove(training);
-                await context.SaveChangesAsync();
+            context.Trainings.Remove(training);
+            await context.SaveChangesAsync();
 
-                return training;
-            }
-            catch (Exception e)
-            {
-                throw new ArgumentException(e.Message);
-            }
+            return training;
         }
 
     }

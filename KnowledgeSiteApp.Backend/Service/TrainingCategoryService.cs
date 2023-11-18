@@ -18,22 +18,24 @@ namespace KnowledgeSiteApp.Backend.Service
 
         public async Task<TrainingCategory> Create(TrainingCategoryCreateDto dto)
         {
-            try
+            var existingCategoryName = await context.TrainingCategories
+                                                    .Where(c => c.CategoryName == dto.CategoryName)
+                                                    .FirstOrDefaultAsync();
+
+            if (existingCategoryName != null) 
             {
-                var addCategory = mapper.Map<TrainingCategory>(dto);
-
-                addCategory.IsActive = true;
-                addCategory.DateCreated = DateTime.Now;
-
-                context.TrainingCategories.Add(addCategory);
-                await context.SaveChangesAsync();
-
-                return addCategory;
+                throw new InvalidOperationException("Category with name already exists");
             }
-            catch (Exception e)
-            {
-                throw new ArgumentException(e.Message);
-            }
+
+            var addCategory = mapper.Map<TrainingCategory>(dto);
+
+            addCategory.IsActive = true;
+            addCategory.DateCreated = DateTime.Now;
+
+            context.TrainingCategories.Add(addCategory);
+            await context.SaveChangesAsync();
+
+            return addCategory;
         }
 
         public Task<List<TrainingCategory>> GetAll()
@@ -48,117 +50,82 @@ namespace KnowledgeSiteApp.Backend.Service
 
         public async Task<IEnumerable<TrainingCategory>> SearchCategory(string search)
         {
-            try
-            {
-                var category = await context.TrainingCategories
-                                            .Where(c => c.CategoryName.Contains(search))
-                                            .ToListAsync();
+            var category = await context.TrainingCategories
+                                        .Where(c => c.CategoryName.Contains(search))
+                                        .ToListAsync();
 
-                if (string.IsNullOrWhiteSpace(search)) 
-                {
-                    return await context.TrainingCategories.ToListAsync();
-                }
-
-                return category;
-            }
-            catch (Exception e)
+            if (string.IsNullOrWhiteSpace(search)) 
             {
-                throw new ArgumentException(e.Message);
+                return await context.TrainingCategories.ToListAsync();
             }
+
+            return category;
         }
 
         public async Task<TrainingCategory> Update(int id, TrainingCategoryUpdateDto dto)
         {
-            try
-            {
-                var category = await context.TrainingCategories
-                                            .Where(c => c.Id == id)
-                                            .FirstOrDefaultAsync();
+            var category = await context.TrainingCategories
+                                        .Where(c => c.Id == id)
+                                        .FirstOrDefaultAsync();
 
-                if (category == null)
-                    throw new InvalidOperationException("Training Category not found");
+            if (category == null)
+                throw new InvalidOperationException("Training Category not found");
 
-                mapper.Map(dto, category);
+            mapper.Map(dto, category);
 
-                context.TrainingCategories.Update(category);
-                await context.SaveChangesAsync();
+            context.TrainingCategories.Update(category);
+            await context.SaveChangesAsync();
 
-                return category;
-            }
-            catch (Exception e)
-            {
-                throw new ArgumentException(e.Message);
-            }
+            return category;
         }
 
         public async Task<TrainingCategory> Activate(int id)
         {
-            try
-            {
-                var category = await context.TrainingCategories
-                                            .Where(ct => ct.Id == id)
-                                            .FirstOrDefaultAsync();
+            var category = await context.TrainingCategories
+                                        .Where(ct => ct.Id == id)
+                                        .FirstOrDefaultAsync();
 
-                if (category == null)
-                    throw new InvalidOperationException("Training Category not found");
+            if (category == null)
+                throw new InvalidOperationException("Training Category not found");
 
-                category.IsActive = true;
+            category.IsActive = true;
 
-                context.TrainingCategories.Update(category);
-                await context.SaveChangesAsync();
+            context.TrainingCategories.Update(category);
+            await context.SaveChangesAsync();
 
-                return category;
-            }
-            catch (Exception e)
-            {
-                throw new ArgumentException(e.Message);
-            }
+            return category;
         }
 
         public async Task<TrainingCategory> Deactivate(int id)
         {
-            try
-            {
-                var category = await context.TrainingCategories
-                                            .Where(ct => ct.Id == id)
-                                            .FirstOrDefaultAsync();
+            var category = await context.TrainingCategories
+                                        .Where(ct => ct.Id == id)
+                                        .FirstOrDefaultAsync();
 
-                if (category == null)
-                    throw new InvalidOperationException("Training Category not found");
+            if (category == null)
+                throw new InvalidOperationException("Training Category not found");
 
-                category.IsActive = false;
+            category.IsActive = false;
 
-                context.TrainingCategories.Update(category);
-                await context.SaveChangesAsync();
+            context.TrainingCategories.Update(category);
+            await context.SaveChangesAsync();
 
-                return category;
-            }
-            catch (Exception e)
-            {
-                throw new ArgumentException(e.Message);
-            }
+            return category;
         }
 
         public async Task<TrainingCategory> Delete(int id)
         {
-            try
-            {
-                var category = await context.TrainingCategories
-                                            .Where(c => c.Id == id)
-                                            .FirstOrDefaultAsync();
+            var category = await context.TrainingCategories
+                                        .Where(c => c.Id == id)
+                                        .FirstOrDefaultAsync();
 
-                if (category == null)
-                    throw new InvalidOperationException("Training Category not found");
+            if (category == null)
+                throw new InvalidOperationException("Training Category not found");
 
-                context.TrainingCategories.Remove(category);
-                await context.SaveChangesAsync();
+            context.TrainingCategories.Remove(category);
+            await context.SaveChangesAsync();
 
-                return category;
-            }
-            catch (Exception e)
-            {
-                throw new ArgumentException(e.Message);
-            }
+            return category;
         }
     }
 }

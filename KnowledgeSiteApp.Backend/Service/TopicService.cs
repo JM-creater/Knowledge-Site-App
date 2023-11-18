@@ -18,26 +18,19 @@ namespace KnowledgeSiteApp.Backend.Service
 
         public async Task<Topic> Create(TopicCreateDto dto)
         {
-            try
-            {
-                var topic = await context.Topics
-                                         .Where(t => t.Title == dto.Title)
-                                         .FirstOrDefaultAsync();
+            var topic = await context.Topics
+                                        .Where(t => t.Title == dto.Title)
+                                        .FirstOrDefaultAsync();
 
-                if (topic != null)
-                    throw new InvalidOperationException("Topic is already exists");
+            if (topic != null)
+                throw new InvalidOperationException("Topic is already exists");
 
-                var newTopic = mapper.Map<Topic>(dto);
+            var newTopic = mapper.Map<Topic>(dto);
 
-                context.Topics.Add(newTopic);
-                await context.SaveChangesAsync();
+            context.Topics.Add(newTopic);
+            await context.SaveChangesAsync();
 
-                return newTopic;
-            }
-            catch (Exception e)
-            {
-                throw new ArgumentException(e.Message);
-            }
+            return newTopic;
         }
 
         public async Task<List<Topic>> GetAll()
@@ -59,28 +52,21 @@ namespace KnowledgeSiteApp.Backend.Service
 
         public async Task<Topic> Update(int id, TopicUpdateDto dto)
         {
-            try
-            {
-                var topic = await context.Topics
-                                         .Where(t => t.TopicId == id)
-                                         .FirstOrDefaultAsync();
+            var topic = await context.Topics
+                                        .Where(t => t.TopicId == id)
+                                        .FirstOrDefaultAsync();
 
-                if (topic == null)
-                    throw new InvalidOperationException("Topic not found");
+            if (topic == null)
+                throw new InvalidOperationException("Topic not found");
 
-                mapper.Map(dto, topic);
-                topic.Title = dto.Title;
-                topic.Resource = dto.Resource;
-                topic.TrainingId = dto.TrainingId;
+            mapper.Map(dto, topic);
+            topic.Title = dto.Title;
+            topic.Resource = dto.Resource;
+            topic.TrainingId = dto.TrainingId;
 
-                await context.SaveChangesAsync();
+            await context.SaveChangesAsync();
 
-                return topic;
-            }
-            catch (Exception e)
-            {
-                throw new ArgumentException(e.Message);
-            }
+            return topic;
         }
 
         public async Task<Topic> Delete(int id)
