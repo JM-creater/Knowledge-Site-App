@@ -5,7 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace KnowledgeSiteApp.Backend.Controllers
 {
-    [ApiController, Route("api/[controller]")]
+    [ApiController]
+    [Route("api/[controller]")]
     [ApiKey]
     public class TrainingCategoryController : ControllerBase
     {

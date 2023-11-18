@@ -17,22 +17,6 @@ namespace KnowledgeSiteApp.Backend.Core.ErrorHandlingMiddleware
         {
             try
             {
-                if (!context.Request.Headers.TryGetValue(ApiKey, out var apiKeyVal))
-                {
-                    context.Response.StatusCode = 401;
-                    await context.Response.WriteAsync("Api Key not found!");
-                    return;
-                }
-
-                var appSettings = context.RequestServices.GetRequiredService<IConfiguration>();
-                var apiKey = appSettings.GetValue<string>(ApiKey);
-                if (!apiKey.Equals(apiKeyVal))
-                {
-                    context.Response.StatusCode = 401;
-                    await context.Response.WriteAsync("Unauthorized client");
-                    return;
-                }
-
                 await next(context);
             }
             catch (Exception e)
