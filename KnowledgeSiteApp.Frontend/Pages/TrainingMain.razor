@@ -1,0 +1,197 @@
+﻿@page "/"
+@inherits TrainingMainLayout
+@inject HttpClient http
+@inject IJSRuntime js
+@inject NavigationManager navigate
+
+<script language="javascript" type="text/javascript" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+<link rel="icon" type="image/x-icon" href="~/origami_bold_ico.ico" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="css/main.css" />
+<link rel="stylesheet" type="text/css" href="css/common-forms-stylesheet.css" />
+<link rel="stylesheet" type="text/css" href="css/add-trainings-stylesheet.css" />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" />
+
+<div style="margin-left: 2vh; margin-right: auto"
+     class="centered-container">
+    <div>
+        <h2 style="
+              font-weight: 600;
+              font-size: 4vh;
+              margin-left: 20%;
+              text-align: left;
+              margin-bottom: 5vh;
+              color: #862b0d;
+            ">
+            Upload Files
+        </h2>
+    </div>
+    <div class="container">
+        <div class="item container-inside" style=" background-color: #efebe0; border-style: dashed; border-width: 5px;">
+            @if (!string.IsNullOrEmpty(uploadedImage))
+            {
+                <img src="@uploadedImage" alt="Uploaded Image" style="width: 350px; height: 350px;" />
+            }
+            else
+            {
+                <h3 style="
+                    font-weight: 700;
+                    font-size: 25vh;
+                    text-align: center;
+                    margin-top: 8vh;
+                    margin-bottom: 1vh;
+                    color: #862b0d;
+                ">
+                    <i class="bi bi-cloud-upload"></i>
+                </h3>
+            }
+            <div class="item-inside">
+                <label for="file"> Upload Files: </label>
+                <InputFile OnChange="UploadImage" accept="image/*" />
+            </div>
+        </div>
+        <div class="item">
+            <div class="container-inside"
+                 style="
+                border-style: none;
+                border-color: transparent;
+                background-color: #efebe0;
+                margin-bottom: 10px;
+              ">
+                <div class="item-inside">
+                    <div class="form-group form-group-element"
+                         style="color: #862b0d">
+                        <input type="text"
+                               style="width: 50vh; color: #862b0d"
+                               class="form-control-override"
+                               id="username"
+                               aria-describedby="training-title"
+                               placeholder="Training Title"
+                               @bind="training.Title"/>
+                    </div>
+                    <div class="form-group form-group-element">
+                        <input type="text"
+                               class="form-control-override"
+                               id="username"
+                               aria-describedby="description"
+                               placeholder="Description"
+                               style="width: 50vh; color: #862b0d" 
+                               @bind="training.Description" />
+                    </div>
+                    <div class="form-group form-group-element">
+                        <select class="form-control-override" id="category" style="width: 50vh; color: #862b0d" @bind="selectedCategory">
+                            <option value="" disabled hidden>Select Category</option>
+                            @foreach (var category in getCategory)
+                            {
+                                <option value="@category.Id">@category.CategoryName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="container-inside"
+                 style="background-color: #efebe0; border-color: transparent">
+                <div class="item-inside">
+                    <button type="submit"
+                            style="width: 50vh; margin-left: auto; margin-right: auto"
+                            class="btn button btn-primary"
+                            onclick="@HandleAddTraining">
+                        Add Training
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+    private TrainingCreateDto training = new TrainingCreateDto();
+    private TrainingCategory[] getCategory { get; set; } = Array.Empty<TrainingCategory>();
+    private string uploadedImage = string.Empty;
+    private string errorMessage = string.Empty;
+    private int selectedCategory;
+
+    private async Task HandleAddTraining()
+    {
+        try
+        {
+            training.CategoryId = selectedCategory;
+            var response = await http.PostAsJsonAsync("https://localhost:7095/api/Training", training);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var createdTraining = await response.Content.ReadFromJsonAsync<Training>();
+                if (createdTraining != null && !string.IsNullOrWhiteSpace(uploadedImage))
+                {
+                    await UploadTrainingImage(createdTraining.Id);
+                }
+                await js.InvokeVoidAsync("alert", "Training created successfully");
+            }
+            else
+            {
+                if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                {
+                    var errorResponse = await response.Content.ReadFromJsonAsync<ValidationErrorResponse>();
+                    errorMessage = String.Join(" ", errorResponse?.Errors.SelectMany(err => err.Value));
+                }
+                errorMessage = "An error occured while adding the training. Please try again later.";
+            }
+        }
+        catch (Exception e)
+        {
+            errorMessage = "An unexpected error occurred: " + e.Message;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            getCategory = await http.GetFromJsonAsync<TrainingCategory[]>($"https://localhost:7095/api/TrainingCategory") ?? Array.Empty<TrainingCategory>();
+        }
+        catch (Exception e)
+        {
+            await js.InvokeVoidAsync("alert", e.Message);
+        }
+    }
+
+    private async Task UploadTrainingImage(int trainingId)
+    {
+        try
+        {
+            using var imageFile = new MultipartFormDataContent();
+            var bytes = Convert.FromBase64String(uploadedImage.Split(',')[1]);
+            imageFile.Add(new ByteArrayContent(bytes), "image", "upload.png");
+
+            var response = await http.PostAsync($"https://localhost:7095/api/Training/SaveTrainingImage/{trainingId}", imageFile);
+        }
+        catch (Exception e)
+        {
+            errorMessage = "An unexpected error occurred: " + e.Message;
+        }
+    }
+
+    private async Task UploadImage(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file != null)
+        {
+            var format = "image/png";
+            using var stream = file.OpenReadStream();
+            var buffer = new byte[file.Size];
+            await stream.ReadAsync(buffer);
+            uploadedImage = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
+        }
+    }
+
+    public class ValidationErrorResponse
+    {
+        public Dictionary<string, string[]> Errors { get; set; }
+    }
+
+}

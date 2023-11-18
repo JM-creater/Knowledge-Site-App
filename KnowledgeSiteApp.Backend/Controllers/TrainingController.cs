@@ -14,13 +14,27 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateTraining([FromForm] TrainingCreateDto dto)
+        public async Task<IActionResult> CreateTraining([FromBody] TrainingCreateDto dto)
         {
             try
             {
                 var training = await service.Create(dto);
 
                 return Ok(training);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPost("SaveTrainingImage/{id}")]
+        public async Task<IActionResult> SaveTrainingImage(int id, [FromForm] ImageCreateDto dto)
+        {
+            try
+            {
+                var updatedTraining = await service.SaveTrainingImage(id, dto);
+                return Ok(updatedTraining);
             }
             catch (Exception e)
             {
@@ -64,6 +78,36 @@ namespace KnowledgeSiteApp.Backend.Controllers
             try
             {
                 var training = await service.Update(id, dto);
+
+                return Ok(training);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPut("activate/{id}")]
+        public async Task<IActionResult> Activation(int id)
+        {
+            try
+            {
+                var training = await service.Activate(id);
+
+                return Ok(training);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPut("deactivate/{id}")]
+        public async Task<IActionResult> Deactivation(int id)
+        {
+            try
+            {
+                var training = await service.Deactivate(id);
 
                 return Ok(training);
             }

@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@page "/categorymain"
 @inherits CategoryMainLayout
 @inject HttpClient http
 @inject IJSRuntime js
@@ -165,7 +165,6 @@
             if (response.IsSuccessStatusCode)
             {
                 await js.InvokeVoidAsync("alert", "Category created successfully");
-                navigate.NavigateTo("/");
                 await ReloadCategories();
             }
             else
@@ -230,7 +229,6 @@
             if (response.IsSuccessStatusCode)
             {
                 await js.InvokeVoidAsync("alert", "Category edited successfully");
-                navigate.NavigateTo("/");
                 await ReloadCategories();
             }
             else
