@@ -37,21 +37,13 @@
         <label for="password">Password</label>
         <InputText id="password" class="form-control" type="password" @bind-Value="newUser.Password" />
     </div>
-    @*<div class="form-group">
-        <label for="password">Password</label>
-        <InputFile id="password" class="form-control" type="password" @bind-Value="newUser.ProfileImage" />
-    </div>
-    <div class="form-group">
-        <label for="password">Password</label>
-        <InputFile id="password" class="form-control" type="password" @bind-Value="newUser.BooksImages" />
-    </div>*@
 
     <button type="submit" class="btn btn-primary">Register</button>
 </EditForm>
 
 @code {
     private RegisterUserDto newUser = new RegisterUserDto();
-    private string errorMessage;
+    private string errorMessage = string.Empty;
 
     private async Task HandleValidSubmit()
     {

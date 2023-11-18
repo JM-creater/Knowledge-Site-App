@@ -3,6 +3,7 @@
 @inject HttpClient http
 @inject IJSRuntime js
 @inject NavigationManager navigate
+@* @inject Blazored.SessionStorage.ISessionStorageService sessionStorage *@
 
 <link href="css/login-stylesheet.css" rel="stylesheet" />
 <link href="css/main.css" rel="stylesheet" />
@@ -44,7 +45,7 @@
         if (response.IsSuccessStatusCode)
         {
             await js.InvokeVoidAsync("alert", "Successfully Logged In");
-            navigate.NavigateTo("/index");
+            navigate.NavigateTo("/trainingmain");
         }
         else
         {

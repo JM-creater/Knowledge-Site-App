@@ -22,7 +22,7 @@ namespace KnowledgeSiteApp.Backend.Service
             {
                 var addCategory = mapper.Map<TrainingCategory>(dto);
 
-                addCategory.CreateAt = DateTime.UtcNow;
+                addCategory.DateCreated = DateTime.Now;
 
                 context.TrainingCategories.Add(addCategory);
                 await context.SaveChangesAsync();
@@ -37,7 +37,7 @@ namespace KnowledgeSiteApp.Backend.Service
 
         public Task<List<TrainingCategory>> GetAll()
             => context.TrainingCategories
-                      .OrderByDescending(c => c.CreateAt)
+                      .OrderByDescending(c => c.DateCreated)
                       .ToListAsync();
 
         public async Task<List<TrainingCategory>> GetById(int id)
