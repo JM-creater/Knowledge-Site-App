@@ -18,76 +18,41 @@ namespace KnowledgeSiteApp.Backend.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateTopic([FromBody] TopicCreateDto dto)
         {
-            try
-            {
-                var topic = await service.Create(dto);
+            var topic = await service.Create(dto);
 
-                return Ok(topic);   
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+            return Ok(topic);   
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllTopic()
         {
-            try
-            {
-                var topic = await service.GetAll();
+            var topic = await service.GetAll();
 
-                return Ok(topic);   
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+            return Ok(topic);   
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdTopic([FromRoute] int id)
         {
-            try
-            {
-                var topic = await service.GetById(id);
+            var topic = await service.GetById(id);
 
-                return Ok(topic);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+            return Ok(topic);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTopic([FromRoute] int id, [FromBody] TopicUpdateDto dto)
         {
-            try
-            {
-                var topic = await service.Update(id, dto);
+            var topic = await service.Update(id, dto);
 
-                return Ok(topic);
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
-            }
+            return Ok(topic);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTopic([FromRoute] int id)
         {
-            try
-            {
-                var topic = await service.Delete(id);
+            var topic = await service.Delete(id);
 
-                return Ok(topic);   
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+            return Ok(topic);   
         }
     }
 }

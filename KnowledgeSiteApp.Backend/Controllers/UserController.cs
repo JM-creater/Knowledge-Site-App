@@ -19,184 +19,97 @@ namespace KnowledgeSiteApp.Backend.Controllers
         [HttpPost("add")]
         public async Task<IActionResult> RegisterUser([FromBody] Core.Dto.RegisterUserDto dto)
         {
-            try
-            {
-                var user = await service.Register(dto);
-                return Ok(user);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+            var user = await service.Register(dto);
+
+            return Ok(user);
         }
 
         [HttpPost("Login")]
         public async Task<IActionResult> LoginUser([FromBody] LoginUserDto dto)
         {
-            try
-            {
-                var user = await service.Login(dto);
+            var user = await service.Login(dto);
                 
-                return Ok(user);
-            }
-            catch (InvalidOperationException e)
-            {
-                return BadRequest(e.Message);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+            return Ok(user);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            try
-            {
-                var user = await service.GetAllUser();
+            var user = await service.GetAllUser();
 
-                return Ok(user);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+            return Ok(user);
         }
 
         [HttpGet("getAllAdmins")]
         public async Task<IActionResult> GetAdmins()
         {
-            try
-            {
-                var user = await service.GetAllByAdmin();
+            var user = await service.GetAllByAdmin();
 
-                return Ok(user);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+            return Ok(user);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAdmin(int id)
         {
-            try
-            {
-                var user = await service.GetById(id);
+            var user = await service.GetById(id);
 
-                return Ok(user);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+            return Ok(user);
         }
 
         [HttpPut("update-password")]
         public async Task<IActionResult> Update(UpdatePasswordDto dto)
         {
-            try
-            {
-                var user = await service.ResetPassword(dto);
+            var user = await service.ResetPassword(dto);
 
-                return Ok(user);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+            return Ok(user);
         }
 
         [HttpPut("{id}/profile-pic")]
         public async Task<IActionResult> UpdateProfilePic(int userId, string newProfilePicture)
         {
-            try
-            {
-                var user = await service.UpdateProfilePic(userId, newProfilePicture);
+            var user = await service.UpdateProfilePic(userId, newProfilePicture);
 
-                return Ok(user);    
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+            return Ok(user);   
         }
 
         [HttpPut("validate")]
         public async Task<IActionResult> ValidateUser(string userName, ValidateUserDto dto)
         {
-            try
-            {
-                var user = await service.Validate(userName, dto);
-                return Ok(user);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+            var user = await service.Validate(userName, dto);
+
+            return Ok(user);
         }
 
         [HttpPut("updateDetails/{id}")]
         public async Task<IActionResult> UpdateUserDetails(int id, [FromBody] UpdateUserDetailsDto dto)
         {
-            try
-            {
-                var user = await service.UpdateDetails(id, dto);
+            var user = await service.UpdateDetails(id, dto);
 
-                return Ok(user);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+            return Ok(user);
         }
 
         [HttpDelete]
         public async Task<IActionResult> DeleteUser(string userName)
         {
-            try
-            {
-                var user = await service.Delete(userName);
+            var user = await service.Delete(userName);
 
-                return Ok("Sucessfully Deleted a Author");
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+            return Ok("Sucessfully Deleted a Author");
         }
 
         [HttpPut("activate/{id}")]
         public async Task<IActionResult> ActivationUser(int id)
         {
-            try
-            {
-                var user = await service.ActivateUser(id);
+            var user = await service.ActivateUser(id);
 
-                return Ok(user);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+            return Ok(user);
         }
 
         [HttpPut("deactivate/{id}")]
         public async Task<IActionResult> DeactivationUser(int id)
         {
-            try
-            {
-                var user = await service.DeactivateUser(id);
+            var user = await service.DeactivateUser(id);
 
-                return Ok(user);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+            return Ok(user);
         }
-
     }
 }

@@ -20,44 +20,25 @@ namespace KnowledgeSiteApp.Backend.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreateSubTopicDto dto)
         {
-            try
-            {
-                var subTopic = await service.Create(dto);
-                return Ok(subTopic);
-            }
-            catch (Exception e)
-            {
+            var subTopic = await service.Create(dto);
 
-                return BadRequest(e.Message);
-            }
+            return Ok(subTopic);
         }
 
         [HttpPost("SaveSubTopicResources/{id}")]
         public async Task<IActionResult> SaveSubTopicResources(int id, [FromForm] SubTopicResourcesDto dto)
         {
-            try
-            {
-                var updatedTraining = await service.SaveSubTopicResources(id, dto);
-                return Ok(updatedTraining);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+            var updatedTraining = await service.SaveSubTopicResources(id, dto);
+
+            return Ok(updatedTraining);
         }
 
         [HttpPost("SaveSubTopicVideo/{id}")]
         public async Task<IActionResult> SaveSubTopicVideo(int id, [FromForm] SubTopicVideoDto dto)
         {
-            try
-            {
-                var updatedTraining = await service.SaveSubTopicVideo(id, dto);
-                return Ok(updatedTraining);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+            var updatedTraining = await service.SaveSubTopicVideo(id, dto);
+
+            return Ok(updatedTraining);
         }
     }
 }

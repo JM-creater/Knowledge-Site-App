@@ -35,90 +35,49 @@ namespace KnowledgeSiteApp.Backend.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdCategory(int id)
         {
-            try
-            {
-                var category = await service.GetById(id);
+            var category = await service.GetById(id);
 
-                return Ok(category);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+            return Ok(category);
         }
 
         [HttpGet("search")]
         public async Task<IActionResult> Search(string searchTerm)
         {
-            try
-            {
-                var categories = await service.SearchCategory(searchTerm);
-                return Ok(categories);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+            var categories = await service.SearchCategory(searchTerm);
+
+            return Ok(categories);
         }
 
         [HttpPut("update/{id}")]
         public async Task<IActionResult> UpdateCategory(int id, TrainingCategoryUpdateDto dto)
         {
-            try
-            {
-                var category = await service.Update(id, dto);
+            var category = await service.Update(id, dto);
 
-                return Ok(category);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+            return Ok(category);
         }
 
         [HttpPut("activate/{id}")]
         public async Task<IActionResult> Activation(int id)
         {
-            try
-            {
-                var category = await service.Activate(id);
+            var category = await service.Activate(id);
 
-                return Ok(category);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+            return Ok(category);
         }
 
         [HttpPut("deactivate/{id}")]
         public async Task<IActionResult> Deactivation(int id)
         {
-            try
-            {
-                var category = await service.Deactivate(id);
+            var category = await service.Deactivate(id);
 
-                return Ok(category);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+            return Ok(category);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> DeleteCategory(int id)
         {
-            try
-            {
-                var category = await service.Delete(id);
+            var category = await service.Delete(id);
 
-                return Ok(category);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+            return Ok(category);
         }
     }
 }

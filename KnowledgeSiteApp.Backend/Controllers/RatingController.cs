@@ -18,16 +18,9 @@ namespace KnowledgeSiteApp.Backend.Controllers
         [HttpPost]
         public async Task<IActionResult> Submit(RatingCreateDto dto)
         {
-            try
-            {
-                var rating = await service.SubmitRating(dto);
+            var rating = await service.SubmitRating(dto);
 
-                return Ok(rating);
-            }
-            catch (Exception e)
-            {
-                throw new ArgumentException(e.Message);
-            }
+            return Ok(rating);
         }
     }
 }
