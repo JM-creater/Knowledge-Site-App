@@ -243,13 +243,11 @@ namespace KnowledgeSiteApp.Backend.Service
                 if (user == null)
                     throw new InvalidOperationException("User not found");
 
-                var encryptedPassword = PasswordHasher.EncryptPassword(dto.Password);
-
                 mapper.Map(dto, user);
+                user.Username = dto.Username;
                 user.FirstName = dto.FirstName;
                 user.LastName = dto.LastName;
                 user.Email = dto.Email;
-                user.Password = encryptedPassword;
 
                 user.Role = (int)UserRole.Admin;
 
