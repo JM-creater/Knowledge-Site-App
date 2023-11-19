@@ -2,6 +2,6 @@
 {
     public class SubTopicVideoDto
     {
-        public IFormFile Video { get; set; }
+        public IFormFile? Video { get; set; }
     }
 }

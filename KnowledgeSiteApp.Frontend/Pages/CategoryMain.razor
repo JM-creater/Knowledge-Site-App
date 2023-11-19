@@ -158,95 +158,77 @@
 
     private async Task HandleAddCategory()
     {
-        try
-        {
-            var response = await http.PostAsJsonAsync("https://localhost:7095/api/TrainingCategory/add", category);
+        var response = await SendAuthorizedRequest(HttpMethod.Post, "https://localhost:7095/api/TrainingCategory/add", JsonContent.Create(category));
 
-            if (response.IsSuccessStatusCode)
+        if (response.IsSuccessStatusCode)
+        {
+            await js.InvokeVoidAsync("alert", "Category created successfully");
+            await ReloadCategories();
+        }
+        else
+        {
+            if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
             {
-                await js.InvokeVoidAsync("alert", "Category created successfully");
-                await ReloadCategories();
+                var errorResponse = await response.Content.ReadFromJsonAsync<ValidationErrorResponse>();
+                errorMessage = String.Join(" ", errorResponse?.Errors.SelectMany(err => err.Value));
             }
             else
             {
-                if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
-                {
-                    var errorResponse = await response.Content.ReadFromJsonAsync<ValidationErrorResponse>();
-                    errorMessage = String.Join(" ", errorResponse?.Errors.SelectMany(err => err.Value));
-                }
-                else
-                {
-                    errorMessage = "An error occurred while adding the category. Please try again later.";
-                }
-
+                errorMessage = "An error occurred while adding the category. Please try again later.";
             }
-        }
-        catch (Exception e)
-        {
-            errorMessage = "An unexpected error occurred: " + e.Message;
+
         }
     }
 
     protected override async Task OnParametersSetAsync()
     {
-        try
+        var response = await SendAuthorizedRequest(HttpMethod.Get, "https://localhost:7095/api/TrainingCategory");
+        if (response.IsSuccessStatusCode)
         {
-            trainingcategory = await http.GetFromJsonAsync<TrainingCategory[]>("https://localhost:7095/api/TrainingCategory") ?? Array.Empty<TrainingCategory>();
-            foreach (var category in trainingcategory)
-            {
-                dropdownStates[category.Id] = false;
-            }
+            trainingcategory = await response.Content.ReadFromJsonAsync<TrainingCategory[]>() ?? Array.Empty<TrainingCategory>();
         }
-        catch (Exception e)
+
+        foreach (var category in trainingcategory)
         {
-            errorMessage = "An unexpected error occurred: " + e.Message;
+            dropdownStates[category.Id] = false;
         }
     }
 
     private async Task ReloadCategories()
     {
-        try
+        var response = await SendAuthorizedRequest(HttpMethod.Get, "https://localhost:7095/api/TrainingCategory");
+        if (response.IsSuccessStatusCode)
         {
-            trainingcategory = await http.GetFromJsonAsync<TrainingCategory[]>("https://localhost:7095/api/TrainingCategory") ?? Array.Empty<TrainingCategory>();
-            foreach (var category in trainingcategory)
-            {
-                dropdownStates[category.Id] = false;
-            }
-            StateHasChanged(); 
+            trainingcategory = await response.Content.ReadFromJsonAsync<TrainingCategory[]>() ?? Array.Empty<TrainingCategory>();
         }
-        catch (Exception e)
+
+        foreach (var category in trainingcategory)
         {
-            errorMessage = "An unexpected error occurred: " + e.Message;
+            dropdownStates[category.Id] = false;
         }
+        StateHasChanged(); 
     }
 
     private async Task HandleEditCategory()
     {
-        try
-        {
-            var response = await http.PutAsJsonAsync($"https://localhost:7095/api/TrainingCategory/update/{category.Id}", category);
+        var response = await SendAuthorizedRequest(HttpMethod.Put, $"https://localhost:7095/api/TrainingCategory/update/{category.Id}", JsonContent.Create(category));
 
-            if (response.IsSuccessStatusCode)
+        if (response.IsSuccessStatusCode)
+        {
+            await js.InvokeVoidAsync("alert", "Category edited successfully");
+            await ReloadCategories();
+        }
+        else
+        {
+            if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
             {
-                await js.InvokeVoidAsync("alert", "Category edited successfully");
-                await ReloadCategories();
+                var errorResponse = await response.Content.ReadFromJsonAsync<ValidationErrorResponse>();
+                errorMessage = String.Join(" ", errorResponse?.Errors.SelectMany(err => err.Value));
             }
             else
             {
-                if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
-                {
-                    var errorResponse = await response.Content.ReadFromJsonAsync<ValidationErrorResponse>();
-                    errorMessage = String.Join(" ", errorResponse?.Errors.SelectMany(err => err.Value));
-                }
-                else
-                {
-                    errorMessage = "An error occurred while editing the category. Please try again later.";
-                }
+                errorMessage = "An error occurred while editing the category. Please try again later.";
             }
-        }
-        catch (Exception e)
-        {
-            errorMessage = "An unexpected error occurred: " + e.Message;
         }
     }
 
@@ -260,14 +242,14 @@
         }
 
         var confirmationMessage = categoryStatus.IsActive ?
-            $"Do you want to deactivate {categoryStatus.CategoryName}'s ({categoryStatus.Id}) record?" :
-            $"Do you want to activate {categoryStatus.CategoryName}'s ({categoryStatus.Id}) record?";
+            $"Do you want to deactivate {categoryStatus.CategoryName}'s ({categoryStatus.Id})?" :
+            $"Do you want to activate {categoryStatus.CategoryName}'s ({categoryStatus.Id})?";
 
         if (await js.InvokeAsync<bool>("confirm", confirmationMessage))
         {
             categoryStatus.IsActive = !categoryStatus.IsActive;
             var endpoint = categoryStatus.IsActive ? $"api/TrainingCategory/activate/{id}" : $"api/TrainingCategory/deactivate/{id}";
-            var response = await http.PutAsync($"https://localhost:7095/{endpoint}", null);
+            var response = await SendAuthorizedRequest(HttpMethod.Put, $"https://localhost:7095/{endpoint}", null);
             if (response.IsSuccessStatusCode)
             {
                 StateHasChanged();
@@ -281,27 +263,25 @@
     }
 
     private IEnumerable<TrainingCategory> FilteredCategories 
-            => trainingcategory.Where(ct => string.IsNullOrEmpty(searchTerm) || ct.CategoryName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
+            => trainingcategory.Where(ct => string.IsNullOrEmpty(searchTerm) || 
+                ct.CategoryName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
 
     private async Task HandleSearch()
     {
-        try
-        {
-            trainingcategory = await http.GetFromJsonAsync<TrainingCategory[]>($"https://localhost:7095/api/TrainingCategory/search?searchTerm={searchTerm}");
+        var response = await SendAuthorizedRequest(HttpMethod.Get, $"https://localhost:7095/api/TrainingCategory/search?searchTerm={searchTerm}");
 
-            foreach (var category in trainingcategory)
-            {
-                dropdownStates[category.Id] = false;
-            }
-
-            StateHasChanged(); 
-        }
-        catch (Exception e)
+        if (response.IsSuccessStatusCode)
         {
-            errorMessage = "An error occurred while searching: " + e.Message;
+            trainingcategory = await response.Content.ReadFromJsonAsync<TrainingCategory[]>();
         }
+
+        foreach (var category in trainingcategory)
+        {
+            dropdownStates[category.Id] = false;
+        }
+
+        StateHasChanged(); 
     }
-
 
     private void EditCategory(TrainingCategory selectedCategory)
     {
@@ -327,6 +307,19 @@
     private string GetDropdownMenuClass(int categoryId)
     {
         return dropdownStates.TryGetValue(categoryId, out var isOpen) && isOpen ? "dropdown-menu show" : "dropdown-menu";
+    }
+
+    private async Task<HttpResponseMessage> SendAuthorizedRequest(HttpMethod method, string url, HttpContent content = null)
+    {
+        var request = new HttpRequestMessage(method, url);
+        request.Headers.Add("X-API-KEY", "KNOWLEDGESITEAPPAPI");
+
+        if (content != null)
+        {
+            request.Content = content;
+        }
+
+        return await http.SendAsync(request);
     }
 
     public class ValidationErrorResponse

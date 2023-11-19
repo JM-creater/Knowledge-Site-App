@@ -2,25 +2,33 @@
 using KnowledgeSiteApp.Backend.Core.Dto;
 using KnowledgeSiteApp.Backend.Service;
 using KnowledgeSiteApp.Models.Dto;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace KnowledgeSiteApp.Backend.Controllers
 {
     [ApiController, Route("api/[controller]")]
-    [ApiKey]
     public class SubTopicsController : ControllerBase
     {
         private readonly ISubTopicService service;
         public SubTopicsController(ISubTopicService _service)
         {
-            this.service = _service;
+            service = _service;
         }
 
         [HttpPost]
+        [ApiKey]
         public async Task<IActionResult> Create(CreateSubTopicDto dto)
         {
             var subTopic = await service.Create(dto);
+
+            return Ok(subTopic);
+        }
+
+        [HttpGet]
+        [ApiKey]
+        public async Task<IActionResult> GetSubTopic()
+        {
+            var subTopic = await service.GetSubTopic();
 
             return Ok(subTopic);
         }

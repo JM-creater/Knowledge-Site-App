@@ -130,32 +130,43 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        try
+        var response = await SendAuthorizedRequest(HttpMethod.Get, $"https://localhost:7095/api/User/{id}");
+
+        if (response.IsSuccessStatusCode)
         {
-            editUser = await http.GetFromJsonAsync<User>($"https://localhost:7095/api/User/{id}");
-        }
-        catch (Exception e)
-        {
-            await js.InvokeVoidAsync("alert", e.Message);
+            editUser = await response.Content.ReadFromJsonAsync<User>();
         }
     }
 
     private async Task HandleEditUser()
     {
-        var response = await http.PutAsJsonAsync($"https://localhost:7095/api/User/updateDetails/{id}", editUser);
+        var response = await SendAuthorizedRequest(HttpMethod.Put, $"https://localhost:7095/api/User/updateDetails/{id}", JsonContent.Create(editUser));
 
         if (response.IsSuccessStatusCode)
         {
             var updatedUser = await response.Content.ReadFromJsonAsync<User>();
             editUser = updatedUser;
             await js.InvokeVoidAsync("alert", "Admin updated successfully");
-            navigate.NavigateTo("main");
+            navigate.NavigateTo("/index");
         }
         else
         {
             var errorResponse = await response.Content.ReadFromJsonAsync<ValidationErrorResponse>();
             errorMessage = String.Join(" ", errorResponse?.Errors.SelectMany(err => err.Value));
         }
+    }
+
+    private async Task<HttpResponseMessage> SendAuthorizedRequest(HttpMethod method, string url, HttpContent content = null)
+    {
+        var request = new HttpRequestMessage(method, url);
+        request.Headers.Add("X-API-KEY", "KNOWLEDGESITEAPPAPI");
+
+        if (content != null)
+        {
+            request.Content = content;
+        }
+
+        return await http.SendAsync(request);
     }
 
     public class ValidationErrorResponse

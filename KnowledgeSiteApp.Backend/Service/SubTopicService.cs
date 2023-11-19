@@ -3,7 +3,6 @@ using KnowledgeSiteApp.Backend.Core.Context;
 using KnowledgeSiteApp.Backend.Core.Dto;
 using KnowledgeSiteApp.Models.Entities;
 using Microsoft.EntityFrameworkCore;
-using KnowledgeSiteApp.Models;
 using KnowledgeSiteApp.Models.Dto;
 using KnowledgeSiteApp.Backend.Core.ImageDirectory;
 
@@ -13,10 +12,10 @@ namespace KnowledgeSiteApp.Backend.Service
     {
         private readonly AppDbContext context;
         private readonly IMapper mapper;
-        public SubTopicService(AppDbContext dbcontext, IMapper imapper)
+        public SubTopicService(AppDbContext dbcontext, IMapper _mapper)
         {
-            this.context = dbcontext;
-            this.mapper = imapper;
+            context = dbcontext;
+            mapper = _mapper;
         }
 
         public async Task<SubTopic> Create(CreateSubTopicDto dto)
@@ -37,6 +36,9 @@ namespace KnowledgeSiteApp.Backend.Service
 
             return newSubTopic;
         }
+
+        public async Task<List<SubTopic>> GetSubTopic()
+            => await context.SubTopics.ToListAsync();
 
         public async Task<SubTopic> SaveSubTopicResources(int id, SubTopicResourcesDto dto)
         {

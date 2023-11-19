@@ -7,6 +7,7 @@ namespace KnowledgeSiteApp.Backend.Service
     public interface ISubTopicService 
     {
         public Task<SubTopic> Create(CreateSubTopicDto dto);
+        public Task<List<SubTopic>> GetSubTopic();
         public Task<SubTopic> SaveSubTopicResources(int id, SubTopicResourcesDto dto);
         public Task<SubTopic> SaveSubTopicVideo(int id, SubTopicVideoDto dto);
     }

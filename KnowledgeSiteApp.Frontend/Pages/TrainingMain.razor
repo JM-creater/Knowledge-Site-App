@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@page "/trainingmain"
 @inherits TrainingMainLayout
 @inject HttpClient http
 @inject IJSRuntime js
@@ -118,61 +118,50 @@
 
     private async Task HandleAddTraining()
     {
-        try
-        {
-            training.CategoryId = selectedCategory;
-            var response = await http.PostAsJsonAsync("https://localhost:7095/api/Training", training);
+        training.CategoryId = selectedCategory;
+        var response = await SendAuthorizedRequest(HttpMethod.Post, "https://localhost:7095/api/Training", JsonContent.Create(training));
 
-            if (response.IsSuccessStatusCode)
-            {
-                var createdTraining = await response.Content.ReadFromJsonAsync<Training>();
-                if (createdTraining != null && !string.IsNullOrWhiteSpace(uploadedImage))
-                {
-                    await UploadTrainingImage(createdTraining.Id);
-                }
-                await js.InvokeVoidAsync("alert", "Training created successfully");
-            }
-            else
-            {
-                if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
-                {
-                    var errorResponse = await response.Content.ReadFromJsonAsync<ValidationErrorResponse>();
-                    errorMessage = String.Join(" ", errorResponse?.Errors.SelectMany(err => err.Value));
-                }
-                errorMessage = "An error occured while adding the training. Please try again later.";
-            }
-        }
-        catch (Exception e)
+        if (response.IsSuccessStatusCode)
         {
-            errorMessage = "An unexpected error occurred: " + e.Message;
+            var createdTraining = await response.Content.ReadFromJsonAsync<Training>();
+            if (createdTraining != null && !string.IsNullOrWhiteSpace(uploadedImage))
+            {
+                await UploadTrainingImage(createdTraining.Id);
+            }
+            await js.InvokeVoidAsync("alert", "Training created successfully");
+        }
+        else
+        {
+            if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                var errorResponse = await response.Content.ReadFromJsonAsync<ValidationErrorResponse>();
+                errorMessage = String.Join(" ", errorResponse?.Errors.SelectMany(err => err.Value));
+            }
+            errorMessage = "An error occured while adding the training. Please try again later.";
         }
     }
 
     protected override async Task OnInitializedAsync()
     {
-        try
+        var response = await SendAuthorizedRequest(HttpMethod.Get, "https://localhost:7095/api/TrainingCategory");
+
+        if (response.IsSuccessStatusCode)
         {
-            getCategory = await http.GetFromJsonAsync<TrainingCategory[]>($"https://localhost:7095/api/TrainingCategory") ?? Array.Empty<TrainingCategory>();
-        }
-        catch (Exception e)
-        {
-            await js.InvokeVoidAsync("alert", e.Message);
+            getCategory = await response.Content.ReadFromJsonAsync<TrainingCategory[]>() ?? Array.Empty<TrainingCategory>();
         }
     }
 
     private async Task UploadTrainingImage(int trainingId)
     {
-        try
-        {
-            using var imageFile = new MultipartFormDataContent();
-            var bytes = Convert.FromBase64String(uploadedImage.Split(',')[1]);
-            imageFile.Add(new ByteArrayContent(bytes), "image", "upload.png");
+        using var imageFile = new MultipartFormDataContent();
+        var bytes = Convert.FromBase64String(uploadedImage.Split(',')[1]);
+        imageFile.Add(new ByteArrayContent(bytes), "image", "upload.png");
 
-            var response = await http.PostAsync($"https://localhost:7095/api/Training/SaveTrainingImage/{trainingId}", imageFile);
-        }
-        catch (Exception e)
+        var response = await SendAuthorizedRequest(HttpMethod.Post, $"https://localhost:7095/api/Training/SaveTrainingImage/{trainingId}", JsonContent.Create(imageFile));
+
+        if (response.IsSuccessStatusCode)
         {
-            errorMessage = "An unexpected error occurred: " + e.Message;
+            await js.InvokeVoidAsync("alert", "Traning Image Uploaded");
         }
     }
 
@@ -187,6 +176,19 @@
             await stream.ReadAsync(buffer);
             uploadedImage = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
         }
+    }
+
+    private async Task<HttpResponseMessage> SendAuthorizedRequest(HttpMethod method, string url, HttpContent content = null)
+    {
+        var request = new HttpRequestMessage(method, url);
+        request.Headers.Add("X-API-KEY", "KNOWLEDGESITEAPPAPI"); 
+
+        if (content != null)
+        {
+            request.Content = content;
+        }
+
+        return await http.SendAsync(request);
     }
 
     public class ValidationErrorResponse

@@ -54,13 +54,11 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        try
+        var response = await SendAuthorizedRequest(HttpMethod.Get, "https://localhost:7095/api/User");
+
+        if (response.IsSuccessStatusCode)
         {
-            user = await http.GetFromJsonAsync<User[]>("https://localhost:7095/api/User") ?? Array.Empty<User>();
-        }
-        catch (Exception e)
-        {
-            await js.InvokeVoidAsync("alert", e.Message);
+            user = await response.Content.ReadFromJsonAsync<User[]>() ?? Array.Empty<User>();
         }
     }
 
@@ -79,14 +77,15 @@
         }
 
         var confirmationMessage = userStatus.IsActive ?
-            $"Do you want to deactivate {userStatus.FirstName}'s ({userStatus.Id}) record?" :
-            $"Do you want to activate {userStatus.FirstName}'s ({userStatus.Id}) record?";
+            $"Do you want to deactivate {userStatus.FirstName}'s ({userStatus.Id})?" :
+            $"Do you want to activate {userStatus.FirstName}'s ({userStatus.Id})?";
 
         if (await js.InvokeAsync<bool>("confirm", confirmationMessage))
         {
             userStatus.IsActive = !userStatus.IsActive;
             var endpoint = userStatus.IsActive ? $"api/User/activate/{id}" : $"api/User/deactivate/{id}";
-            var response = await http.PutAsync($"https://localhost:7095/{endpoint}", null);
+            var response = await SendAuthorizedRequest(HttpMethod.Put, $"https://localhost:7095/{endpoint}", null);
+
             if (response.IsSuccessStatusCode)
             {
                 StateHasChanged();
@@ -99,5 +98,17 @@
         }
     }
 
+    private async Task<HttpResponseMessage> SendAuthorizedRequest(HttpMethod method, string url, HttpContent content = null)
+    {
+        var request = new HttpRequestMessage(method, url);
+        request.Headers.Add("X-API-KEY", "KNOWLEDGESITEAPPAPI");
+
+        if (content != null)
+        {
+            request.Content = content;
+        }
+
+        return await http.SendAsync(request);
+    }
 
 }
