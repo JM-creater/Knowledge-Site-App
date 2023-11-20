@@ -2,7 +2,6 @@
 @inject HttpClient http
 @inject IJSRuntime js
 @inject NavigationManager navigate
-@inherits CreateAdminLayout
 
 <h3>Create Admin</h3>
 
@@ -54,7 +53,7 @@
         if (response.IsSuccessStatusCode)
         {
             await js.InvokeVoidAsync("alert", "Admin created successfully");
-            navigate.NavigateTo("/index");
+            navigate.NavigateTo("/editadmin");
         }
         else
         {

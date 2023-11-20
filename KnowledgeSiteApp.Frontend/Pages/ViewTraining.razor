@@ -1,0 +1,117 @@
+﻿@page "/viewtraining"
+
+<link rel="icon" type="image/x-icon" href="origami_bold_ico.ico" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" type="text/css" href="css/view-trainings-stylesheet.css" />
+<link rel="stylesheet" type="text/css" href="css/view-training-description.css" />
+<link rel="stylesheet" type="text/css" href="css/main.css" />
+<link rel="stylesheet" type="text/css" href="css/common-forms-stylesheet.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+<script language="javascript" type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+
+<EditForm Model="@newTraining">
+    <div class="centered-container">
+        <h2 style="
+            font-weight: 700;
+            font-size: 4vh;
+            margin-left: 40%;
+            margin-right: auto;
+            text-align: left;
+            margin-bottom: auto;
+            color: #862b0d;
+          ">
+            Training Title
+        </h2>
+    </div>
+    <div style="margin-left: 1vh; margin-right: auto; margin-bottom: 5vh"
+         class="centered-container left-flexbox">
+        <!-- Training content -->
+        <div class="container">
+            <div class="item container-inside"
+                 style="align-items: center; width: 60%; padding: 0px">
+                <img style="
+                width: 100%;
+                height: 100%;
+                aspect-ratio: 1/1;
+                object-fit: cover;
+              "
+                     src="https://www.vagdevitechnologies.com/wp-content/uploads/2022/11/Learn-SQL-Online-Courses.png"
+                     alt="Training Image" />
+            </div>
+            <div class="item right-flexbox"
+                 style="align-items: center; width: 40%">
+                <div class="item-inside" style="height: 100%">
+                    <div class="form-group form-group-element">
+                        <h4 style="
+                    font-weight: 600;
+                    font-size: 18px;
+                    text-align: center;
+                    margin-top: auto;
+                    margin-bottom: 2vh;
+                    color: #862b0d;
+                  ">
+                            Description
+                        </h4>
+                        <p style="font-size: inherit; text-align: justify">
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam
+                            id ligula tincidunt, tristique erat non, egestas lacus. Mauris
+                            non nisi mauris. Nulla luctus tincidunt diam id venenatis.
+                            Aenean viverra placerat est, sed eleifend ligula elementum sit
+                            amet.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+<div class="edit-link">
+    <a style="
+          font-weight: 600;
+          font-size: 20px;
+          font-weight: bolder;
+          text-align: center;
+          margin-top: auto;
+          margin-bottom: 2vh;
+          color: #862b0d;
+        "
+       href="edit-topic-page.html">Edit This Training</a>
+</div>
+
+<script>
+    const previousPage = () => {
+        // Add logic to navigate to the previous page
+        alert("Go to previous page");
+    };
+
+    const nextPage = () => {
+        // Add logic to navigate to the next page
+        alert("Go to next page");
+    };
+</script>
+<div class="nav-buttons">
+    <button style="
+          display: inline;
+          border-style: solid;
+          font-size: 50px;
+          color: #ffc95f;
+        "
+            onclick="previousPage()">
+        <Icon CustomIconName="fa-solid fa-circle-arrow-left" />
+    </button>
+    <button style="
+          display: inline;
+          border-style: solid;
+          font-size: 50px;
+          color: #ffc95f;
+        "
+            onclick="nextPage()">
+        <Icon CustomIconName="fa-solid fa-circle-arrow-right" />
+    </button>
+</div>
+
+@code {
+    private Training newTraining = new Training();
+}
