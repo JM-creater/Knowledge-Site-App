@@ -1,4 +1,4 @@
-﻿@page "/viewuser"
+﻿@page "/viewAdmin"
 @inject HttpClient http
 @inject IJSRuntime js
 @inject NavigationManager navigate
@@ -34,7 +34,7 @@
                     <td>@userItem.Username</td>
                     <td>
                         <button class="clickable-action">
-                            <a class="fas fa-edit" href="editadmin/@userItem.Id"></a>
+                            <a class="fas fa-edit" href="editadmin/@userItem.Id">TEST</a>
                         </button>
                         <button @onclick="() => ActivateDeactivateUser(userItem.Id)" class="clickable-action">
                             @if (userItem.IsActive)
