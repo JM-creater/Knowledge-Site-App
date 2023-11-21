@@ -112,6 +112,7 @@
 
 
 @code {
+    [Inject] protected PreloadService PreloadService { get; set; }
     private TrainingCreateDto training = new TrainingCreateDto();
     private TrainingCategory[] getCategory { get; set; } = Array.Empty<TrainingCategory>();
     private string uploadedImage = string.Empty;
