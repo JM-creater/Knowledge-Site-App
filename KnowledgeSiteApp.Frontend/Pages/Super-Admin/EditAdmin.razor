@@ -1,0 +1,162 @@
+﻿@page "/editadmin/{id:int}"
+@inject HttpClient http
+@inject IJSRuntime js
+@inject NavigationManager navigate
+
+<link rel="icon" type="image/x-icon" href="origami_bold_ico.ico" />
+<link rel="stylesheet" type="text/css" href="css/main.css" />
+<link rel="stylesheet" type="text/css" href="css/common-forms-stylesheet.css" />
+
+<script>
+    const loadFile = (event) => {
+        var output = document.getElementById("output");
+        output.src = URL.createObjectURL(event.target.files[0]);
+    };
+</script>
+
+<div class="centered-container">
+    <form class="login-form">
+        <!-- Header -->
+        <div class="header" style="margin-top: 5px; margin-bottom: 5px">
+            <table align="center">
+                <tr>
+                    <td>
+                        <img src="origami bold.png" class="change_password_logo_image" />
+                    </td>
+                    <td>
+                        <p class="content-title content-no-margin"
+                            style="text-align: left">
+                            LearnNest
+                        </p>
+                        <p class="content-subtitle">Edit Admin Account</p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Profile Picture -->
+        <div class="form-group form-group-element"
+                style="align-items: baseline; margin-left: 30%">
+            <div style="margin-left: 5vh">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Jennie_Porsche_A4_2022.jpg/220px-Jennie_Porsche_A4_2022.jpg"
+                        id="output"
+                        style="
+                        display: inline-flex;
+                        width: 20vh;
+                        aspect-ratio: 1/1;
+                        object-fit: cover;
+                        border-radius: 50%;
+                        "
+                        alt="Profile Picture" />
+            </div>
+        </div>
+        <div class="form-group form-group-element" style="margin-left: 30%">
+            <div style="margin-top: 5px; margin-bottom: 5px">
+                <input id="file" type="file" style="font-family: inherit" onchange="loadFile(event)" />
+            </div>
+        </div>
+
+        <!-- Username -->
+        <div class="form-group form-group-element">
+            <input type="text"
+                    class="form-control"
+                    id="username"
+                    @bind="editUser.Username"
+                    aria-describedby="username"
+                    placeholder="Username" />
+        </div>
+
+        <!-- Firstname -->
+        <div class="form-group form-group-element">
+            <input type="text"
+                    class="form-control"
+                    id="first_name"
+                    @bind="editUser.FirstName"
+                    placeholder="First Name" />
+        </div>
+
+        <!-- Lastname -->
+        <div class="form-group form-group-element">
+            <input type="text"
+                    class="form-control"
+                    id="last_name"
+                    @bind="editUser.LastName"
+                    placeholder="Last Name" />
+        </div>
+
+        <!-- Email -->
+        <div class="form-group form-group-element">
+            <input type="text"
+                    class="form-control"
+                    id="email"
+                    @bind="editUser.Email"
+                    placeholder="Email" />
+        </div>
+
+        <!-- Login button only -->
+        <div>
+            <button type="submit"
+                    class="btn button btn-primary"
+                    onclick="@HandleEditUser">
+                Change Details
+            </button>
+        </div>
+
+        <div>
+            <a href="login.html" class="content-link-center">Return to Account Management</a>
+        </div>
+    </form>
+</div>
+
+
+
+@code {
+    [Parameter] public int id { get; set; }
+    private User editUser = new User();
+    private string errorMessage;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var response = await SendAuthorizedRequest(HttpMethod.Get, $"https://localhost:7095/api/User/{id}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            editUser = await http.GetFromJsonAsync<User>($"https://localhost:7095/api/User/{id}");
+        }
+    }
+
+    private async Task HandleEditUser()
+    {
+        var response = await SendAuthorizedRequest(HttpMethod.Put, $"https://localhost:7095/api/User/updateDetails/{id}", JsonContent.Create(editUser));
+        navigate.NavigateTo("/");
+
+        if (response.IsSuccessStatusCode)
+        {
+            await js.InvokeVoidAsync("alert", "Admin updated successfully");
+            
+        }
+        else
+        {
+            var errorResponse = await response.Content.ReadFromJsonAsync<ValidationErrorResponse>();
+            errorMessage = String.Join(" ", errorResponse?.Errors.SelectMany(err => err.Value));
+        }
+    }
+
+    private async Task<HttpResponseMessage> SendAuthorizedRequest(HttpMethod method, string url, HttpContent content = null)
+    {
+        var request = new HttpRequestMessage(method, url);
+        request.Headers.Add("X-API-KEY", "KNOWLEDGESITEAPPAPI");
+
+        if (content != null)
+        {
+            request.Content = content;
+        }
+
+        return await http.SendAsync(request);
+    }
+
+    public class ValidationErrorResponse
+    {
+        public Dictionary<string, string[]> Errors { get; set; }
+    }
+}
