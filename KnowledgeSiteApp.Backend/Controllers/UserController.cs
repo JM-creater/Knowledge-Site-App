@@ -23,6 +23,14 @@ namespace KnowledgeSiteApp.Backend.Controllers
             return Ok(user);
         }
 
+        [HttpPost("SaveAdminImage/{id}")]
+        public async Task<IActionResult> SaveAdminImage(int id, [FromForm] CreateAdminImageDto dto)
+        {
+            var adminImage = await service.SaveAdminImage(id, dto);
+
+            return Ok(adminImage);
+        }
+
         [HttpPost("Login")]
         public async Task<IActionResult> LoginUser([FromBody] LoginUserDto dto)
         {

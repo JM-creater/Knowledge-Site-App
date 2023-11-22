@@ -97,7 +97,7 @@
         <div>
             <button type="submit"
                     class="btn button btn-primary"
-                    onclick="@HandleEditUser">
+                    @onclick="HandleEditUser">
                 Change Details
             </button>
         </div>
@@ -128,7 +128,7 @@
     private async Task HandleEditUser()
     {
         var response = await SendAuthorizedRequest(HttpMethod.Put, $"https://localhost:7095/api/User/updateDetails/{id}", JsonContent.Create(editUser));
-        navigate.NavigateTo("/");
+        navigate.NavigateTo("/viewAdmin");
 
         if (response.IsSuccessStatusCode)
         {

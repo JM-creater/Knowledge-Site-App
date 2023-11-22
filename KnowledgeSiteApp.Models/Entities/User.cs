@@ -12,6 +12,7 @@ public class User
     public string? Email { get; set; }
     public string? Password { get; set; }
     public int Role { get; set; }
-    public bool IsActive { get; set; } 
+    public bool IsActive { get; set; }
+    public string? Image { get; set; }
     public DateTime DateCreated { get; set; }
 }
