@@ -2,6 +2,8 @@
 @inject HttpClient http
 @inject IJSRuntime js
 @inject NavigationManager navigate
+@using Blazored.Toast.Configuration
+@inject IToastService toastService
 
 <link rel="icon" type="image/x-icon" href="origami_bold_ico.ico" />
 <link rel="stylesheet" type="text/css" href="css/main.css" />
@@ -52,7 +54,7 @@
         </div>
         <div class="form-group form-group-element" style="margin-left: 30%">
             <div style="margin-top: 5px; margin-bottom: 5px">
-                <input id="file" type="file" style="font-family: inherit" onchange="loadFile(event)" />
+                <InputFile id="file" type="file" style="font-family: inherit" OnChange="UploadImage" />
             </div>
         </div>
 
@@ -86,19 +88,37 @@
 
         <!-- Email -->
         <div class="form-group form-group-element">
-            <input type="text"
+            <input type="email"
                    class="form-control"
                    id="email"
                    @bind="newUser.Email"
                    placeholder="Email" />
         </div>
 
+        <!-- Password -->
+        <div class="form-group form-group-element">
+            <input type="password"
+                   class="form-control"
+                   id="last_name"
+                   @bind="newUser.Password"
+                   placeholder="Password" />
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="form-group form-group-element">
+            <input type="password"
+                   class="form-control"
+                   id="last_name"
+                   @bind="conPass"
+                   placeholder="Confirm Password" />
+        </div>
+
         <!-- Login button only -->
         <div>
             <button type="submit"
                     class="btn button btn-primary"
-                    onclick="@HandleValidSubmit">
-                Change Details
+                    @onclick="HandleAddAdmin">
+                Add Admin
             </button>
         </div>
 
@@ -108,26 +128,118 @@
     </form>
 </div>
 
+<BlazoredToasts Position="ToastPosition.TopCenter"
+                Timeout="3"
+                IconType="IconType.FontAwesome"
+                SuccessClass="success-toast-override"
+                SuccessIcon="fa fa-thumbs-up"
+                ErrorIcon="fa fa-bug" />
+
 @code {
     private RegisterUserDto newUser = new RegisterUserDto();
+    private string uploadedImage = string.Empty;
     private string errorMessage = string.Empty;
+    private string conPass = string.Empty;
 
 
-
-    private async Task HandleValidSubmit()
+    private async Task HandleAddAdmin()
     {
-        var response = await http.PostAsJsonAsync("https://localhost:7095/api/User/add", newUser);
-
-        if (response.IsSuccessStatusCode)
+        if (newUser.Username != null && newUser.FirstName != null && newUser.LastName != null && newUser.Email != null && newUser.Password != null && uploadedImage != null && newUser.Password == conPass)
         {
-            await js.InvokeVoidAsync("alert", "Admin created successfully");
-            navigate.NavigateTo("/viewAdmin");
+            var response = await SendAuthorizedRequest(HttpMethod.Post, "https://localhost:7095/api/User/add", JsonContent.Create(newUser));
+
+            if (response.IsSuccessStatusCode)
+            {
+                var createdAdmin = await response.Content.ReadFromJsonAsync<User>();
+                if (createdAdmin != null && !string.IsNullOrWhiteSpace(uploadedImage))
+                {
+                    await UploadAdminImage(createdAdmin.Id);
+                }
+                toastService.ShowSuccess("Admin created successfully");
+            }
+            else
+            {
+                if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                {
+                    var errorResponse = await response.Content.ReadFromJsonAsync<ValidationErrorResponse>();
+                    errorMessage = String.Join(" ", errorResponse?.Errors.SelectMany(err => err.Value));
+                }
+                errorMessage = "An error occured while adding the training. Please try again later.";
+            }
+        }
+        else if (newUser.Username == null && newUser.FirstName != null && newUser.LastName != null && newUser.Email != null && newUser.Password != null && uploadedImage != null && newUser.Password == conPass)
+        {
+            toastService.ShowError("Please fill-up Username.");
+        }
+        else if (newUser.Username != null && newUser.FirstName == null && newUser.LastName != null && newUser.Email != null && newUser.Password != null && uploadedImage != null && newUser.Password == conPass)
+        {
+            toastService.ShowError("Please fill-up First Name.");
+        }
+        else if (newUser.Username != null && newUser.FirstName != null && newUser.LastName == null && newUser.Email != null && newUser.Password != null && uploadedImage != null && newUser.Password == conPass)
+        {
+            toastService.ShowError("Please fill-up Last Name.");
+        }
+        else if (newUser.Username != null && newUser.FirstName != null && newUser.LastName != null && newUser.Email == null && newUser.Password != null && uploadedImage != null && newUser.Password == conPass)
+        {
+            toastService.ShowError("Please fill-up Email Address.");
+        }
+        else if (newUser.Username != null && newUser.FirstName != null && newUser.LastName != null && newUser.Email != null && newUser.Password == null && uploadedImage != null && newUser.Password == conPass)
+        {
+            toastService.ShowError("Please fill-up Password.");
+        }
+        else if (newUser.Username != null && newUser.FirstName != null && newUser.LastName != null && newUser.Email != null && newUser.Password != null && uploadedImage == null && newUser.Password == conPass)
+        {
+            toastService.ShowError("Please Upload Imag.e");
+        }
+        else if (newUser.Username != null && newUser.FirstName != null && newUser.LastName != null && newUser.Email != null && newUser.Password != null && uploadedImage != null && newUser.Password != conPass)
+        {
+            toastService.ShowError("Password did not matched.");
         }
         else
         {
-            var errorResponse = await response.Content.ReadFromJsonAsync<ValidationErrorResponse>();
-            errorMessage = String.Join(" ", errorResponse?.Errors.SelectMany(err => err.Value));
+            toastService.ShowError("Please fill-up all fields.");
         }
+
+    }
+
+    private async Task UploadImage(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file != null)
+        {
+            var format = "image/png";
+            using var stream = file.OpenReadStream();
+            var buffer = new byte[file.Size];
+            await stream.ReadAsync(buffer);
+            uploadedImage = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
+        }
+    }
+
+    private async Task UploadAdminImage(int adminId)
+    {
+        using var imageFile = new MultipartFormDataContent();
+        var bytes = Convert.FromBase64String(uploadedImage.Split(',')[1]);
+        imageFile.Add(new ByteArrayContent(bytes), "image", "upload.png");
+
+        var response = await SendAuthorizedRequest(HttpMethod.Post, $"https://localhost:7095/api/User/SaveAdminImage/{adminId}", JsonContent.Create(imageFile));
+
+        if (response.IsSuccessStatusCode)
+        {
+            await js.InvokeVoidAsync("alert", "Admin Image Uploaded");
+        }
+    }
+
+    private async Task<HttpResponseMessage> SendAuthorizedRequest(HttpMethod method, string url, HttpContent content = null)
+    {
+        var request = new HttpRequestMessage(method, url);
+        request.Headers.Add("X-API-KEY", "KNOWLEDGESITEAPPAPI");
+
+        if (content != null)
+        {
+            request.Content = content;
+        }
+
+        return await http.SendAsync(request);
     }
 
     public class ValidationErrorResponse

@@ -76,19 +76,12 @@ namespace KnowledgeSiteApp.Backend.Service
                     throw new InvalidOperationException($"Unable to register ApplicationUser: {GetErrorsText(identityResult.Errors)}");
                 }
 
-                var existingFirstname = await context.Users
-                                                .Where(u => u.FirstName == dto.FirstName)
-                                                .FirstOrDefaultAsync();
-
-                if (existingFirstname != null)
-                    throw new InvalidOperationException("Admin with first name already exists");
-
-                var existingLastname = await context.Users
-                                                     .Where(u => u.LastName == dto.LastName)
+                var existingFullName = await context.Users
+                                                     .Where(u => u.LastName == dto.LastName && u.FirstName == dto.FirstName)
                                                      .FirstOrDefaultAsync();
 
-                if (existingLastname != null)
-                    throw new InvalidOperationException("Admin with last name already exists");
+                if (existingFullName != null)
+                    throw new InvalidOperationException("Admin with name already exists");
 
                 User newUser = mapper.Map<User>(dto);
                 newUser.Password = PasswordHasher.EncryptPassword(dto.Password);
@@ -329,6 +322,22 @@ namespace KnowledgeSiteApp.Backend.Service
             {
                 throw new ArgumentException(e.Message);
             }
+        }
+
+        public async Task<User> SaveAdminImage(int id, CreateAdminImageDto dto)
+        {
+            var adminImage = await context.Users.FindAsync(id);
+
+            if (adminImage == null)
+                throw new InvalidOperationException("Profile not found");
+
+            var adminImageUpload = await new ImagePathConfig().profileImages(dto.Image);
+
+            adminImage.Image = adminImageUpload;
+
+            await context.SaveChangesAsync();
+
+            return adminImage;
         }
 
     }
