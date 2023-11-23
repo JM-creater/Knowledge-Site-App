@@ -5,8 +5,8 @@ namespace KnowledgeSiteApp.Backend.Service
 {
     public interface IUserService
     {
-        public Task<User> Register(Core.Dto.RegisterUserDto dto);
-        public Task<string> Login(LoginUserDto dto);
+        public Task<User> Register(RegisterUserDto dto);
+        public Task<User> Login(LoginUserDto dto);
         public Task<List<User>> GetAllUser();
         public Task<List<User>> GetAllByAdmin();
         public Task<User> GetById(int id);

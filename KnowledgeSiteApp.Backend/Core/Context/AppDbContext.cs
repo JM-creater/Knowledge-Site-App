@@ -1,11 +1,10 @@
-﻿using KnowledgeSiteApp.Backend.Authentication;
-using KnowledgeSiteApp.Models.Entities;
+﻿using KnowledgeSiteApp.Models.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace KnowledgeSiteApp.Backend.Core.Context
 {
-    public class AppDbContext : IdentityDbContext<ApplicationUser>
+    public class AppDbContext : DbContext
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {

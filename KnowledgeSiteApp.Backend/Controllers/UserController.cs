@@ -16,7 +16,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPost("add")]
-        public async Task<IActionResult> RegisterUser([FromBody] Core.Dto.RegisterUserDto dto)
+        public async Task<IActionResult> RegisterUser([FromBody] RegisterUserDto dto)
         {
             var user = await service.Register(dto);
 

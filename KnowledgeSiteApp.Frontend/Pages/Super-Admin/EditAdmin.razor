@@ -2,10 +2,19 @@
 @inject HttpClient http
 @inject IJSRuntime js
 @inject NavigationManager navigate
+@using Blazored.Toast.Configuration
+@inject IToastService toastService
 
 <link rel="icon" type="image/x-icon" href="origami_bold_ico.ico" />
 <link rel="stylesheet" type="text/css" href="css/main.css" />
 <link rel="stylesheet" type="text/css" href="css/common-forms-stylesheet.css" />
+
+<BlazoredToasts Position="ToastPosition.BottomRight"
+                Timeout="5"
+                IconType="IconType.FontAwesome"
+                SuccessClass="success-toast-override"
+                SuccessIcon="fa fa-thumbs-up"
+                ErrorIcon="fa fa-bug" />
 
 <script>
     const loadFile = (event) => {
@@ -15,7 +24,7 @@
 </script>
 
 <div class="centered-container">
-    <form class="login-form">
+    <EditForm Model="@editUser" OnValidSubmit="HandleEditUser" class="login-form">
         <!-- Header -->
         <div class="header" style="margin-top: 5px; margin-bottom: 5px">
             <table align="center">
@@ -25,7 +34,7 @@
                     </td>
                     <td>
                         <p class="content-title content-no-margin"
-                            style="text-align: left">
+                           style="text-align: left">
                             LearnNest
                         </p>
                         <p class="content-subtitle">Edit Admin Account</p>
@@ -36,68 +45,67 @@
 
         <!-- Profile Picture -->
         <div class="form-group form-group-element"
-                style="align-items: baseline; margin-left: 30%">
+             style="align-items: baseline; margin-left: 30%">
             <div style="margin-left: 5vh">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Jennie_Porsche_A4_2022.jpg/220px-Jennie_Porsche_A4_2022.jpg"
-                        id="output"
-                        style="
+                <img src="@editUser.Image"
+                     id="output"
+                     style="
                         display: inline-flex;
                         width: 20vh;
                         aspect-ratio: 1/1;
                         object-fit: cover;
                         border-radius: 50%;
                         "
-                        alt="Profile Picture" />
+                     alt="Profile Picture" />
             </div>
         </div>
         <div class="form-group form-group-element" style="margin-left: 30%">
             <div style="margin-top: 5px; margin-bottom: 5px">
-                <input id="file" type="file" style="font-family: inherit" onchange="loadFile(event)" />
+                <InputFile id="file" type="file" style="font-family: inherit" />
             </div>
         </div>
 
         <!-- Username -->
         <div class="form-group form-group-element">
             <input type="text"
-                    class="form-control"
-                    id="username"
-                    @bind="editUser.Username"
-                    aria-describedby="username"
-                    placeholder="Username" />
+                   class="form-control"
+                   id="username"
+                   @bind="editUser.Username"
+                   aria-describedby="username"
+                   placeholder="Username" />
         </div>
 
         <!-- Firstname -->
         <div class="form-group form-group-element">
             <input type="text"
-                    class="form-control"
-                    id="first_name"
-                    @bind="editUser.FirstName"
-                    placeholder="First Name" />
+                   class="form-control"
+                   id="first_name"
+                   @bind="editUser.FirstName"
+                   placeholder="First Name" />
         </div>
 
         <!-- Lastname -->
         <div class="form-group form-group-element">
             <input type="text"
-                    class="form-control"
-                    id="last_name"
-                    @bind="editUser.LastName"
-                    placeholder="Last Name" />
+                   class="form-control"
+                   id="last_name"
+                   @bind="editUser.LastName"
+                   placeholder="Last Name" />
         </div>
 
         <!-- Email -->
         <div class="form-group form-group-element">
             <input type="text"
-                    class="form-control"
-                    id="email"
-                    @bind="editUser.Email"
-                    placeholder="Email" />
+                   class="form-control"
+                   id="email"
+                   @bind="editUser.Email"
+                   placeholder="Email" />
         </div>
 
-        <!-- Login button only -->
+        <!-- Update button only -->
         <div>
             <button type="submit"
-                    class="btn button btn-primary"
-                    @onclick="HandleEditUser">
+                    class="btn button btn-primary">
                 Change Details
             </button>
         </div>
@@ -105,7 +113,7 @@
         <div>
             <a href="login.html" class="content-link-center">Return to Account Management</a>
         </div>
-    </form>
+    </EditForm>
 </div>
 
 
@@ -127,18 +135,53 @@
 
     private async Task HandleEditUser()
     {
-        var response = await SendAuthorizedRequest(HttpMethod.Put, $"https://localhost:7095/api/User/updateDetails/{id}", JsonContent.Create(editUser));
-        navigate.NavigateTo("/viewAdmin");
-
-        if (response.IsSuccessStatusCode)
+        if (editUser.Username != null && editUser.FirstName != null && editUser.LastName != null && editUser.Email != null && editUser.Password != null )
         {
-            await js.InvokeVoidAsync("alert", "Admin updated successfully");
-            
+            var response = await SendAuthorizedRequest(HttpMethod.Put, $"https://localhost:7095/api/User/updateDetails/{id}", JsonContent.Create(editUser));
+            if (response.IsSuccessStatusCode)
+            {
+                toastService.ShowSuccess("Admin updated successfully");
+                await Task.Delay(3000);
+                navigate.NavigateTo("/viewAdmin");
+
+            }
+            else
+            {
+                var errorResponse = await response.Content.ReadFromJsonAsync<ValidationErrorResponse>();
+                errorMessage = String.Join(" ", errorResponse?.Errors.SelectMany(err => err.Value));
+            }
+        }
+        else if (editUser.Username == null && editUser.FirstName != null && editUser.LastName != null && editUser.Email != null && editUser.Password != null )
+        {
+            toastService.ShowError("Please fill-up Username.");
+        }
+        else if (editUser.Username != null && editUser.FirstName == null && editUser.LastName != null && editUser.Email != null && editUser.Password != null )
+        {
+            toastService.ShowError("Please fill-up First Name.");
+        }
+        else if (editUser.Username != null && editUser.FirstName != null && editUser.LastName == null && editUser.Email != null && editUser.Password != null )
+        {
+            toastService.ShowError("Please fill-up Last Name.");
+        }
+        else if (editUser.Username != null && editUser.FirstName != null && editUser.LastName != null && editUser.Email == null && editUser.Password != null )
+        {
+            toastService.ShowError("Please fill-up Email Address.");
+        }
+        else if (editUser.Username != null && editUser.FirstName != null && editUser.LastName != null && editUser.Email != null && editUser.Password == null )
+        {
+            toastService.ShowError("Please fill-up Password.");
+        }
+        else if (editUser.Username != null && editUser.FirstName != null && editUser.LastName != null && editUser.Email != null && editUser.Password != null)
+        {
+            toastService.ShowError("Please Upload Imag.e");
+        }
+        else if (editUser.Username != null && editUser.FirstName != null && editUser.LastName != null && editUser.Email != null && editUser.Password != null)
+        {
+            toastService.ShowError("Password did not matched.");
         }
         else
         {
-            var errorResponse = await response.Content.ReadFromJsonAsync<ValidationErrorResponse>();
-            errorMessage = String.Join(" ", errorResponse?.Errors.SelectMany(err => err.Value));
+            toastService.ShowError("Please fill-up all fields.");
         }
     }
 

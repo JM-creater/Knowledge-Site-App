@@ -29,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Authentication\" />
     <Folder Include="Images\ProfileImage\" />
     <Folder Include="Images\ResourcesImages\" />
     <Folder Include="Images\SubTopicVideo\" />

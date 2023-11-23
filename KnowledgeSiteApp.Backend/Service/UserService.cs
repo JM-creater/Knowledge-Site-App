@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Azure.Core;
-using KnowledgeSiteApp.Backend.Authentication;
 using KnowledgeSiteApp.Backend.Core.Context;
 using KnowledgeSiteApp.Backend.Core.Dto;
 using KnowledgeSiteApp.Backend.Core.Encryption;
@@ -20,62 +19,18 @@ namespace KnowledgeSiteApp.Backend.Service
 {
     public class UserService : IUserService
     {
-        private readonly UserManager<ApplicationUser> userManager;
-        private readonly IConfiguration configuration;
         private readonly AppDbContext context;
         private readonly IMapper mapper;
-        public UserService(AppDbContext dbcontext, IMapper Imapper, UserManager<ApplicationUser> _userManager, IConfiguration _configuration)
+        public UserService(AppDbContext dbcontext, IMapper Imapper)
         {
             context = dbcontext;
             mapper = Imapper;
-            userManager = _userManager;
-            configuration = _configuration;
         }
 
-        private JwtSecurityToken GetToken(IEnumerable<Claim> authClaims)
-        {
-            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"]));
-
-            var token = new JwtSecurityToken(
-                issuer: configuration["JWT:ValidIssuer"],
-                audience: configuration["JWT:ValidAudience"],
-                expires: DateTime.Now.AddHours(3),
-                claims: authClaims,
-                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256));
-
-            return token;
-        }
-
-        private string GetErrorsText(IEnumerable<IdentityError> errors)
-        {
-            return string.Join(", ", errors.Select(error => error.Description).ToArray());
-        }
-
-        public async Task<User> Register(Core.Dto.RegisterUserDto dto)
+        public async Task<User> Register(RegisterUserDto dto)
         {
             try
             {
-                var userByEmail = await userManager.FindByEmailAsync(dto.Email);
-                var userByUsername = await userManager.FindByNameAsync(dto.Username);
-
-                if (userByEmail != null || userByUsername != null)
-                {
-                    throw new InvalidOperationException("Admin with the given email or username already exists.");
-                }
-
-                ApplicationUser applicationUser = new ApplicationUser
-                {
-                    Email = dto.Email,
-                    UserName = dto.Username,
-                    SecurityStamp = Guid.NewGuid().ToString()
-                };
-
-                var identityResult = await userManager.CreateAsync(applicationUser, dto.Password);
-                if (!identityResult.Succeeded)
-                {
-                    throw new InvalidOperationException($"Unable to register ApplicationUser: {GetErrorsText(identityResult.Errors)}");
-                }
-
                 var existingFullName = await context.Users
                                                      .Where(u => u.LastName == dto.LastName && u.FirstName == dto.FirstName)
                                                      .FirstOrDefaultAsync();
@@ -101,7 +56,7 @@ namespace KnowledgeSiteApp.Backend.Service
         }
 
 
-        public async Task<string> Login(LoginUserDto dto)
+        public async Task<User> Login(LoginUserDto dto)
         {
             try
             {
@@ -119,16 +74,7 @@ namespace KnowledgeSiteApp.Backend.Service
                 if (!PasswordHasher.VerifyPassword(dto.Password, user.Password))
                     throw new InvalidOperationException("Invalid password");
 
-                var authClaims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, user.Username),
-                    new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                };
-
-                var token = GetToken(authClaims);
-
-                return new JwtSecurityTokenHandler().WriteToken(token);
+                return user;
             }
             catch (Exception e)
             {
@@ -204,7 +150,7 @@ namespace KnowledgeSiteApp.Backend.Service
             {
                 var userExist = await context.Users
                                              .Where(u => u.Username == userName)
-                                             .FirstOrDefaultAsync();    
+                                             .FirstOrDefaultAsync();
 
                 if (userExist == null)
                     throw new InvalidOperationException("Admin not found");
