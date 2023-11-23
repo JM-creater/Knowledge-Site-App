@@ -9,15 +9,15 @@
 <link rel="stylesheet" type="text/css" href="css/main.css" />
 <link rel="stylesheet" type="text/css" href="css/common-forms-stylesheet.css" />
 
-<script>
-    const loadFile = (event) => {
-        var output = document.getElementById("output");
-        output.src = URL.createObjectURL(event.target.files[0]);
-    };
-</script>
+<BlazoredToasts Position="ToastPosition.BottomRight"
+                Timeout="5"
+                IconType="IconType.FontAwesome"
+                SuccessClass="success-toast-override"
+                SuccessIcon="fa fa-thumbs-up"
+                ErrorIcon="fa fa-bug" />
 
 <div class="centered-container">
-    <form class="login-form">
+    <EditForm Model="@newUser" OnValidSubmit="@HandleAddAdmin" class="login-form">
         <!-- Header -->
         <div class="header" style="margin-top: 5px; margin-bottom: 5px">
             <table align="center">
@@ -40,21 +40,38 @@
         <div class="form-group form-group-element"
              style="align-items: baseline; margin-left: 30%">
             <div style="margin-left: 5vh">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Jennie_Porsche_A4_2022.jpg/220px-Jennie_Porsche_A4_2022.jpg"
-                     id="output"
-                     style="
+                @if (!string.IsNullOrEmpty(uploadedImage))
+                {
+                    <img src="@uploadedImage"
+                         id="output"
+                         style="
                         display: inline-flex;
                         width: 20vh;
                         aspect-ratio: 1/1;
                         object-fit: cover;
                         border-radius: 50%;
-                        "
-                     alt="Profile Picture" />
+                            "
+                    alt="Profile Picture" />
+                }
+                else
+                {
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Jennie_Porsche_A4_2022.jpg/220px-Jennie_Porsche_A4_2022.jpg"
+                         id="output"
+                         style="
+                        display: inline-flex;
+                        width: 20vh;
+                        aspect-ratio: 1/1;
+                        object-fit: cover;
+                        border-radius: 50%;
+                            "
+                         alt="Profile Picture" />
+                }
+                
             </div>
         </div>
         <div class="form-group form-group-element" style="margin-left: 30%">
             <div style="margin-top: 5px; margin-bottom: 5px">
-                <InputFile id="file" type="file" style="font-family: inherit" OnChange="UploadImage" />
+                <InputFile id="file" style="font-family: inherit" OnChange="UploadImage" />
             </div>
         </div>
 
@@ -99,7 +116,7 @@
         <div class="form-group form-group-element">
             <input type="password"
                    class="form-control"
-                   id="last_name"
+                   id="password"
                    @bind="newUser.Password"
                    placeholder="Password" />
         </div>
@@ -108,7 +125,7 @@
         <div class="form-group form-group-element">
             <input type="password"
                    class="form-control"
-                   id="last_name"
+                   id="conPassword"
                    @bind="conPass"
                    placeholder="Confirm Password" />
         </div>
@@ -117,7 +134,7 @@
         <div>
             <button type="submit"
                     class="btn button btn-primary"
-                    @onclick="HandleAddAdmin">
+                    >
                 Add Admin
             </button>
         </div>
@@ -125,15 +142,10 @@
         <div>
             <a href="login.html" class="content-link-center">Return to Account Management</a>
         </div>
-    </form>
+    </EditForm>
 </div>
 
-<BlazoredToasts Position="ToastPosition.TopCenter"
-                Timeout="3"
-                IconType="IconType.FontAwesome"
-                SuccessClass="success-toast-override"
-                SuccessIcon="fa fa-thumbs-up"
-                ErrorIcon="fa fa-bug" />
+
 
 @code {
     private RegisterUserDto newUser = new RegisterUserDto();
@@ -144,18 +156,22 @@
 
     private async Task HandleAddAdmin()
     {
-        if (newUser.Username != null && newUser.FirstName != null && newUser.LastName != null && newUser.Email != null && newUser.Password != null && uploadedImage != null && newUser.Password == conPass)
+        if (newUser.Username != null && newUser.FirstName != null && newUser.LastName != null && newUser.Email != null && newUser.Password != null && uploadedImage != "" && newUser.Password == conPass)
         {
             var response = await SendAuthorizedRequest(HttpMethod.Post, "https://localhost:7095/api/User/add", JsonContent.Create(newUser));
 
             if (response.IsSuccessStatusCode)
             {
                 var createdAdmin = await response.Content.ReadFromJsonAsync<User>();
-                if (createdAdmin != null && !string.IsNullOrWhiteSpace(uploadedImage))
-                {
-                    await UploadAdminImage(createdAdmin.Id);
-                }
+                await UploadAdminImage(createdAdmin.Id);
+
                 toastService.ShowSuccess("Admin created successfully");
+                await Task.Delay(3000);
+                navigate.NavigateTo("/viewAdmin");
+            }
+            else if(response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+            {
+                toastService.ShowError("Full Name Already Exist!");
             }
             else
             {
@@ -187,9 +203,9 @@
         {
             toastService.ShowError("Please fill-up Password.");
         }
-        else if (newUser.Username != null && newUser.FirstName != null && newUser.LastName != null && newUser.Email != null && newUser.Password != null && uploadedImage == null && newUser.Password == conPass)
+        else if (newUser.Username != null && newUser.FirstName != null && newUser.LastName != null && newUser.Email != null && newUser.Password != null && uploadedImage == "" && newUser.Password == conPass)
         {
-            toastService.ShowError("Please Upload Imag.e");
+            toastService.ShowError("Please Upload Image.");
         }
         else if (newUser.Username != null && newUser.FirstName != null && newUser.LastName != null && newUser.Email != null && newUser.Password != null && uploadedImage != null && newUser.Password != conPass)
         {
@@ -221,12 +237,7 @@
         var bytes = Convert.FromBase64String(uploadedImage.Split(',')[1]);
         imageFile.Add(new ByteArrayContent(bytes), "image", "upload.png");
 
-        var response = await SendAuthorizedRequest(HttpMethod.Post, $"https://localhost:7095/api/User/SaveAdminImage/{adminId}", JsonContent.Create(imageFile));
-
-        if (response.IsSuccessStatusCode)
-        {
-            await js.InvokeVoidAsync("alert", "Admin Image Uploaded");
-        }
+        var response = await http.PostAsync($"https://localhost:7095/api/User/SaveAdminImage/{adminId}", imageFile);
     }
 
     private async Task<HttpResponseMessage> SendAuthorizedRequest(HttpMethod method, string url, HttpContent content = null)
