@@ -1,0 +1,305 @@
+﻿@page "/usercategories"
+@inject HttpClient http
+@inject IJSRuntime js
+@inject NavigationManager navigate
+@layout UserCategoriesLayout
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" type="text/css" href="css/main.css" />
+<link rel="stylesheet" type="text/css" href="css/categories-stylesheet.css" />
+
+<div class="container">
+    <!-- Search Bar -->
+    <form class="search-container">
+        <input type="text" placeholder="Search" @bind="searchTerm" @bind:event="oninput" />
+        <i class="fa fa-search" @onclick="HandleSearch"></i>
+    </form>
+    <div class="category-container">
+
+        <!-- Training Categories -->
+        @foreach (TrainingCategory ct in FilteredCategories)
+        {
+            <div class="category-box">
+                <button href="usertraining/@ct.Id" class="category-content">
+                    <h4>@ct.CategoryName</h4>
+                </button>
+                <div class="dropdown-container">
+                    <div class="dropdown" @onclick="() => ToggleDropdown(ct.Id)">
+                        <button class="dropdown-toggle dropdown-custom" type="button" data-bs-toggle="dropdown" id="dropdownMenuButton">
+                            <i class="fa fa-ellipsis-h"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Add Category Modal -->
+        <div class="modal fade"
+             id="staticBackdrop"
+             data-bs-backdrop="static"
+             data-bs-keyboard="false"
+             tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        @if (!string.IsNullOrEmpty(errorMessage))
+                        {
+                            <div class="text-danger">@errorMessage</div>
+                        }
+                        <h4 class="modal-title fs-5" id="staticBackdropLabel">
+                            Add New Category
+                        </h4>
+                        <button type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text"
+                               class="form-control"
+                               id="newCategoryInput"
+                               @bind="category.CategoryName"
+                               placeholder="Enter Category Name" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-add" @onclick="HandleAddCategory">Add</button>
+                        <button type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Category Modal -->
+        <div class="modal fade"
+             id="staticBackdropEdit"
+             data-bs-backdrop="static"
+             data-bs-keyboard="false"
+             tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        @if (!string.IsNullOrEmpty(errorMessage))
+                        {
+                            <div class="text-danger">@errorMessage</div>
+                        }
+                        <h4 class="modal-title fs-5" id="staticBackdropLabel">
+                            Edit Category
+                        </h4>
+                        <button type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text"
+                               class="form-control"
+                               id="editCategoryInput"
+                               @bind="category.CategoryName"
+                               placeholder="Enter Category Name" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-add" @onclick="HandleEditCategory">Save</button>
+                        <button type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@code {
+
+    private Training[] training { get; set; } = Array.Empty<Training>();
+    private TrainingCategory category = new TrainingCategory();
+    private TrainingCategory[] trainingcategory { get; set; } = Array.Empty<TrainingCategory>();
+    private Dictionary<int, bool> dropdownStates = new Dictionary<int, bool>();
+    private string searchTerm = string.Empty;
+    private string errorMessage;
+
+    [Parameter]
+    public EventCallback<int> OnEdit { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnDelete { get; set; }
+
+    private async Task HandleAddCategory()
+    {
+        var response = await SendAuthorizedRequest(HttpMethod.Post, "https://localhost:7095/api/TrainingCategory/add", JsonContent.Create(category));
+
+        if (response.IsSuccessStatusCode)
+        {
+            await js.InvokeVoidAsync("alert", "Category created successfully");
+            await ReloadCategories();
+        }
+        else
+        {
+            if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                var errorResponse = await response.Content.ReadFromJsonAsync<ValidationErrorResponse>();
+                errorMessage = String.Join(" ", errorResponse?.Errors.SelectMany(err => err.Value));
+            }
+            else
+            {
+                errorMessage = "An error occurred while adding the category. Please try again later.";
+            }
+
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var response = await SendAuthorizedRequest(HttpMethod.Get, "https://localhost:7095/api/TrainingCategory");
+        if (response.IsSuccessStatusCode)
+        {
+            trainingcategory = await response.Content.ReadFromJsonAsync<TrainingCategory[]>() ?? Array.Empty<TrainingCategory>();
+        }
+
+        foreach (var category in trainingcategory)
+        {
+            dropdownStates[category.Id] = false;
+        }
+    }
+
+    private async Task ReloadCategories()
+    {
+        var response = await SendAuthorizedRequest(HttpMethod.Get, "https://localhost:7095/api/TrainingCategory");
+        if (response.IsSuccessStatusCode)
+        {
+            trainingcategory = await response.Content.ReadFromJsonAsync<TrainingCategory[]>() ?? Array.Empty<TrainingCategory>();
+        }
+
+        foreach (var category in trainingcategory)
+        {
+            dropdownStates[category.Id] = false;
+        }
+        StateHasChanged();
+    }
+
+    private async Task HandleEditCategory()
+    {
+        var response = await SendAuthorizedRequest(HttpMethod.Put, $"https://localhost:7095/api/TrainingCategory/update/{category.Id}", JsonContent.Create(category));
+
+        if (response.IsSuccessStatusCode)
+        {
+            await js.InvokeVoidAsync("alert", "Category edited successfully");
+            await ReloadCategories();
+        }
+        else
+        {
+            if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                var errorResponse = await response.Content.ReadFromJsonAsync<ValidationErrorResponse>();
+                errorMessage = String.Join(" ", errorResponse?.Errors.SelectMany(err => err.Value));
+            }
+            else
+            {
+                errorMessage = "An error occurred while editing the category. Please try again later.";
+            }
+        }
+    }
+
+    private async Task ActivateDeactivateUser(int id)
+    {
+        var categoryStatus = trainingcategory.FirstOrDefault(u => u.Id == id);
+
+        if (categoryStatus == null)
+        {
+            throw new InvalidOperationException("Training Category not found");
+        }
+
+        var confirmationMessage = categoryStatus.IsActive ?
+            $"Do you want to deactivate {categoryStatus.CategoryName}'s ({categoryStatus.Id})?" :
+            $"Do you want to activate {categoryStatus.CategoryName}'s ({categoryStatus.Id})?";
+
+        if (await js.InvokeAsync<bool>("confirm", confirmationMessage))
+        {
+            categoryStatus.IsActive = !categoryStatus.IsActive;
+            var endpoint = categoryStatus.IsActive ? $"api/TrainingCategory/activate/{id}" : $"api/TrainingCategory/deactivate/{id}";
+            var response = await SendAuthorizedRequest(HttpMethod.Put, $"https://localhost:7095/{endpoint}", null);
+            if (response.IsSuccessStatusCode)
+            {
+                StateHasChanged();
+            }
+            else
+            {
+                categoryStatus.IsActive = !categoryStatus.IsActive;
+                await js.InvokeVoidAsync("alert", "Failed to update category status.");
+            }
+        }
+    }
+
+    private IEnumerable<TrainingCategory> FilteredCategories
+            => trainingcategory.Where(ct => string.IsNullOrEmpty(searchTerm) ||
+                ct.CategoryName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
+
+    private async Task HandleSearch()
+    {
+        var response = await SendAuthorizedRequest(HttpMethod.Get, $"https://localhost:7095/api/TrainingCategory/search?searchTerm={searchTerm}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            trainingcategory = await response.Content.ReadFromJsonAsync<TrainingCategory[]>();
+        }
+
+        foreach (var category in trainingcategory)
+        {
+            dropdownStates[category.Id] = false;
+        }
+
+        StateHasChanged();
+    }
+
+    private void EditCategory(TrainingCategory selectedCategory)
+    {
+        category = new TrainingCategory
+            {
+                Id = selectedCategory.Id,
+                CategoryName = selectedCategory.CategoryName
+            };
+    }
+
+    private void ToggleDropdown(int categoryId)
+    {
+        if (dropdownStates.ContainsKey(categoryId))
+        {
+            dropdownStates[categoryId] = !dropdownStates[categoryId];
+        }
+        else
+        {
+            dropdownStates.Add(categoryId, true);
+        }
+    }
+
+    private string GetDropdownMenuClass(int categoryId)
+    {
+        return dropdownStates.TryGetValue(categoryId, out var isOpen) && isOpen ? "dropdown-menu show" : "dropdown-menu";
+    }
+
+    private async Task<HttpResponseMessage> SendAuthorizedRequest(HttpMethod method, string url, HttpContent content = null)
+    {
+        var request = new HttpRequestMessage(method, url);
+        request.Headers.Add("X-API-KEY", "KNOWLEDGESITEAPPAPI");
+
+        if (content != null)
+        {
+            request.Content = content;
+        }
+
+        return await http.SendAsync(request);
+    }
+
+    public class ValidationErrorResponse
+    {
+        public Dictionary<string, string[]> Errors { get; set; }
+    }
+}
