@@ -25,7 +25,7 @@ namespace KnowledgeSiteApp.Backend.Service
                                         .FirstOrDefaultAsync();
 
             if (subTopic != null)
-                throw new InvalidOperationException("Topic is already exists");
+                throw new InvalidOperationException("Sub-Topic is already exists");
 
             var newSubTopic = mapper.Map<SubTopic>(dto);
 
@@ -47,7 +47,7 @@ namespace KnowledgeSiteApp.Backend.Service
             if (subTopic == null)
                 throw new InvalidOperationException("Sub Topic not found");
 
-            var uploadTrainingImage = await new ImagePathConfig().resourceImages(dto.Resource);
+            var uploadTrainingImage = await new ImagePathConfig().subTopicResource(dto.Resource);
 
             subTopic.Resource = uploadTrainingImage;
 
