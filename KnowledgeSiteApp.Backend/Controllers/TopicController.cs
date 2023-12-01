@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace KnowledgeSiteApp.Backend.Controllers
 {
     [ApiController, Route("api/[controller]")]
-    
     public class TopicController : ControllerBase
     {
         private readonly ITopicService service;
@@ -17,7 +16,6 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPost]
-        [ApiKey]
         public async Task<IActionResult> CreateTopic(CreateTopicDto dto)
         {
             var topic = await service.Create(dto);
@@ -25,8 +23,15 @@ namespace KnowledgeSiteApp.Backend.Controllers
             return Ok(topic);   
         }
 
+        [HttpPost("SaveTopicResources/{id}")]
+        public async Task<IActionResult> SaveTopicResources(int id, [FromForm] TopicResources dto)
+        {
+            var updateTopicResources = await service.SaveTopicResources(id, dto);
+
+            return Ok(updateTopicResources);
+        }
+
         [HttpGet]
-        [ApiKey]
         public async Task<IActionResult> GetAllTopic()
         {
             var topic = await service.GetAll();
@@ -56,14 +61,6 @@ namespace KnowledgeSiteApp.Backend.Controllers
             var topic = await service.Delete(id);
 
             return Ok(topic);   
-        }
-
-        [HttpPost("SaveTopicResources/{id}")]
-        public async Task<IActionResult> SaveTopicResources(int id, [FromForm] TopicResources dto)
-        {
-            var updateTopicResources = await service.SaveTopicResources(id, dto);
-
-            return Ok(updateTopicResources);
         }
 
         [HttpPost("SaveTopicVideo/{id}")]

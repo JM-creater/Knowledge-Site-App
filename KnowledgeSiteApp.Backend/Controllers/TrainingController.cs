@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 namespace KnowledgeSiteApp.Backend.Controllers
 {
     [ApiController, Route("api/[controller]")]
-    [ApiKey]
     public class TrainingController : ControllerBase
     {
         private readonly ITrainingService service;

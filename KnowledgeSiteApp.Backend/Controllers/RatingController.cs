@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace KnowledgeSiteApp.Backend.Controllers
 {
     [ApiController, Route("api/[controller]")]
-    [ApiKey]
     public class RatingController : ControllerBase
     {
         private readonly IRatingService service;

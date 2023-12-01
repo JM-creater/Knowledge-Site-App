@@ -46,6 +46,18 @@ namespace KnowledgeSiteApp.Backend.Core.Context
                 .WithMany()
                 .HasForeignKey(t => t.TrainingId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Training>()
+                .HasMany(t => t.Topics)
+                .WithOne(t => t.Training)
+                .HasForeignKey(t => t.TrainingId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Topic>()
+                .HasMany(t => t.SubTopics)
+                .WithOne(s => s.Topic)
+                .HasForeignKey(s => s.TopicId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

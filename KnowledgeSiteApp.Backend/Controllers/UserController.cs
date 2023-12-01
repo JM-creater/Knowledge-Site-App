@@ -88,7 +88,6 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPut("updateDetails/{id}")]
-        [ApiKey]
         public async Task<IActionResult> UpdateUserDetails(int id, [FromBody] UpdateUserDetailsDto dto)
         {
             var user = await service.UpdateDetails(id, dto);

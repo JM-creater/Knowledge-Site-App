@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using System.Collections.Generic;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace KnowledgeSiteApp.Models.Entities
 {
@@ -17,5 +14,7 @@ namespace KnowledgeSiteApp.Models.Entities
         public int? TrainingId { get; set; }
         public virtual Training Training { get; set; }
         public DateTime DateCreated { get; set; }
+        
+        public virtual ICollection<SubTopic> SubTopics { get; set; } = new List<SubTopic>();
     }
 }

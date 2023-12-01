@@ -16,19 +16,9 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPost]
-        [ApiKey]
         public async Task<IActionResult> Create(CreateSubTopicDto dto)
         {
             var subTopic = await service.Create(dto);
-
-            return Ok(subTopic);
-        }
-
-        [HttpGet]
-        [ApiKey]
-        public async Task<IActionResult> GetSubTopic()
-        {
-            var subTopic = await service.GetSubTopic();
 
             return Ok(subTopic);
         }
@@ -39,6 +29,14 @@ namespace KnowledgeSiteApp.Backend.Controllers
             var updatedTraining = await service.SaveSubTopicResources(id, dto);
 
             return Ok(updatedTraining);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetSubTopic()
+        {
+            var subTopic = await service.GetSubTopic();
+
+            return Ok(subTopic);
         }
 
         [HttpPost("SaveSubTopicVideo/{id}")]
