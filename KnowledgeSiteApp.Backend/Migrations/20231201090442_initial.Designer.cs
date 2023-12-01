@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KnowledgeSiteApp.Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231201085835_inital")]
-    partial class inital
+    [Migration("20231201090442_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -108,18 +108,16 @@ namespace KnowledgeSiteApp.Backend.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Resource")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TrainingId")
+                    b.Property<int?>("TrainingId")
                         .HasColumnType("int");
 
                     b.Property<string>("Video")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("YouTubeUrl")
@@ -264,9 +262,7 @@ namespace KnowledgeSiteApp.Backend.Migrations
                 {
                     b.HasOne("KnowledgeSiteApp.Models.Entities.Training", "Training")
                         .WithMany("Topics")
-                        .HasForeignKey("TrainingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("TrainingId");
 
                     b.Navigation("Training");
                 });
