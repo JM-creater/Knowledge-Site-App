@@ -105,18 +105,16 @@ namespace KnowledgeSiteApp.Backend.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Resource")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TrainingId")
+                    b.Property<int?>("TrainingId")
                         .HasColumnType("int");
 
                     b.Property<string>("Video")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("YouTubeUrl")
@@ -261,9 +259,7 @@ namespace KnowledgeSiteApp.Backend.Migrations
                 {
                     b.HasOne("KnowledgeSiteApp.Models.Entities.Training", "Training")
                         .WithMany("Topics")
-                        .HasForeignKey("TrainingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("TrainingId");
 
                     b.Navigation("Training");
                 });
