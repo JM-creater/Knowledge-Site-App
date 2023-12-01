@@ -100,6 +100,10 @@ namespace KnowledgeSiteApp.Backend.Migrations
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Resource")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");

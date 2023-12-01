@@ -36,9 +36,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Images\TrainingImages\" />
+    <Folder Include="Images\TopicResources\" />
+    <Folder Include="Images\TopicVideo\" />
     <Folder Include="Images\ProfileImage\" />
-    <Folder Include="Images\ResourcesImages\" />
+    <Folder Include="Images\SubTopicResources\" />
     <Folder Include="Images\SubTopicVideo\" />
     <Folder Include="Images\TrainingImages\" />
   </ItemGroup>

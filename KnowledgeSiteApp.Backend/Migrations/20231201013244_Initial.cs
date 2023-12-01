@@ -6,7 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace KnowledgeSiteApp.Backend.Migrations
 {
     /// <inheritdoc />
+<<<<<<<< HEAD:KnowledgeSiteApp.Backend/Migrations/20231201013244_Initial.cs
     public partial class Initial : Migration
+========
+    public partial class initial : Migration
+>>>>>>>> ac5a35d1ae7cafc36ec59d2c763b0054ced23d34:KnowledgeSiteApp.Backend/Migrations/20231201081035_initial.cs
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
