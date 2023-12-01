@@ -18,7 +18,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
 
         [HttpPost]
         [ApiKey]
-        public async Task<IActionResult> CreateTopic([FromBody] CreateTopicDto dto)
+        public async Task<IActionResult> CreateTopic(CreateTopicDto dto)
         {
             var topic = await service.Create(dto);
 
