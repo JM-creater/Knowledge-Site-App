@@ -1,6 +1,7 @@
 ﻿using KnowledgeSiteApp.Backend.Attributes;
 using KnowledgeSiteApp.Backend.Core.Dto;
 using KnowledgeSiteApp.Backend.Service;
+using KnowledgeSiteApp.Models.Dto;
 using Microsoft.AspNetCore.Mvc;
 
 namespace KnowledgeSiteApp.Backend.Controllers
@@ -16,7 +17,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateTopic([FromBody] TopicCreateDto dto)
+        public async Task<IActionResult> CreateTopic([FromBody] CreateTopicDto dto)
         {
             var topic = await service.Create(dto);
 
@@ -53,6 +54,22 @@ namespace KnowledgeSiteApp.Backend.Controllers
             var topic = await service.Delete(id);
 
             return Ok(topic);   
+        }
+
+        [HttpPost("SaveTopicResources/{id}")]
+        public async Task<IActionResult> SaveTopicResources(int id, [FromForm] TopicResources dto)
+        {
+            var updateTopicResources = await service.SaveTopicResources(id, dto);
+
+            return Ok(updateTopicResources);
+        }
+
+        [HttpPost("SaveTopicVideo/{id}")]
+        public async Task<IActionResult> SaveTopicVideo(int id, [FromForm] TopicVideo dto)
+        {
+            var updateTopicVide = await service.SaveTopicVideo(id, dto);
+
+            return Ok(updateTopicVide);
         }
     }
 }

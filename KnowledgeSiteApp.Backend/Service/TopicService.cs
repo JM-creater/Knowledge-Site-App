@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using KnowledgeSiteApp.Backend.Core.Context;
 using KnowledgeSiteApp.Backend.Core.Dto;
+using KnowledgeSiteApp.Backend.Core.ImageDirectory;
+using KnowledgeSiteApp.Models.Dto;
 using KnowledgeSiteApp.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,9 +18,9 @@ namespace KnowledgeSiteApp.Backend.Service
             mapper = _mapper;
         }
 
-        public async Task<Topic> Create(TopicCreateDto dto)
+        public async Task<Topic> Create(CreateTopicDto dto)
         {
-            var topic = await context.Topics
+            var topic = await context.SubTopics
                                         .Where(t => t.Title == dto.Title)
                                         .FirstOrDefaultAsync();
 
@@ -26,6 +28,8 @@ namespace KnowledgeSiteApp.Backend.Service
                 throw new InvalidOperationException("Topic is already exists");
 
             var newTopic = mapper.Map<Topic>(dto);
+
+            newTopic.DateCreated = DateTime.Now;
 
             context.Topics.Add(newTopic);
             await context.SaveChangesAsync();
@@ -80,6 +84,37 @@ namespace KnowledgeSiteApp.Backend.Service
 
             context.Topics.Remove(topic);
             await context.SaveChangesAsync();   
+
+            return topic;
+        }
+
+        public async Task<Topic> SaveTopicResources(int id, TopicResources dto)
+        {
+            var topic = await context.Topics.FindAsync(id);
+
+            if (topic == null)
+                throw new InvalidOperationException("Topic not found");
+
+            var uploadTrainingImage = await new ImagePathConfig().topicResource(dto.Resource);
+
+            topic.Resource = uploadTrainingImage;
+
+            await context.SaveChangesAsync();
+
+            return topic;
+        }
+        public async Task<Topic> SaveTopicVideo(int id, TopicVideo dto)
+        {
+            var topic = await context.Topics.FindAsync(id);
+
+            if (topic == null)
+                throw new InvalidOperationException("Topic not found");
+
+            var uploadTrainingImage = await new ImagePathConfig().topicVideo(dto.Video);
+
+            topic.Video = uploadTrainingImage;
+
+            await context.SaveChangesAsync();
 
             return topic;
         }
