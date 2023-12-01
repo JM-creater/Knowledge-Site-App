@@ -11,10 +11,10 @@ namespace KnowledgeSiteApp.Models.Entities
         public int TopicId { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
-        public string Video { get; set; }
+        public string? Video { get; set; }
         public string YouTubeUrl { get; set; }
-        public string Resource { get; set; }
-        public int TrainingId { get; set; }
+        public string? Resource { get; set; }
+        public int? TrainingId { get; set; }
         public virtual Training Training { get; set; }
         public DateTime DateCreated { get; set; }
     }
