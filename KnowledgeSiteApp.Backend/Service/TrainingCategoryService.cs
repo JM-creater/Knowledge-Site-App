@@ -40,6 +40,7 @@ namespace KnowledgeSiteApp.Backend.Service
 
         public Task<List<TrainingCategory>> GetAll()
             => context.TrainingCategories
+                      .Include(c => c.Trainings)
                       .OrderByDescending(c => c.DateCreated)
                       .ToListAsync();
 

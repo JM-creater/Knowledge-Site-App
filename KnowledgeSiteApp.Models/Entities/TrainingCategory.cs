@@ -9,4 +9,6 @@ public class TrainingCategory
     public string CategoryName { get; set; }
     public bool IsActive { get; set; }
     public DateTime DateCreated { get; set; }
+
+    public virtual ICollection<Training> Trainings { get; set; } = new List<Training>();
 }

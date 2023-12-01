@@ -4,6 +4,7 @@ using KnowledgeSiteApp.Backend.Core.Dto;
 using KnowledgeSiteApp.Backend.Core.ImageDirectory;
 using KnowledgeSiteApp.Models.Entities;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace KnowledgeSiteApp.Backend.Service
 {
@@ -53,6 +54,18 @@ namespace KnowledgeSiteApp.Backend.Service
             return training;
         }
 
+        public async Task<IEnumerable<Training>> GetAllTrainingByCategory(int? categoryId)
+        {
+            var trainings = context.Trainings.AsQueryable();
+
+            if (categoryId.HasValue)
+            {
+                trainings = trainings.Where(t => t.CategoryId == categoryId);
+            }
+
+            return await trainings.ToListAsync();
+        }
+
         public async Task<List<Training>> GetAll()
             => await context.Trainings
                             .Include(t => t.Admin)
@@ -65,6 +78,20 @@ namespace KnowledgeSiteApp.Backend.Service
                             .Include(u => u.Category)
                             .Where(u => u.Id == id)
                             .ToListAsync();
+
+        public async Task<IEnumerable<Training>> SearchTraining(string search)
+        {
+            var training = await context.Trainings
+                                        .Where(t => t.Title.Contains(search))
+                                        .ToListAsync();
+
+            if (string.IsNullOrWhiteSpace(search))
+            {
+                return await context.Trainings.ToListAsync();
+            }
+
+            return training;
+        }
 
         public async Task<Training> Update(int id, TrainingUpdateDto dto)
         {

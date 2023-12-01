@@ -17,5 +17,5 @@ public class Training
     public virtual TrainingCategory Category { get; set; }
     public bool IsActive { get; set; }
     public DateTime DateCreated { get; set; }
-    public ICollection<Topic> Topics { get; set; } = new List<Topic>();
+    public virtual ICollection<Topic> Topics { get; set; } = new List<Topic>();
 }

@@ -2,6 +2,7 @@
 using KnowledgeSiteApp.Backend.Core.Dto;
 using KnowledgeSiteApp.Backend.Service;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace KnowledgeSiteApp.Backend.Controllers
 {
@@ -39,6 +40,15 @@ namespace KnowledgeSiteApp.Backend.Controllers
             return Ok(training);
         }
 
+        [HttpGet("trainingByCategory")]
+        public async Task<IActionResult> GetTrainingsByCategory(int? categoryId)
+        {
+            var training = await service.GetAllTrainingByCategory(categoryId);
+
+            return Ok(training);
+        }
+
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdTraining([FromRoute] int id)
         {
@@ -53,6 +63,14 @@ namespace KnowledgeSiteApp.Backend.Controllers
             var training = await service.Update(id, dto);
 
             return Ok(training);
+        }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> Search(string searchTerm)
+        {
+            var categories = await service.SearchTraining(searchTerm);
+
+            return Ok(categories);
         }
 
         [HttpPut("activate/{id}")]
