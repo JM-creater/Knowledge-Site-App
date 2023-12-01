@@ -75,7 +75,7 @@
     {
         if (newTopic.Title != null && newTopic.Description != null && newTopic.YouTubeUrl != null && uploadedResourceFiles != null && uploadedVideoFiles != null)
         {
-            var response = await SendAuthorizedRequest(HttpMethod.Post, "https://localhost:7095/api/SubTopics", JsonContent.Create(newTopic));
+            var response = await SendAuthorizedRequest(HttpMethod.Post, "https://localhost:7095/api/Topic", JsonContent.Create(newTopic));
             if (response.IsSuccessStatusCode)
             {
                 var createdSubTopic = await response.Content.ReadFromJsonAsync<Topic>();
@@ -114,6 +114,11 @@
         {
             toastService.ShowError("Please upload Video.");
         }
+        else 
+        {
+            toastService.ShowError("Fill up all fields");
+        }
+
     }
 
     private void OnVideoFileChanged(InputFileChangeEventArgs e)
@@ -135,7 +140,7 @@
             var content = new MultipartFormDataContent();
             content.Add(new StreamContent(stream), "Video", videoFile.Name);
 
-            var response = await http.PostAsync($"https://localhost:7095/api/Topics/SaveTopicVideo/{topicId}", content);
+            var response = await http.PostAsync($"https://localhost:7095/api/Topic/SaveTopicVideo/{topicId}", content);
         }
     }
 
@@ -150,13 +155,13 @@
                 formData.Add(new StreamContent(stream), "Resource", file.Name);
             }
 
-            var response = await http.PostAsync($"https://localhost:7095/api/Topics/SaveTopicResources/{topicId}", formData);
+            var response = await http.PostAsync($"https://localhost:7095/api/Topic/SaveTopicResources/{topicId}", formData);
         }
     }
 
     protected override async Task OnInitializedAsync()
     {
-        var response = await SendAuthorizedRequest(HttpMethod.Get, "https://localhost:7095/api/Topics");
+        var response = await SendAuthorizedRequest(HttpMethod.Get, "https://localhost:7095/api/Topic");
 
         if (response.IsSuccessStatusCode)
         {

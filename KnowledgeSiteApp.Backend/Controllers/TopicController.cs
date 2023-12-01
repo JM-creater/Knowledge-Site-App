@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace KnowledgeSiteApp.Backend.Controllers
 {
     [ApiController, Route("api/[controller]")]
-    [ApiKey]
+    
     public class TopicController : ControllerBase
     {
         private readonly ITopicService service;
@@ -17,6 +17,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPost]
+        [ApiKey]
         public async Task<IActionResult> CreateTopic([FromBody] CreateTopicDto dto)
         {
             var topic = await service.Create(dto);
@@ -25,6 +26,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpGet]
+        [ApiKey]
         public async Task<IActionResult> GetAllTopic()
         {
             var topic = await service.GetAll();
