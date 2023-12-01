@@ -20,7 +20,7 @@ namespace KnowledgeSiteApp.Backend.Service
 
         public async Task<Topic> Create(CreateTopicDto dto)
         {
-            var topic = await context.SubTopics
+            var topic = await context.Topics
                                         .Where(t => t.Title == dto.Title)
                                         .FirstOrDefaultAsync();
 
