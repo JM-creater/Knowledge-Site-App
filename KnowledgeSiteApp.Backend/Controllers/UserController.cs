@@ -63,12 +63,37 @@ namespace KnowledgeSiteApp.Backend.Controllers
             return Ok(user);
         }
 
-        [HttpPut("update-password")]
-        public async Task<IActionResult> Update(UpdatePasswordDto dto)
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword(string email)
         {
-            var user = await service.ResetPassword(dto);
+            try
+            {
+                var user = await service.ForgotPassword(email);
 
-            return Ok(user);
+                return Ok(user);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
+        {
+            try
+            {
+                var user = await service.ResetPassword(dto);
+                if (user != null)
+                {
+                    return Ok(user);
+                }
+                return BadRequest("Failed to reset password");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpPut("{id}/profile-pic")]

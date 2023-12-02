@@ -10,7 +10,8 @@ namespace KnowledgeSiteApp.Backend.Service
         public Task<List<User>> GetAllUser();
         public Task<List<User>> GetAllByAdmin();
         public Task<User> GetById(int id);
-        public Task<User> ResetPassword(UpdatePasswordDto dto);
+        public Task<User> ForgotPassword(string email);
+        public Task<User> ResetPassword(ResetPasswordDto dto);
         public Task<User> UpdateProfilePic(int userId, string newProfilePicture);
         public Task<User> Validate(string userName, ValidateUserDto dto);
         public Task<User> UpdateDetails(int id, UpdateUserDetailsDto dto);

@@ -15,4 +15,7 @@ public class User
     public bool IsActive { get; set; }
     public string? Image { get; set; }
     public DateTime DateCreated { get; set; }
+    public DateTime DateUpdated { get; set; }
+    public string? PasswordResetToken { get; set; }
+    public DateTime? ResetTokenExpires { get; set; }
 }
