@@ -39,6 +39,14 @@ namespace KnowledgeSiteApp.Backend.Controllers
             return Ok(subTopic);
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetByIdSubTopic(int id)
+        {
+            var subTopic = await service.GetById(id);
+
+            return Ok(subTopic);
+        }
+
         [HttpPost("SaveSubTopicVideo/{id}")]
         public async Task<IActionResult> SaveSubTopicVideo(int id, [FromForm] SubTopicVideoDto dto)
         {

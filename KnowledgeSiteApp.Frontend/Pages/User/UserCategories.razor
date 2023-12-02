@@ -1,4 +1,4 @@
-﻿@page "/usercategories"
+﻿@page "/"
 @inject HttpClient http
 @inject IJSRuntime js
 @inject NavigationManager navigate
@@ -10,7 +10,6 @@
 <link rel="stylesheet" type="text/css" href="css/categories-stylesheet.css" />
 
 <div class="container">
-    <!-- Search Bar -->
     <h4>Welcome to LearnNest!</h4>
     <form class="search-container">
         <input type="text" placeholder="Search" @bind="searchTerm" @bind:event="oninput" />
@@ -18,7 +17,6 @@
     </form>
     <div class="category-container">
 
-        <!-- Training Categories -->
         @foreach (TrainingCategory ct in FilteredCategories)
         {
             <div class="category-box">

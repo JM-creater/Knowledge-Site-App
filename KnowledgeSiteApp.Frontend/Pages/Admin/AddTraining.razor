@@ -156,12 +156,7 @@
         var bytes = Convert.FromBase64String(uploadedImage.Split(',')[1]);
         imageFile.Add(new ByteArrayContent(bytes), "image", "upload.png");
 
-        var response = await SendAuthorizedRequest(HttpMethod.Post, $"https://localhost:7095/api/Training/SaveTrainingImage/{trainingId}", JsonContent.Create(imageFile));
-
-        if (response.IsSuccessStatusCode)
-        {
-            await js.InvokeVoidAsync("alert", "Traning Image Uploaded");
-        }
+        var response = await http.PostAsync($"https://localhost:7095/api/Training/SaveTrainingImage/{trainingId}", imageFile);
     }
 
     private async Task UploadImage(InputFileChangeEventArgs e)

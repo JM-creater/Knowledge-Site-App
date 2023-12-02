@@ -41,12 +41,14 @@ namespace KnowledgeSiteApp.Backend.Service
             => await context.Topics
                             .Include(t => t.Training)
                                 .ThenInclude(t => t.Category)
+                            .Include(t => t.SubTopics)
                             .ToListAsync();
 
         public async Task<List<Topic>> GetById(int id)
             => await context.Topics
                             .Include(t => t.Training)
                                 .ThenInclude(t => t.Category)
+                            .Include(t => t.SubTopics)  
                             .Where(t => t.TopicId == id)
                             .ToListAsync();
 

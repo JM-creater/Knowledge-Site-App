@@ -68,14 +68,15 @@ namespace KnowledgeSiteApp.Backend.Service
         public async Task<List<Training>> GetAll()
             => await context.Trainings
                             .Include(t => t.Admin)
-                            .Include(t => t.Category)  
                             .Include(t => t.Topics)
+                                .ThenInclude(t => t.SubTopics)
                             .ToListAsync();
 
         public async Task<List<Training>> GetById(int id)
             => await context.Trainings
                             .Include(u => u.Admin)
-                            .Include(u => u.Category)
+                            .Include(t => t.Topics)
+                                .ThenInclude(t => t.SubTopics)
                             .Where(u => u.Id == id)
                             .ToListAsync();
 
