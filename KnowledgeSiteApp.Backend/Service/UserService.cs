@@ -5,11 +5,14 @@ using KnowledgeSiteApp.Backend.Core.Dto;
 using KnowledgeSiteApp.Backend.Core.Encryption;
 using KnowledgeSiteApp.Backend.Core.Enum;
 using KnowledgeSiteApp.Backend.Core.ImageDirectory;
+using KnowledgeSiteApp.Backend.Core.Token;
 using KnowledgeSiteApp.Models.Dto;
 using KnowledgeSiteApp.Models.Entities;
+using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using MimeKit;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Authentication;
 using System.Security.Claims;
@@ -21,10 +24,12 @@ namespace KnowledgeSiteApp.Backend.Service
     {
         private readonly AppDbContext context;
         private readonly IMapper mapper;
-        public UserService(AppDbContext dbcontext, IMapper Imapper)
+        private readonly IConfiguration configuration;
+        public UserService(AppDbContext dbcontext, IMapper Imapper, IConfiguration _configuration)
         {
             context = dbcontext;
             mapper = Imapper;
+            configuration = _configuration;
         }
 
         public async Task<User> Register(RegisterUserDto dto)
@@ -119,24 +124,85 @@ namespace KnowledgeSiteApp.Backend.Service
             }
         }
 
-        public async Task<User> ResetPassword(UpdatePasswordDto dto)
+        public async Task SendEmailAsync(string email, string subject, string message)
+        {
+            var emailSettings = configuration.GetSection("EmailSettings");
+            var mimeMessage = new MimeMessage();
+            mimeMessage.From.Add(new MailboxAddress(emailSettings["SenderName"], emailSettings["Sender"]));
+            mimeMessage.To.Add(MailboxAddress.Parse(email));
+            mimeMessage.Subject = subject;
+
+            mimeMessage.Body = new TextPart("html") { Text = message };
+
+            using (var client = new SmtpClient())
+            {
+                await client.ConnectAsync(emailSettings["MailServer"], int.Parse(emailSettings["MailPort"]), false);
+                client.AuthenticationMechanisms.Remove("XOAUTH2");
+                await client.AuthenticateAsync(emailSettings["Sender"], emailSettings["Password"]);
+                await client.SendAsync(mimeMessage);
+                await client.DisconnectAsync(true);
+            }
+        }
+
+        public async Task SendPasswordResetEmail(string email, string token) 
+        {
+            string resetLink = $"http://127.0.0.1:5173/forgot_password?email={Uri.EscapeDataString(email)}&token={Uri.EscapeDataString(token)}";
+            string subject = "Password Reset Request";
+            string message = $"Please click on the link to reset your password: <a href='{resetLink}'>Reset Password</a>";
+
+            await SendEmailAsync(email, subject, message);
+        }
+
+        public async Task<User> ForgotPassword(string email)
         {
             try
             {
-                var existingUser = await context.Users
-                                                .Where(u => u.Username == dto.Username)
-                                                .FirstOrDefaultAsync();
+                var user = await context.Users
+                                        .Where(u => u.Email == email)
+                                        .FirstOrDefaultAsync();
 
-                if (existingUser == null)
-                    throw new InvalidOperationException("Admin not found");
+                if (user == null)
+                {
+                    throw new InvalidOperationException("User not found");
+                }
 
-                var newPassword = PasswordHasher.EncryptPassword(dto.Password);
+                user.PasswordResetToken = RandomToken.CreateRandomToken();
+                user.ResetTokenExpires = DateTime.Now.AddDays(1);
 
-                existingUser.Password = newPassword;
-
+                context.Users.Update(user);
                 await context.SaveChangesAsync();
 
-                return mapper.Map<User>(existingUser);
+                await SendPasswordResetEmail(user.Email, user.PasswordResetToken);
+
+                return user;
+            }
+            catch (Exception e)
+            {
+                throw new ArgumentException(e.Message);
+            }
+        }
+
+        public async Task<User> ResetPassword(ResetPasswordDto dto)
+        {
+            try
+            {
+                var user = await context.Users
+                                        .Where(u => u.PasswordResetToken == dto.Token)
+                                        .FirstOrDefaultAsync();
+
+                if (user == null || user.ResetTokenExpires < DateTime.Now)
+                {
+                    throw new InvalidOperationException("Invalid Token.");
+                }
+
+                user.Password = PasswordHasher.EncryptPassword(dto.NewPassword);
+                user.PasswordResetToken = null;
+                user.ResetTokenExpires = null;
+
+                context.Users.Update(user);
+                await context.SaveChangesAsync();
+
+                return user;
             }
             catch (Exception e)
             {
