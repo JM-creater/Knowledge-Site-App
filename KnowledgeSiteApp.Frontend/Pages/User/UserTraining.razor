@@ -18,11 +18,11 @@
     <div class="category-container">
 
         <!-- Training -->
-        @foreach (Training ct in FilteredTrainings)
+        @foreach (Training tr in FilteredTrainings)
         {
             <div class="category-box">
-                <button href="usertraining/@ct.Id" class="category-content">
-                    <h4>@ct.Title</h4>
+                <button @onclick="() => NavigateToStartTraining(tr.Id)" class="category-content">
+                    <h4>@tr.Title</h4>
                 </button>
             </div>
         }
@@ -35,6 +35,11 @@
     private Training[] training { get; set; } = Array.Empty<Training>();
     private string searchTerm = string.Empty;
     private string errorMessage;
+
+    private void NavigateToStartTraining(int trainingId)
+    {
+        navigate.NavigateTo($"/starttraining/{trainingId}");
+    }
 
     protected override async Task OnParametersSetAsync()
     {

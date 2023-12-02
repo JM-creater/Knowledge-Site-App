@@ -38,7 +38,15 @@ namespace KnowledgeSiteApp.Backend.Service
         }
 
         public async Task<List<SubTopic>> GetSubTopic()
-            => await context.SubTopics.ToListAsync();
+            => await context.SubTopics
+                            .Include(st => st.Topic)
+                            .ToListAsync();
+
+        public async Task<List<SubTopic>> GetById(int id)
+            => await context.SubTopics
+                            .Include(st => st.Topic)
+                            .Where(st => st.Id == id)   
+                            .ToListAsync();
 
         public async Task<SubTopic> SaveSubTopicResources(int id, SubTopicResourcesDto dto)
         {
