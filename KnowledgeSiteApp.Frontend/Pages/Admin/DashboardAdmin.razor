@@ -1,8 +1,23 @@
 ﻿@page "/dashboardadmin"
 @layout AdminMainLayout
+@inject AdminService service
 
 <h3>DashboardAdmin</h3>
 
+@if (AdminId > 0)
+{
+    <p>Welcome, Admin with ID: @AdminId</p>
+}
+else
+{
+    <p>Please log in to view this page.</p>
+}
+
 @code {
-    [CascadingParameter] public int AdminId { get; set; }
+    private int? AdminId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        AdminId = await service.GetUserIdAsync() ?? 0;
+    }
 }
