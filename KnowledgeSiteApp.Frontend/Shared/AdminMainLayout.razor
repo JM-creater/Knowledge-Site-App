@@ -1,6 +1,8 @@
 ﻿@inherits LayoutComponentBase
+@inject AdminService adminService
 
-<div class="bb-page">
+<CascadingValue Value="adminService.AdminId">
+    <div class="bb-page">
 
     <Sidebar @ref="sidebar"
              Title="LearnNest"
@@ -20,6 +22,7 @@
     </main>
 
 </div>
+</CascadingValue>
 
 @code {
     private Sidebar sidebar = default!;
@@ -64,5 +67,4 @@
     .bb-top-row {
         background-color: #FFC95F;
     }
-
 </style>

@@ -14,8 +14,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 <script language="javascript" type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
 
-<div class="centered-container">
-    <h2 style="
+    <div class="centered-container">
+        <h2 style="
         font-weight: 700;
         font-size: 4vh;
         margin-left: 40%;
@@ -24,29 +24,29 @@
         margin-bottom: auto;
         color: #862b0d;
         ">
-        @currentTraining.Title
-    </h2>
-</div>
-<div style="margin-left: 1vh; margin-right: auto; margin-bottom: 5vh"
-        class="centered-container left-flexbox">
-    <!-- Training content -->
-    <div class="container">
-        <div class="item container-inside"
-                style="align-items: center; width: 60%; padding: 0px">
-            <img style="
+            @currentTraining.Title
+        </h2>
+    </div>
+    <div style="margin-left: 1vh; margin-right: auto; margin-bottom: 5vh"
+         class="centered-container left-flexbox">
+        <!-- Training content -->
+        <div class="container">
+            <div class="item container-inside"
+                 style="align-items: center; width: 60%; padding: 0px">
+                <img style="
                 width: 100%;
                 height: 100%;
                 aspect-ratio: 1/1;
                 object-fit: cover;
             "
                  src=@($"https://localhost:7095/{currentTraining.Image}")
-                    alt="Training Image" />
-        </div>
-        <div class="item right-flexbox"
-                style="align-items: center; width: 40%">
-            <div class="item-inside" style="height: 100%">
-                <div class="form-group form-group-element">
-                    <h4 style="
+                     alt="Training Image" />
+            </div>
+            <div class="item right-flexbox"
+                 style="align-items: center; width: 40%">
+                <div class="item-inside" style="height: 100%">
+                    <div class="form-group form-group-element">
+                        <h4 style="
                         font-weight: 600;
                         font-size: 18px;
                         text-align: center;
@@ -54,19 +54,19 @@
                         margin-bottom: 2vh;
                         color: #862b0d;
                     ">
-                        Description
-                    </h4>
-                    <p style="font-size: inherit; text-align: justify">
-                        @currentTraining.Description
-                    </p>
+                            Description
+                        </h4>
+                        <p style="font-size: inherit; text-align: justify">
+                            @currentTraining.Description
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="edit-link">
-    <a style="
+    <div class="edit-link">
+        <a style="
           font-weight: 600;
           font-size: 20px;
           font-weight: bolder;
@@ -76,34 +76,33 @@
           color: #862b0d;
           cursor: pointer;
         "
-       @onclick="EditCurrentTraining">
+           @onclick="EditCurrentTraining">
             Edit This Training
-    </a>
-</div>
+        </a>
+    </div>
 
-<div class="nav-buttons">
-    <button style="
+    <div class="nav-buttons">
+        <button style="
                   display: inline;
                   border-style: solid;
                   font-size: 50px;
                   color: #ffc95f;
                 "
-            @onclick="PreviousTraining">
-        <Icon CustomIconName="fa-solid fa-circle-arrow-left" />
-    </button>
-    <button style="
+                @onclick="PreviousTraining">
+            <Icon CustomIconName="fa-solid fa-circle-arrow-left" />
+        </button>
+        <button style="
                   display: inline;
                   border-style: solid;
                   font-size: 50px;
                   color: #ffc95f;
                 "
-            @onclick="NextTraining">
-        <Icon CustomIconName="fa-solid fa-circle-arrow-right" />
-    </button>
-</div>
+                @onclick="NextTraining">
+            <Icon CustomIconName="fa-solid fa-circle-arrow-right" />
+        </button>
+    </div>
 
 @code {
-    [Parameter] public int adminId { get; set; }
     private Training[] trainings;
     private int currentIndex = 0;
     private Training currentTraining => trainings[currentIndex];

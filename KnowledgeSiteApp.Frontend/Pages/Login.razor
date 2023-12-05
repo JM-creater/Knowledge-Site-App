@@ -3,6 +3,7 @@
 @inject IJSRuntime js
 @inject NavigationManager navigate
 @layout LoginLayout
+@inject AdminService adminService
 
 <link href="css/login-stylesheet.css" rel="stylesheet" />
 <link href="css/main.css" rel="stylesheet" />
@@ -55,13 +56,14 @@
         if (response.IsSuccessStatusCode)
         {
             var user = await response.Content.ReadFromJsonAsync<KnowledgeSiteApp.Models.Entities.User>();
+            adminService.SetAdminId(user.Id);
             if (user.Role == 1) //Admin Role
             {
-                navigate.NavigateTo($"/addTopic/{user.Id}");
+                    navigate.NavigateTo($"/addTopic/{user.Id}");
             }
             else if (user.Role == 2) //Super-Admin
             {
-                navigate.NavigateTo($"/dashboard/{user.Id}");
+                    navigate.NavigateTo($"/dashboard/{user.Id}");
             }
         }
         else

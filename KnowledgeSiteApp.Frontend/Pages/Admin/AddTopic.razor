@@ -1,4 +1,4 @@
-﻿@page "/addTopic"
+﻿@page "/addTopic/{AdminId:int}"
 @inject HttpClient http
 @inject IJSRuntime js
 @inject NavigationManager navigate
@@ -75,6 +75,8 @@
 </div>
 
 @code {
+    [Parameter]
+    public int AdminId { get; set; }
     private CreateTopicDto newTopic = new CreateTopicDto();
     private Topic[] getTopic { get; set; } = Array.Empty<Topic>();
     private Training[] getTraining { get; set; } = Array.Empty<Training>();

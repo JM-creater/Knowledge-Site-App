@@ -108,6 +108,7 @@
 
 
 @code {
+    [Parameter] public int adminId { get; set; }
     [Parameter] public int Id { get; set; }
     private Training editTraining;
     private TrainingCategory[] getCategory { get; set; } = Array.Empty<TrainingCategory>();
