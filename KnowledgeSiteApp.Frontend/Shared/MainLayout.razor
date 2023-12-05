@@ -37,7 +37,7 @@
     {
         navItems = new List<NavItem>
         {
-            new NavItem { Id = "1", Href = "/index", IconName = IconName.HouseDoorFill, Text = "Home", Match=NavLinkMatch.All},
+            new NavItem { Id = "1", Href = "/", IconName = IconName.HouseDoorFill, Text = "Dashboard", Match=NavLinkMatch.All},
 
             new NavItem { Id = "2", IconName = IconName.LayoutSidebarInset, Text = "User" },
             new NavItem { Id = "3", Href = "/viewAdmin", IconName = IconName.CheckCircleFill, Text = "View Admin", ParentId="2"},
@@ -48,13 +48,14 @@
             new NavItem { Id = "7", Href = "/addTraining", IconName = IconName.CheckCircleFill, Text = "Add Training", ParentId="5"},
 
             new NavItem { Id = "8", IconName = IconName.LayoutSidebarInset, Text = "Topic" },
-            new NavItem { Id = "9", Href = "/addTopic", IconName = IconName.CheckCircleFill, Text = "Add Topic", ParentId="8"},
+            new NavItem { Id = "9", Href = "/viewTopics", IconName = IconName.CheckCircleFill, Text = "View Topic", ParentId="8"},
+            new NavItem { Id = "10", Href = "/addTopic", IconName = IconName.CheckCircleFill, Text = "Add Topic", ParentId="8"},
 
-            new NavItem { Id = "10", IconName = IconName.LayoutSidebarInset, Text = "Sub Topic" },
-            new NavItem { Id = "11", Href = "/addSubTopic", IconName = IconName.CheckCircleFill, Text = "Add Sub Topic", ParentId="10"},
+            new NavItem { Id = "11", IconName = IconName.LayoutSidebarInset, Text = "Sub Topic" },
+            new NavItem { Id = "12", Href = "/addSubTopic", IconName = IconName.CheckCircleFill, Text = "Add Sub Topic", ParentId="11"},
 
-            new NavItem { Id = "12", IconName = IconName.LayoutSidebarInset, Text = "Training Category" },
-            new NavItem { Id = "13", Href = "/categoryMain", IconName = IconName.CheckCircleFill, Text = "View Category", ParentId="12"},
+            new NavItem { Id = "13", IconName = IconName.LayoutSidebarInset, Text = "Training Category" },
+            new NavItem { Id = "14", Href = "/categoryMain", IconName = IconName.CheckCircleFill, Text = "View Category", ParentId="13"},
         };
 
         return navItems;

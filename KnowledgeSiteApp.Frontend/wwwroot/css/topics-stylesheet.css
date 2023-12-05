@@ -57,9 +57,13 @@ input[type="text"] {
     background: transparent;
     border: transparent;
     border-bottom: 2px solid #333333;
-    outline: none;
     padding: 5px 10px;
+    outline: none;
 }
+
+    input[type="text"]:focus {
+        border-bottom: 2px solid #ffc95f;
+    }
 
 .topic,
 .description {
@@ -87,60 +91,6 @@ input[type="text"] {
     .btn-add:not(:disabled):not(.disabled):active,
     .btn-update:not(:disabled):not(.disabled):active {
         color: white;
-    }
-
-/* Topic View */
-
-/* Table */
-.table {
-    width: 80%;
-    border: 3px solid #ffc95f;
-    color: #862b0d;
-}
-
-.dropdown {
-    cursor: pointer;
-    margin-right: 10px;
-}
-
-    .dropdown i {
-        transition: transform 0.3s ease;
-    }
-
-    .dropdown.open i {
-        transform: rotate(90deg);
-    }
-
-.sub-topics {
-    display: none;
-}
-
-    .sub-topics.show {
-        display: block;
-    }
-
-.inner-row {
-    display: flex;
-    justify-content: space-between;
-    list-style-type: disc;
-}
-
-a {
-    color: #862b0d;
-    text-decoration: none;
-}
-
-.icon-click {
-    color: #862b0d;
-    outline: none;
-    border: none;
-    margin: 0;
-    background-color: transparent;
-}
-
-    .icon-click:hover,
-    .dropdown:hover {
-        color: #ffc95f;
     }
 
 /* Responsive */
@@ -178,16 +128,7 @@ a {
 }
 
 @media (max-width: 80em) {
-    .table {
-        width: 100%;
-    }
-
     .container-full {
         padding: 3em;
-    }
-
-    .icons {
-        display: flex;
-        flex-direction: column;
     }
 }
