@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Json;
 using Blazored.LocalStorage;
+using Blazored.SessionStorage;
 using KnowledgeSiteApp.Models.Dto;
 
 namespace KnowledgeSiteApp.Frontend.Pages
@@ -8,26 +9,26 @@ namespace KnowledgeSiteApp.Frontend.Pages
     {
         private readonly HttpClient _httpClient;
         private readonly ILogger<AdminService> _logger;
-        private readonly ILocalStorageService _localStorage;
+        private readonly ISessionStorageService _sessionStorage;
 
         public Models.Entities.User User { get; private set; } = new Models.Entities.User();
         public bool IsAuthenticated { get; private set; }
 
-        public AdminService(HttpClient httpClient, ILogger<AdminService> logger, ILocalStorageService localStorage)
+        public AdminService(HttpClient httpClient, ILogger<AdminService> logger, ISessionStorageService sessionStorage)
         {
             _httpClient = httpClient;
             _logger = logger;
-            _localStorage = localStorage;
+            _sessionStorage = sessionStorage;
         }
 
         public async Task SaveUserIdAsync(int userId)
         {
-            await _localStorage.SetItemAsync("UserId", userId);
+            await _sessionStorage.SetItemAsync("UserId", userId);
         }
 
         public async Task<int?> GetUserIdAsync()
         {
-            return await _localStorage.GetItemAsync<int?>("UserId");
+            return await _sessionStorage.GetItemAsync<int?>("UserId");
         }
 
         public async Task Login(LoginUserDto loginUser)
