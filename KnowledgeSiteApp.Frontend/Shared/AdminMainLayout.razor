@@ -1,9 +1,7 @@
 ﻿@inherits LayoutComponentBase
 @inject AdminService adminService
 
-<CascadingValue Value="adminService.User.Id">
-    <div class="bb-page">
-
+<div class="bb-page">
     <Sidebar @ref="sidebar"
              Title="LearnNest"
              DataProvider="SidebarDataProvider"
@@ -20,9 +18,7 @@
             </div>
         </article>
     </main>
-
 </div>
-</CascadingValue>
 
 @code {
     private Sidebar sidebar = default!;
@@ -30,15 +26,16 @@
 
     private async Task<SidebarDataProviderResult> SidebarDataProvider(SidebarDataProviderRequest request)
     {
+        var userId = await adminService.GetUserIdAsync() ?? 0;
         if (navItems is null)
-            navItems = GetNavItems();
+            navItems = await GetNavItems(userId);
 
         return await Task.FromResult(request.ApplyTo(navItems));
     }
 
-    private IEnumerable<NavItem> GetNavItems()
+    private async Task<IEnumerable<NavItem>> GetNavItems(int userId)
     {
-        navItems = new List<NavItem>
+        return new List<NavItem>
         {
             new NavItem { Id = "1", Href = "/dashboardadmin", IconName = IconName.List, Text = "Dashboard" },
             new NavItem { Id = "2", IconName = IconName.Book, Text = "Training" },
@@ -54,7 +51,6 @@
             new NavItem { Id = "9", Href = "/categoryMain", IconName = IconName.List, Text = "View Category" },
         };
 
-        return navItems;
     }
 }
 

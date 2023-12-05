@@ -140,6 +140,7 @@
 </div>
 
 @code {
+    [CascadingParameter] public int AdminId { get; set; }
     private TrainingCategory category = new TrainingCategory();
     private TrainingCategory[] trainingcategory { get; set; } = Array.Empty<TrainingCategory>();
     private Dictionary<int, bool> dropdownStates = new Dictionary<int, bool>();

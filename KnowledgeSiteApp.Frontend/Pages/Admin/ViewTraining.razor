@@ -116,7 +116,7 @@ else
 
 
 @code {
-    [CascadingParameter] public int AdminId { get; set; }
+    private int? AdminId { get; set; }
     private Training[] trainings;
     private int currentIndex = 0;
     private Training currentTraining => currentIndex >= 0 && currentIndex < trainings?.Length
@@ -131,7 +131,9 @@ else
         }
 
         var response = await http.GetFromJsonAsync<Training[]>($"https://localhost:7095/api/Training/trainingByAdminId/{AdminId}");
+
         trainings = response ?? Array.Empty<Training>();
+
         StateHasChanged();
     }
 
