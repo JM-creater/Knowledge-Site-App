@@ -1,4 +1,4 @@
-﻿@page "/viewTopics"
+﻿@page "/viewTopics/{TrainingId:int}"
 @inject HttpClient http
 @inject IJSRuntime js
 @inject NavigationManager navigate
@@ -23,7 +23,7 @@
                 <th scope="col" style="width: 5%"></th>
                 <th scope="col" style="width: 75%; text-align: center">Topic</th>
                 <th scope="col" style="width: 10%; text-align: right">
-                    <button class="icon-click">
+                    <button class="icon-click" @onclick="GoToAddTopic">
                         <i class="fa-solid fa-plus"></i>
                         New
                     </button>
@@ -40,16 +40,16 @@
                         <td>
                             <div>
                                 <span class="dropdown" @onclick="() => ToggleDropdown(topic.TopicId)">
-                                    <i class="fa-solid fa-caret-right @(dropdownStates.ContainsKey(topic.TopicId) && dropdownStates[topic.TopicId] ? "open" : "")"></i>
+                                    <i class="fa-solid fa-caret-right @(dropdownStates.ContainsKey(topic.TopicId) && dropdownStates[topic.TopicId] ? "fa-solid fa-caret-down" : "fa-solid fa-caret-right")"></i>
                                 </span>
-                                <a class="table-row-click" href="/">@topic.Title</a>
+                                <a class="table-row-click">@topic.Title</a>
                                 @if (dropdownStates.ContainsKey(topic.TopicId) && dropdownStates[topic.TopicId])
                                 {
                                     <ul class="sub-topics show">
                                         @foreach (var subTopic in topic.SubTopics)
                                         {
                                             <li class="inner-row">
-                                                <a class="table-row-click" href="/">@subTopic.Title</a><span class="icons">
+                                                <a class="table-row-click">@subTopic.Title</a><span class="icons">
                                                     <button class="icon-click">
                                                         <i class="fa-solid fa-pen"></i>
                                                     </button><button class="icon-click">
@@ -64,7 +64,7 @@
                         </td>
                         <td style="text-align: center">
                             <span class="icons">
-                                <button class="icon-click">
+                                <button class="icon-click" @onclick="() => GoToAddSubTopic(topic.TopicId)">
                                     <i class="fa-solid fa-plus"></i>
                                 </button><button class="icon-click">
                                     <i class="fa-solid fa-pen"></i>
@@ -87,18 +87,39 @@
 </div>
 
 @code {
+
+    [CascadingParameter] 
+    public int AdminId { get; set; }
+
+    [Parameter] 
+    public int TrainingId { get; set; }
+
     private Dictionary<int, bool> dropdownStates = new Dictionary<int, bool>();
+
     private Topic[] getTopics { get; set; } = Array.Empty<Topic>();
+
+    private Topic topics = new Topic();
 
     protected override async Task OnInitializedAsync()
     {
-        var response = await SendAuthorizedRequest(HttpMethod.Get, "https://localhost:7095/api/Topic");
+        var response = await SendAuthorizedRequest(HttpMethod.Get, $"https://localhost:7095/api/Topic/byTrainingId/{TrainingId}");
 
         if (response.IsSuccessStatusCode)
         {
             getTopics = await response.Content.ReadFromJsonAsync<Topic[]>() ?? Array.Empty<Topic>();
         }
     }
+
+    private void GoToAddTopic()
+    {
+        navigate.NavigateTo($"/addTopic/{TrainingId}");
+    }
+
+    private void GoToAddSubTopic(int topicId) // Added parameter to pass topicId
+    {
+        navigate.NavigateTo($"/addSubTopic/{topicId}");
+    }
+
 
     private void ToggleDropdown(int dropdownId)
     {

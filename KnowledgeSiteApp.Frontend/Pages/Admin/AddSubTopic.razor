@@ -1,4 +1,4 @@
-﻿@page "/addSubTopic"
+﻿@page "/addSubTopic/{TopicId:int}"
 @inject HttpClient http
 @inject IJSRuntime js
 @inject NavigationManager navigate
@@ -42,7 +42,7 @@
     <!-- Topic Title & Description -->
     <div class="container-half">
         <div class="topic">
-            <label for="topic" style="font-weight: 600; font-size: 20px">Topic</label>
+            <label for="topic" style="font-weight: 600; font-size: 20px">Sub Topic</label>
             <input type="text" id="topic" @bind="newSubTopic.Title" />
         </div>
         <div class="description">
@@ -56,15 +56,6 @@
                 Clear
             </button>
         </div>
-        <div class="form-group form-group-element">
-            <select class="form-control-override" id="category" style="width: 50vh; color: #862b0d" @bind="selectedTopic">
-                <option value="" disabled hidden>Select Category</option>
-                @foreach (var topic in getTopic)
-                {
-                    <option value="@topic.TopicId">@topic.Title</option>
-                }
-            </select>
-        </div>
         <button class="btn btn-add" style="background-color: #862b0d" onclick="@HandleButtonCreate">
             Add Sub-topics
         </button>
@@ -75,11 +66,16 @@
 </div>
 
 @code {
+    [Parameter]
+    public int TopicId { get; set; }
+
+    [Parameter]
+    public int TrainingId { get; set; }
+
     private CreateSubTopicDto newSubTopic = new CreateSubTopicDto();
     private SubTopic[] getSubTopic { get; set; } = Array.Empty<SubTopic>();
     private Topic[] getTopic { get; set; } = Array.Empty<Topic>();
     private string errorMessage = string.Empty;
-    private int selectedTopic;
     private IReadOnlyList<IBrowserFile> uploadedVideoFiles;
     private IReadOnlyList<IBrowserFile> uploadedResourceFiles;
 
@@ -87,7 +83,7 @@
     {
         if(newSubTopic.Title != null && newSubTopic.Description != null && newSubTopic.YouTubeUrl != null && uploadedResourceFiles != null && uploadedVideoFiles != null)
         {
-            newSubTopic.TopicId = selectedTopic;
+            newSubTopic.TopicId = TopicId;
             var response = await SendAuthorizedRequest(HttpMethod.Post, "https://localhost:7095/api/SubTopics", JsonContent.Create(newSubTopic));
             if (response.IsSuccessStatusCode)
             {
@@ -96,6 +92,12 @@
                 await UploadVideo(createdSubTopic.Id);
                 await UploadResources(createdSubTopic.Id);
                 toastService.ShowSuccess("Sub-Topic created successfully.");
+                await Task.Delay(2000);
+                var trainingId = getTopic.FirstOrDefault(t => t.TopicId == createdSubTopic.TopicId)?.TrainingId ?? 0;
+                if (trainingId != 0)
+                {
+                    navigate.NavigateTo($"/viewTopics/{trainingId}");
+                }
             }
             else if(response.StatusCode == System.Net.HttpStatusCode.BadRequest || response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {

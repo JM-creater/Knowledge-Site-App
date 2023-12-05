@@ -39,6 +39,14 @@ namespace KnowledgeSiteApp.Backend.Controllers
             return Ok(topic);   
         }
 
+        [HttpGet("byTrainingId/{trainingId}")]
+        public async Task<IActionResult> GetTopicsByTrainingId(int trainingId)
+        {
+            var topic = await service.GetTopicsByTrainingId(trainingId);
+
+            return Ok(topic);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdTopic([FromRoute] int id)
         {

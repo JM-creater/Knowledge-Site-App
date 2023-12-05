@@ -52,6 +52,17 @@ namespace KnowledgeSiteApp.Backend.Service
                             .Where(t => t.TopicId == id)
                             .ToListAsync();
 
+        public async Task<List<Topic>> GetTopicsByTrainingId(int trainingId)
+        {
+            return await context.Topics
+                                .Include(t => t.Training)
+                                    .ThenInclude(t => t.Topics)
+                                        .ThenInclude(t => t.SubTopics)
+                                .Include(t => t.SubTopics)
+                                .Where(t => t.TrainingId == trainingId)
+                                .ToListAsync();
+        }
+
         public async Task<Topic> Update(int id, TopicUpdateDto dto)
         {
             var topic = await context.Topics

@@ -27,7 +27,6 @@ namespace KnowledgeSiteApp.Backend.Service
                 throw new InvalidOperationException("Training with the same title already exists");
 
             var newTraining = mapper.Map<Training>(dto);
-            //newTraining.AdminId = dto.AdminId;
             newTraining.IsActive = true;
             newTraining.DateCreated = DateTime.Now;
 
@@ -79,6 +78,16 @@ namespace KnowledgeSiteApp.Backend.Service
                                 .ThenInclude(t => t.SubTopics)
                             .Where(u => u.Id == id)
                             .FirstOrDefaultAsync();
+
+        public async Task<List<Training>> GetTrainingByAdminId(int adminId)
+        {
+            return await context.Trainings
+                                .Include(t => t.Admin)
+                                .Include(t => t.Topics)
+                                    .ThenInclude(t => t.SubTopics)
+                                .Where(t => t.AdminId == adminId)
+                                .ToListAsync();
+        }
 
         public async Task<IEnumerable<Training>> SearchTraining(string search)
         {
