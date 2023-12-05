@@ -23,12 +23,12 @@ namespace KnowledgeSiteApp.Frontend.Pages
 
         public async Task SaveUserIdAsync(int userId)
         {
-            await _sessionStorage.SetItemAsync("UserId", userId);
+            await _sessionStorage.SetItemAsync("AdminId", userId);
         }
 
         public async Task<int?> GetUserIdAsync()
         {
-            return await _sessionStorage.GetItemAsync<int?>("UserId");
+            return await _sessionStorage.GetItemAsync<int?>("AdminId");
         }
 
         public async Task Login(LoginUserDto loginUser)
