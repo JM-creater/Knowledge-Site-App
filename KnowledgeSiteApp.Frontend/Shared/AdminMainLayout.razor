@@ -41,11 +41,11 @@
         navItems = new List<NavItem>
         {
             new NavItem { Id = "1", IconName = IconName.Book, Text = "Training" },
-            new NavItem { Id = "2", Href = "/viewTraining/{adminId:int}", IconName = IconName.CheckCircleFill, Text = "View Training", ParentId="1"},
-            new NavItem { Id = "3", Href = "/addTraining/{adminId:int}", IconName = IconName.CheckCircleFill, Text = "Add Training", ParentId="1"},
+            new NavItem { Id = "2", Href = $"/viewTraining/{adminService.AdminId}", IconName = IconName.CheckCircleFill, Text = "View Training", ParentId="1"},
+            new NavItem { Id = "3", Href = $"/addTraining/{adminService.AdminId}", IconName = IconName.CheckCircleFill, Text = "Add Training", ParentId="1"},
 
             new NavItem { Id = "4", IconName = IconName.LayoutSidebarInset, Text = "Topic" },
-            new NavItem { Id = "5", Href = "/addTopic", IconName = IconName.CheckCircleFill, Text = "Add Topic", ParentId="4"},
+            new NavItem { Id = "5", Href = $"/addTopic/{adminService.AdminId}", IconName = IconName.CheckCircleFill, Text = "Add Topic", ParentId="4"},
 
             new NavItem { Id = "6", IconName = IconName.LayoutSidebarInset, Text = "Sub Topic" },
             new NavItem { Id = "7", Href = "/addSubTopic", IconName = IconName.CheckCircleFill, Text = "Add Sub Topic", ParentId="6"},
