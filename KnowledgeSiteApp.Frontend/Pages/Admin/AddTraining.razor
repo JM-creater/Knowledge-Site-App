@@ -1,4 +1,4 @@
-﻿@page "/addTraining/{adminId:int}"
+﻿@page "/addTraining"
 @inject HttpClient http
 @inject IJSRuntime js
 @inject NavigationManager navigate
@@ -110,7 +110,7 @@
 
 
 @code {
-    [Parameter] public int adminId { get; set; }
+    [CascadingParameter] public int AdminId { get; set; }
     private TrainingCreateDto training = new TrainingCreateDto();
     private TrainingCategory[] getCategory { get; set; } = Array.Empty<TrainingCategory>();
     private string uploadedImage = string.Empty;
@@ -119,6 +119,7 @@
 
     private async Task HandleAddTraining()
     {
+        training.AdminId = AdminId;
         training.CategoryId = selectedCategory;
         var response = await SendAuthorizedRequest(HttpMethod.Post, "https://localhost:7095/api/Training", JsonContent.Create(training));
 

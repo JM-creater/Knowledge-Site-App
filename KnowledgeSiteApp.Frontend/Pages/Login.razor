@@ -44,32 +44,28 @@
     </EditForm>
 </div>
 
-
 @code {
     private LoginUserDto loginUser = new LoginUserDto();
     private string errorMessage;
 
     private async Task HandleLoginSubmit()
     {
-        var response = await SendAuthorizedRequest(HttpMethod.Post, "https://localhost:7095/api/User/Login", JsonContent.Create(loginUser));
-
-        if (response.IsSuccessStatusCode)
+        try
         {
-            var user = await response.Content.ReadFromJsonAsync<KnowledgeSiteApp.Models.Entities.User>();
-            adminService.SetAdminId(user.Id);
-            if (user.Role == 1) //Admin Role
+            await adminService.Login(loginUser);
+
+            if (adminService.IsAuthenticated)
             {
-                    navigate.NavigateTo($"/addTopic/{user.Id}");
+                navigate.NavigateTo($"/dashboardadmin");
             }
-            else if (user.Role == 2) //Super-Admin
+            else
             {
-                    navigate.NavigateTo($"/dashboard/{user.Id}");
+                errorMessage = "Invalid username or password.";
             }
         }
-        else
+        catch (Exception ex)
         {
-            var errorResponse = await response.Content.ReadFromJsonAsync<ValidationErrorResponse>();
-            errorMessage = String.Join(" ", errorResponse?.Errors.SelectMany(err => err.Value));
+            errorMessage = "An error occurred: " + ex.Message;
         }
     }
 

@@ -1,4 +1,4 @@
-﻿@page "/viewTraining/{adminId:int}"
+﻿@page "/viewTraining"
 @inject HttpClient http
 @inject IJSRuntime js
 @inject NavigationManager navigate
@@ -81,6 +81,10 @@
         </a>
     </div>
 
+    <div>
+        <button @onclick="() => GoToViewTopic(currentTraining.Id)">View Topics</button>
+    </div>
+
     <div class="nav-buttons">
         <button style="
                   display: inline;
@@ -103,13 +107,14 @@
     </div>
 
 @code {
+    [CascadingParameter] public int AdminId { get; set; }
     private Training[] trainings;
     private int currentIndex = 0;
     private Training currentTraining => trainings[currentIndex];
 
     protected override async Task OnInitializedAsync()
     {
-        var response = await http.GetFromJsonAsync<Training[]>("https://localhost:7095/api/Training");
+        var response = await http.GetFromJsonAsync<Training[]>($"https://localhost:7095/api/Training/trainingByAdminId/{AdminId}");
         if (response != null)
         {
             trainings = response;
@@ -139,5 +144,10 @@
             currentIndex--;
             StateHasChanged();
         }
+    }
+
+    private void GoToViewTopic(int trainingId)
+    {
+        navigate.NavigateTo($"/viewTopics/{trainingId}");
     }
 }
