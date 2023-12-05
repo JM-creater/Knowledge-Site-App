@@ -37,15 +37,15 @@
     {
         navItems = new List<NavItem>
         {
-            new NavItem { Id = "1", Href = "/dashboard", IconName = IconName.HouseDoorFill, Text = "Dashboard", Match=NavLinkMatch.All},
+            new NavItem { Id = "1", Href = "/dashboard/{adminId:int}", IconName = IconName.HouseDoorFill, Text = "Dashboard", Match=NavLinkMatch.All},
 
             new NavItem { Id = "2", IconName = IconName.LayoutSidebarInset, Text = "User" },
             new NavItem { Id = "3", Href = "/viewAdmin", IconName = IconName.CheckCircleFill, Text = "View Admin", ParentId="2"},
             new NavItem { Id = "4", Href = "/createAdmin", IconName = IconName.CheckCircleFill, Text = "Add Admin", ParentId="2"},
 
             new NavItem { Id = "5", IconName = IconName.LayoutSidebarInset, Text = "Training" },
-            new NavItem { Id = "6", Href = "/viewTraining", IconName = IconName.CheckCircleFill, Text = "View Training", ParentId="5"},
-            new NavItem { Id = "7", Href = "/addTraining", IconName = IconName.CheckCircleFill, Text = "Add Training", ParentId="5"},
+            new NavItem { Id = "6", Href = "/viewTraining/{adminId:int}", IconName = IconName.CheckCircleFill, Text = "View Training", ParentId="5"},
+            new NavItem { Id = "7", Href = "/addTraining/{adminId:int}", IconName = IconName.CheckCircleFill, Text = "Add Training", ParentId="5"},
 
             new NavItem { Id = "8", IconName = IconName.LayoutSidebarInset, Text = "Topic" },
             new NavItem { Id = "9", Href = "/addTopic", IconName = IconName.CheckCircleFill, Text = "Add Topic", ParentId="8"},

@@ -1,8 +1,62 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="main">
-    <div class="content px-4">
-        @Body
-    </div>
+<div class="bb-page">
+
+    <Sidebar @ref="sidebar"
+             Title="LearnNest"
+             DataProvider="SidebarDataProvider"
+             class="sidebar" />
+
+    <main>
+        <div class="bb-top-row px-4 d-flex justify-content-end">
+            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+        </div>
+
+        <article class="content px-4">
+            <div class="py-2">
+                @Body
+            </div>
+        </article>
+    </main>
+
 </div>
 
+@code {
+    private Sidebar sidebar = default!;
+    private IEnumerable<NavItem> navItems = default!;
+
+    private async Task<SidebarDataProviderResult> SidebarDataProvider(SidebarDataProviderRequest request)
+    {
+        if (navItems is null)
+            navItems = GetNavItems();
+
+        return await Task.FromResult(request.ApplyTo(navItems));
+    }
+
+    private IEnumerable<NavItem> GetNavItems()
+    {
+        navItems = new List<NavItem>
+        {
+            new NavItem { Id = "1", Href = "/dashboard/{adminId:int}", IconName = IconName.HouseDoorFill, Text = "Dashboard", Match=NavLinkMatch.All},
+
+            new NavItem { Id = "2", IconName = IconName.LayoutSidebarInset, Text = "User" },
+            new NavItem { Id = "3", Href = "/viewAdmin", IconName = IconName.CheckCircleFill, Text = "View Admin", ParentId="2"},
+            new NavItem { Id = "4", Href = "/createAdmin", IconName = IconName.CheckCircleFill, Text = "Add Admin", ParentId="2"},
+        };
+
+        return navItems;
+    }
+}
+
+<style>
+    :root {
+        --bb-sidebar-top-row-background-color: #FFC95F;
+        --bb-sidebar-top-row-border-color: #efebe0;
+        --bb-sidebar-top-row-background-color: #FFC95F;
+    }
+
+    .bb-top-row {
+        background-color: #FFC95F;
+    }
+
+</style>

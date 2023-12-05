@@ -1,7 +1,8 @@
-﻿@page "/viewTraining"
+﻿@page "/viewTraining/{adminId:int}"
 @inject HttpClient http
 @inject IJSRuntime js
 @inject NavigationManager navigate
+@layout AdminMainLayout
 
 <link rel="icon" type="image/x-icon" href="origami_bold_ico.ico" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -102,6 +103,7 @@
 </div>
 
 @code {
+    [Parameter] public int adminId { get; set; }
     private Training[] trainings;
     private int currentIndex = 0;
     private Training currentTraining => trainings[currentIndex];
