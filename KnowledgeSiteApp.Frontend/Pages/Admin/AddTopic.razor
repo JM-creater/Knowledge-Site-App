@@ -4,6 +4,7 @@
 @inject NavigationManager navigate
 @using Blazored.Toast.Configuration
 @inject IToastService toastService
+@layout AdminMainLayout
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -55,6 +56,15 @@
                 Clear
             </button>
         </div>
+        <div class="form-group form-group-element">
+            <select class="form-control-override" id="category" style="width: 50vh; color: #862b0d" @bind="selectedTraining">
+                <option value="" disabled hidden>Select Category</option>
+                @foreach (var training in getTraining)
+                {
+                    <option value="@training.Id">@training.Title</option>
+                }
+            </select>
+        </div>
         <button class="btn btn-add" style="background-color: #862b0d" onclick="@HandleButtonCreate">
             Add Topic
         </button>
@@ -67,7 +77,9 @@
 @code {
     private CreateTopicDto newTopic = new CreateTopicDto();
     private Topic[] getTopic { get; set; } = Array.Empty<Topic>();
+    private Training[] getTraining { get; set; } = Array.Empty<Training>();
     private string errorMessage = string.Empty;
+    private int selectedTraining;
     private IReadOnlyList<IBrowserFile> uploadedVideoFiles;
     private IReadOnlyList<IBrowserFile> uploadedResourceFiles;
 
@@ -75,6 +87,7 @@
     {
         if (newTopic.Title != null && newTopic.Description != null && newTopic.YouTubeUrl != null && uploadedResourceFiles != null && uploadedVideoFiles != null)
         {
+            newTopic.TrainingId = selectedTraining;
             var response = await SendAuthorizedRequest(HttpMethod.Post, "https://localhost:7095/api/Topic", JsonContent.Create(newTopic));
             if (response.IsSuccessStatusCode)
             {
@@ -118,7 +131,23 @@
         {
             toastService.ShowError("Fill up all fields");
         }
+    }
 
+    protected override async Task OnInitializedAsync()
+    {
+        var trainingResponse = await SendAuthorizedRequest(HttpMethod.Get, "https://localhost:7095/api/Training");
+
+        if (trainingResponse.IsSuccessStatusCode)
+        {
+            getTraining = await trainingResponse.Content.ReadFromJsonAsync<Training[]>() ?? Array.Empty<Training>();
+        }
+
+        var topicResponse = await SendAuthorizedRequest(HttpMethod.Get, "https://localhost:7095/api/Topic");
+
+        if (topicResponse.IsSuccessStatusCode)
+        {
+            getTopic = await topicResponse.Content.ReadFromJsonAsync<Topic[]>() ?? Array.Empty<Topic>();
+        }
     }
 
     private void OnVideoFileChanged(InputFileChangeEventArgs e)
@@ -156,16 +185,6 @@
             }
 
             var response = await http.PostAsync($"https://localhost:7095/api/Topic/SaveTopicResources/{topicId}", formData);
-        }
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        var response = await SendAuthorizedRequest(HttpMethod.Get, "https://localhost:7095/api/Topic");
-
-        if (response.IsSuccessStatusCode)
-        {
-            getTopic = await response.Content.ReadFromJsonAsync<Topic[]>() ?? Array.Empty<Topic>();
         }
     }
 

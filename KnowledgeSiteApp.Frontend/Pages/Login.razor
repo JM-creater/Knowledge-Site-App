@@ -2,8 +2,7 @@
 @inject HttpClient http
 @inject IJSRuntime js
 @inject NavigationManager navigate
-@* @layout LoginLayout *@
-@* @inject Blazored.SessionStorage.ISessionStorageService sessionStorage *@
+@layout LoginLayout
 
 <link href="css/login-stylesheet.css" rel="stylesheet" />
 <link href="css/main.css" rel="stylesheet" />
@@ -55,8 +54,15 @@
 
         if (response.IsSuccessStatusCode)
         {
-            await js.InvokeVoidAsync("alert", "Successfully Logged In");
-            navigate.NavigateTo("/index");
+            var user = await response.Content.ReadFromJsonAsync<KnowledgeSiteApp.Models.Entities.User>();
+            if (user.Role == 1) //Admin Role
+            {
+                navigate.NavigateTo($"/addTopic/{user.Id}");
+            }
+            else if (user.Role == 2) //Super-Admin
+            {
+                navigate.NavigateTo($"/dashboard/{user.Id}");
+            }
         }
         else
         {

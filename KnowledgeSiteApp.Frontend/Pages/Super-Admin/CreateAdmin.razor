@@ -134,7 +134,7 @@
         <div>
             <button type="submit"
                     class="btn button btn-primary"
-                    >
+                    disabled="@isRequestInProgress">
                 Add Admin
             </button>
         </div>
@@ -152,10 +152,17 @@
     private string uploadedImage = string.Empty;
     private string errorMessage = string.Empty;
     private string conPass = string.Empty;
-
+    private bool isRequestInProgress = false;
 
     private async Task HandleAddAdmin()
     {
+        if (isRequestInProgress)
+        {
+            return;
+        }
+
+        isRequestInProgress = true;
+
         if (newUser.Username != null && newUser.FirstName != null && newUser.LastName != null && newUser.Email != null && newUser.Password != null && uploadedImage != "" && newUser.Password == conPass)
         {
             var response = await SendAuthorizedRequest(HttpMethod.Post, "https://localhost:7095/api/User/add", JsonContent.Create(newUser));
@@ -165,6 +172,7 @@
                 var createdAdmin = await response.Content.ReadFromJsonAsync<User>();
                 await UploadAdminImage(createdAdmin.Id);
 
+                ClearForm();
                 toastService.ShowSuccess("Admin created successfully");
                 await Task.Delay(3000);
                 navigate.NavigateTo("/viewAdmin");
@@ -215,7 +223,7 @@
         {
             toastService.ShowError("Please fill-up all fields.");
         }
-
+        isRequestInProgress = false;
     }
 
     private async Task UploadImage(InputFileChangeEventArgs e)
@@ -251,6 +259,14 @@
         }
 
         return await http.SendAsync(request);
+    }
+
+    private void ClearForm()
+    {
+        newUser = new RegisterUserDto();
+        uploadedImage = string.Empty;
+        errorMessage = string.Empty;
+        conPass = string.Empty;
     }
 
     public class ValidationErrorResponse

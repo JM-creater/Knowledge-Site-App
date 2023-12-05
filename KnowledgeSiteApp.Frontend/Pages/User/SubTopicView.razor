@@ -1,0 +1,98 @@
+﻿@page "/subtopicview/{SubTopicId:int}"
+@inject HttpClient http
+@inject IJSRuntime js
+@inject NavigationManager navigate
+@layout UserMainLayout
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="css/gentrainings-stylesheet.css" />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+@* <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script> *@
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+
+
+<div class="container-fluid d-flex flex-column justify-content-center align-items-center">
+    @if (selectedSubTopic != null)
+    {
+        <div>
+            <h2 style="font-weight: 700; text-align: center">@selectedSubTopic.Title</h2>
+        </div>
+        <div class="video-container" style="width: 50%; margin: 1em auto">
+            <div class="ratio ratio-16x9">
+                <iframe style="max-width: 100%; height: 100%"
+                        class="embed-responsive-item"
+                        src=@selectedSubTopic.YouTubeUrl
+                        allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+
+        <div style="width: 90%">
+            <h4 style="font-weight: 700; text-align: center; margin-bottom: 0.5em">
+                Description
+            </h4>
+            <p style="text-align: center">@selectedSubTopic.Description</p>
+        </div>
+
+        <div class="footer-container">
+            <button class="btn-arrow" @onclick="NavigateBack">
+                <i class="fa-solid fa-circle-arrow-left"></i> 
+            </button>
+
+            <button class="btn-arrow" @onclick="NavigateForward">
+                <i class="fa-solid fa-circle-arrow-right"></i> 
+            </button>
+        </div>
+    }
+    else
+    {
+        <p>Loading subtopic details...</p>
+    }
+</div>
+
+@code {
+    [Parameter] public int SubTopicId { get; set; }
+    private SubTopic selectedSubTopic { get; set; }
+
+    private async Task FetchSubTopicDetails(int subTopicId)
+    {
+        var response = await http.GetAsync($"https://localhost:7095/api/Training");
+
+        if (response.IsSuccessStatusCode)
+        {
+            var trainings = await response.Content.ReadFromJsonAsync<Training[]>();
+            selectedSubTopic = trainings.SelectMany(t => t.Topics)
+                                        .SelectMany(tp => tp.SubTopics)
+                                        .FirstOrDefault(st => st.Id == subTopicId);
+
+            StateHasChanged();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchSubTopicDetails(SubTopicId);
+    }
+
+    private async Task NavigateForward()
+    {
+        int nextSubTopicId = SubTopicId + 1;
+        navigate.NavigateTo($"/subtopicview/{nextSubTopicId}");
+
+        await FetchSubTopicDetails(nextSubTopicId);
+    }
+
+    private async Task NavigateBack()
+    {
+        int previousSubTopicId = SubTopicId - 1;
+        if (previousSubTopicId >= 0)
+        {
+            navigate.NavigateTo($"/subtopicview/{previousSubTopicId}");
+            await FetchSubTopicDetails(previousSubTopicId);
+        }
+    }
+}

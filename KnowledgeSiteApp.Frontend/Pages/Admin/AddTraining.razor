@@ -1,7 +1,8 @@
-﻿@page "/addTraining"
+﻿@page "/addTraining/{adminId:int}"
 @inject HttpClient http
 @inject IJSRuntime js
 @inject NavigationManager navigate
+@layout AdminMainLayout
 
 @* <script language="javascript" type="text/javascript" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script> *@
 <link rel="icon" type="image/x-icon" href="origami_bold_ico.ico" />
@@ -109,6 +110,7 @@
 
 
 @code {
+    [Parameter] public int adminId { get; set; }
     private TrainingCreateDto training = new TrainingCreateDto();
     private TrainingCategory[] getCategory { get; set; } = Array.Empty<TrainingCategory>();
     private string uploadedImage = string.Empty;
@@ -156,12 +158,7 @@
         var bytes = Convert.FromBase64String(uploadedImage.Split(',')[1]);
         imageFile.Add(new ByteArrayContent(bytes), "image", "upload.png");
 
-        var response = await SendAuthorizedRequest(HttpMethod.Post, $"https://localhost:7095/api/Training/SaveTrainingImage/{trainingId}", JsonContent.Create(imageFile));
-
-        if (response.IsSuccessStatusCode)
-        {
-            await js.InvokeVoidAsync("alert", "Traning Image Uploaded");
-        }
+        var response = await http.PostAsync($"https://localhost:7095/api/Training/SaveTrainingImage/{trainingId}", imageFile);
     }
 
     private async Task UploadImage(InputFileChangeEventArgs e)

@@ -1,9 +1,16 @@
-﻿/* Material UI icons definitions */
+﻿/*
+  This stylesheet is only for the user-management panel
+*/
+
+/* Material UI icons definitions */
 .material-symbols-outlined {
     font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
 }
 
-/* Media definitions */
+/*
+  --- Forms Definitions ---
+  This is for screens with max 1080p height 
+*/
 @media (max-height: 1080px) {
     .table-container {
         display: flex;
@@ -26,6 +33,7 @@
     }
 }
 
+/* This is for screens with max 768p height */
 @media (max-height: 768px) {
     .table-container {
         display: flex;
@@ -48,6 +56,10 @@
     }
 }
 
+/*
+    End of Media Definitions
+*/
+
 /* Table definitions */
 .clickable-action {
     background-color: inherit;
@@ -62,6 +74,7 @@
 
 .table {
     border: 3px solid #ffc95f;
+    padding: 25px;
     color: #862b0d;
 }
 

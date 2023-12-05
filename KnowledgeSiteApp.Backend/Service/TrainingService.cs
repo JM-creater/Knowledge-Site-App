@@ -68,16 +68,17 @@ namespace KnowledgeSiteApp.Backend.Service
         public async Task<List<Training>> GetAll()
             => await context.Trainings
                             .Include(t => t.Admin)
-                            .Include(t => t.Category)  
                             .Include(t => t.Topics)
+                                .ThenInclude(t => t.SubTopics)
                             .ToListAsync();
 
-        public async Task<List<Training>> GetById(int id)
+        public async Task<Training> GetById(int id)
             => await context.Trainings
-                            .Include(u => u.Admin)
-                            .Include(u => u.Category)
+                            .Include(t => t.Category)
+                            .Include(t => t.Topics)
+                                .ThenInclude(t => t.SubTopics)
                             .Where(u => u.Id == id)
-                            .ToListAsync();
+                            .FirstOrDefaultAsync();
 
         public async Task<IEnumerable<Training>> SearchTraining(string search)
         {
@@ -102,11 +103,9 @@ namespace KnowledgeSiteApp.Backend.Service
             if (training == null)
                 throw new InvalidOperationException("Training does not exist");
 
-            var newCoverImagePath = await new ImagePathConfig().trainingImages(dto.Image);
 
             training.Title = dto.Title;
             training.Description = dto.Description;
-            training.Image = newCoverImagePath;
             training.CategoryId = dto.CategoryId;
 
             context.Trainings.Update(training);

@@ -4,6 +4,7 @@
 @inject NavigationManager navigate
 @using Blazored.Toast.Configuration
 @inject IToastService toastService
+@layout AdminMainLayout
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -55,6 +56,15 @@
                 Clear
             </button>
         </div>
+        <div class="form-group form-group-element">
+            <select class="form-control-override" id="category" style="width: 50vh; color: #862b0d" @bind="selectedTopic">
+                <option value="" disabled hidden>Select Category</option>
+                @foreach (var topic in getTopic)
+                {
+                    <option value="@topic.TopicId">@topic.Title</option>
+                }
+            </select>
+        </div>
         <button class="btn btn-add" style="background-color: #862b0d" onclick="@HandleButtonCreate">
             Add Sub-topics
         </button>
@@ -67,7 +77,9 @@
 @code {
     private CreateSubTopicDto newSubTopic = new CreateSubTopicDto();
     private SubTopic[] getSubTopic { get; set; } = Array.Empty<SubTopic>();
+    private Topic[] getTopic { get; set; } = Array.Empty<Topic>();
     private string errorMessage = string.Empty;
+    private int selectedTopic;
     private IReadOnlyList<IBrowserFile> uploadedVideoFiles;
     private IReadOnlyList<IBrowserFile> uploadedResourceFiles;
 
@@ -75,6 +87,7 @@
     {
         if(newSubTopic.Title != null && newSubTopic.Description != null && newSubTopic.YouTubeUrl != null && uploadedResourceFiles != null && uploadedVideoFiles != null)
         {
+            newSubTopic.TopicId = selectedTopic;
             var response = await SendAuthorizedRequest(HttpMethod.Post, "https://localhost:7095/api/SubTopics", JsonContent.Create(newSubTopic));
             if (response.IsSuccessStatusCode)
             {
@@ -116,6 +129,23 @@
         }
     }
 
+    protected override async Task OnInitializedAsync()
+    {
+        var subTopicResponse = await SendAuthorizedRequest(HttpMethod.Get, "https://localhost:7095/api/SubTopics");
+
+        if (subTopicResponse.IsSuccessStatusCode)
+        {
+            getSubTopic = await subTopicResponse.Content.ReadFromJsonAsync<SubTopic[]>() ?? Array.Empty<SubTopic>();
+        }
+
+        var topicResponse = await SendAuthorizedRequest(HttpMethod.Get, "https://localhost:7095/api/Topic");
+
+        if (topicResponse.IsSuccessStatusCode)
+        {
+            getTopic = await topicResponse.Content.ReadFromJsonAsync<Topic[]>() ?? Array.Empty<Topic>();
+        }
+    }
+
     private void OnVideoFileChanged(InputFileChangeEventArgs e)
     {
         uploadedVideoFiles = e.GetMultipleFiles();
@@ -151,16 +181,6 @@
             }
 
             var response = await http.PostAsync($"https://localhost:7095/api/SubTopics/SaveSubTopicResources/{subTopicId}", formData);
-        }
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        var response = await SendAuthorizedRequest(HttpMethod.Get, "https://localhost:7095/api/SubTopics");
-
-        if (response.IsSuccessStatusCode)
-        {
-            getSubTopic = await response.Content.ReadFromJsonAsync<SubTopic[]>() ?? Array.Empty<SubTopic>();
         }
     }
 
