@@ -1,4 +1,4 @@
-﻿@page "/login"
+﻿@page "/"
 @inject HttpClient http
 @inject IJSRuntime js
 @inject NavigationManager navigate
@@ -54,8 +54,15 @@
 
         if (response.IsSuccessStatusCode)
         {
-            await js.InvokeVoidAsync("alert", "Successfully Logged In");
-            navigate.NavigateTo("/index");
+            var user = await response.Content.ReadFromJsonAsync<KnowledgeSiteApp.Models.Entities.User>();
+            if (user.Role == 1) //Admin Role
+            {
+                navigate.NavigateTo("/addTopic");
+            }
+            else if (user.Role == 2) //Super-Admin
+            {
+                navigate.NavigateTo("/dashboard");
+            }
         }
         else
         {
