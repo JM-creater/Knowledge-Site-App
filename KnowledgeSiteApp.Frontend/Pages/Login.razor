@@ -56,6 +56,8 @@
 
             if (adminService.IsAuthenticated)
             {
+                await adminService.SaveUserIdAsync(adminService.User.Id);
+
                 navigate.NavigateTo($"/dashboardadmin");
             }
             else

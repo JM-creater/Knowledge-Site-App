@@ -3,6 +3,7 @@
 @inject IJSRuntime js
 @inject NavigationManager navigate
 @layout AdminMainLayout
+@inject AdminService service
 
 <link rel="icon" type="image/x-icon" href="origami_bold_ico.ico" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -14,16 +15,18 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 <script language="javascript" type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
 
+@if (currentTraining != null)
+{
     <div class="centered-container">
         <h2 style="
-        font-weight: 700;
-        font-size: 4vh;
-        margin-left: 40%;
-        margin-right: auto;
-        text-align: left;
-        margin-bottom: auto;
-        color: #862b0d;
-        ">
+            font-weight: 700;
+            font-size: 4vh;
+            margin-left: 40%;
+            margin-right: auto;
+            text-align: left;
+            margin-bottom: auto;
+            color: #862b0d;
+            ">
             @currentTraining.Title
         </h2>
     </div>
@@ -38,8 +41,8 @@
                 height: 100%;
                 aspect-ratio: 1/1;
                 object-fit: cover;
-            "
-                 src=@($"https://localhost:7095/{currentTraining.Image}")
+                "
+                     src=@($"https://localhost:7095/{currentTraining.Image}")
                      alt="Training Image" />
             </div>
             <div class="item right-flexbox"
@@ -53,7 +56,7 @@
                         margin-top: auto;
                         margin-bottom: 2vh;
                         color: #862b0d;
-                    ">
+                        ">
                             Description
                         </h4>
                         <p style="font-size: inherit; text-align: justify">
@@ -75,7 +78,7 @@
           margin-bottom: 2vh;
           color: #862b0d;
           cursor: pointer;
-        "
+            "
            @onclick="EditCurrentTraining">
             Edit This Training
         </a>
@@ -91,7 +94,7 @@
                   border-style: solid;
                   font-size: 50px;
                   color: #ffc95f;
-                "
+                    "
                 @onclick="PreviousTraining">
             <Icon CustomIconName="fa-solid fa-circle-arrow-left" />
         </button>
@@ -100,26 +103,36 @@
                   border-style: solid;
                   font-size: 50px;
                   color: #ffc95f;
-                "
+                    "
                 @onclick="NextTraining">
             <Icon CustomIconName="fa-solid fa-circle-arrow-right" />
         </button>
     </div>
+}
+else
+{
+    <p>No training selected or available.</p>
+}
+
 
 @code {
     [CascadingParameter] public int AdminId { get; set; }
     private Training[] trainings;
     private int currentIndex = 0;
-    private Training currentTraining => trainings[currentIndex];
+    private Training currentTraining => currentIndex >= 0 && currentIndex < trainings?.Length
+                                        ? trainings[currentIndex]
+                                        : null;
 
     protected override async Task OnInitializedAsync()
     {
-        var response = await http.GetFromJsonAsync<Training[]>($"https://localhost:7095/api/Training/trainingByAdminId/{AdminId}");
-        if (response != null)
+        if (AdminId == 0)
         {
-            trainings = response;
-            StateHasChanged();
+            AdminId = await service.GetUserIdAsync() ?? 0;
         }
+
+        var response = await http.GetFromJsonAsync<Training[]>($"https://localhost:7095/api/Training/trainingByAdminId/{AdminId}");
+        trainings = response ?? Array.Empty<Training>();
+        StateHasChanged();
     }
 
     private void EditCurrentTraining()
