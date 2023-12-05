@@ -7,6 +7,7 @@ namespace KnowledgeSiteApp.Backend.Service
     {
         public Task<User> Register(RegisterUserDto dto);
         public Task<User> Login(LoginUserDto dto);
+        public Task<IEnumerable<User>> SeachUser(string search);
         public Task<List<User>> GetAllUser();
         public Task<List<User>> GetAllByAdmin();
         public Task<User> GetById(int id);

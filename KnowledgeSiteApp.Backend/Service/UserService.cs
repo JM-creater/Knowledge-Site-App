@@ -32,6 +32,25 @@ namespace KnowledgeSiteApp.Backend.Service
             configuration = _configuration;
         }
 
+        public string GenerateJwtToken(User user)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.ASCII.GetBytes("ByYM000OLlMQG6VVVp1OH7Xzyr7gHuw1qvUC5dcGt3SNM");
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(new Claim[] 
+            {
+                new Claim(ClaimTypes.Name, user.Username.ToString()),
+                new Claim(ClaimTypes.Role, user.Role.ToString()),
+                // Add other claims as needed
+            }),
+            Expires = DateTime.UtcNow.AddDays(7),
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+        };
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        return tokenHandler.WriteToken(token);
+    }
+
         public async Task<User> Register(RegisterUserDto dto)
         {
             try
@@ -77,7 +96,7 @@ namespace KnowledgeSiteApp.Backend.Service
                     throw new InvalidOperationException("User not found");
 
                 if (!PasswordHasher.VerifyPassword(dto.Password, user.Password))
-                    throw new InvalidOperationException("Invalid password");
+                    throw new AuthenticationException("Invalid password");
 
                 return user;
             }
@@ -85,6 +104,22 @@ namespace KnowledgeSiteApp.Backend.Service
             {
                 throw new ArgumentException(e.Message);
             }
+        }
+
+        public async Task<IEnumerable<User>> SeachUser(string search)
+        {
+            var user = await context.Users
+                                    .Where(u => u.FirstName.Contains(search) ||
+                                            u.LastName.Contains(search) ||
+                                            u.Username.Contains(search))
+                                    .ToListAsync();
+
+            if (string.IsNullOrWhiteSpace(search))
+            {
+                return await context.Users.ToListAsync();
+            }
+
+            return user;
         }
 
         public async Task<User> GetById(int id)

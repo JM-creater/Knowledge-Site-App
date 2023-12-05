@@ -39,6 +39,14 @@ namespace KnowledgeSiteApp.Backend.Controllers
             return Ok(user);
         }
 
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchUsers(string search)
+        {
+            var user = await service.SeachUser(search);
+
+            return Ok(user);
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {

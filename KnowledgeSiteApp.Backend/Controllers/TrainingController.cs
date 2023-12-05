@@ -57,7 +57,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateTraining(int id, [FromForm] TrainingUpdateDto dto)
+        public async Task<IActionResult> UpdateTraining(int id, [FromBody] TrainingUpdateDto dto)
         {
             var training = await service.Update(id, dto);
 

@@ -44,10 +44,11 @@ namespace KnowledgeSiteApp.Backend.Service
                       .OrderByDescending(c => c.DateCreated)
                       .ToListAsync();
 
-        public async Task<List<TrainingCategory>> GetById(int id)
+        public async Task<TrainingCategory> GetById(int id)
             => await context.TrainingCategories
+                            .Include(c => c.Trainings)
                             .Where(t => t.Id == id)
-                            .ToListAsync();
+                            .FirstOrDefaultAsync();
 
         public async Task<IEnumerable<TrainingCategory>> SearchCategory(string search)
         {
