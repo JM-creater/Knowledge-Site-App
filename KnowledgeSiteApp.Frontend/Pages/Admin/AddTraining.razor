@@ -1,4 +1,4 @@
-﻿@page "/addTraining"
+﻿@page "/addTraining/{adminId:int}"
 @inject HttpClient http
 @inject IJSRuntime js
 @inject NavigationManager navigate
@@ -109,6 +109,7 @@
 
 
 @code {
+    [Parameter] public int adminId { get; set; }
     private TrainingCreateDto training = new TrainingCreateDto();
     private TrainingCategory[] getCategory { get; set; } = Array.Empty<TrainingCategory>();
     private string uploadedImage = string.Empty;

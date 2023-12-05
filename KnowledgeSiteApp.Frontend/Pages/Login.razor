@@ -57,11 +57,11 @@
             var user = await response.Content.ReadFromJsonAsync<KnowledgeSiteApp.Models.Entities.User>();
             if (user.Role == 1) //Admin Role
             {
-                navigate.NavigateTo("/addTopic");
+                navigate.NavigateTo($"/addTopic/{user.Id}");
             }
             else if (user.Role == 2) //Super-Admin
             {
-                navigate.NavigateTo("/dashboard");
+                navigate.NavigateTo($"/dashboard/{user.Id}");
             }
         }
         else

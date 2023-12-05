@@ -1,4 +1,4 @@
-﻿@page "/viewTraining"
+﻿@page "/viewTraining/{adminId:int}"
 @inject HttpClient http
 @inject IJSRuntime js
 @inject NavigationManager navigate
@@ -102,6 +102,7 @@
 </div>
 
 @code {
+    [Parameter] public int adminId { get; set; }
     private Training[] trainings;
     private int currentIndex = 0;
     private Training currentTraining => trainings[currentIndex];
