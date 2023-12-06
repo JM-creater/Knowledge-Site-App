@@ -42,11 +42,31 @@ namespace KnowledgeSiteApp.Backend.Service
                             .Include(st => st.Topic)
                             .ToListAsync();
 
-        public async Task<List<SubTopic>> GetById(int id)
+        public async Task<SubTopic> GetById(int subTopicId)
             => await context.SubTopics
                             .Include(st => st.Topic)
-                            .Where(st => st.Id == id)   
-                            .ToListAsync();
+                            .Where(st => st.Id == subTopicId)   
+                            .FirstOrDefaultAsync();
+
+        public async Task<SubTopic> Update(int id, SubTopicUpdateDto dto)
+        {
+            var subTopic = await context.SubTopics
+                                        .Where(t => t.Id == id)
+                                        .FirstOrDefaultAsync();
+
+            if (subTopic == null)
+                throw new InvalidOperationException("Topic not found");
+
+            mapper.Map(dto, subTopic);
+            subTopic.Title = dto.Title;
+            subTopic.Description = dto.Description;
+            subTopic.YouTubeUrl = dto.YouTubeUrl;
+
+            context.SubTopics.Update(subTopic);
+            await context.SaveChangesAsync();
+
+            return subTopic;
+        }
 
         public async Task<SubTopic> SaveSubTopicResources(int id, SubTopicResourcesDto dto)
         {

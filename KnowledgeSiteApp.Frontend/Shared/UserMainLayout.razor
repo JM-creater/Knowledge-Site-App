@@ -1,8 +1,22 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="main">
-    <div class="content px-4">
-        @Body
-    </div>
-</div>
+<style>
+    body {
+        overflow: hidden;
+    }
 
+    main {
+        overflow: hidden;
+    }
+</style>
+
+<header>
+    <NavMenu />
+</header>
+
+<div class="container">
+    <main role="main" class="pb-3 d-flex justify-content-center align-items-center" style="overflow-y: auto;">
+        <!-- Added overflow-y: auto; to enable scrolling if the content overflows -->
+        @Body
+    </main>
+</div>

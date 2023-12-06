@@ -8,7 +8,8 @@ namespace KnowledgeSiteApp.Backend.Service
     {
         public Task<SubTopic> Create(CreateSubTopicDto dto);
         public Task<List<SubTopic>> GetSubTopic();
-        public Task<List<SubTopic>> GetById(int id);
+        public Task<SubTopic> GetById(int subTopicId);
+        public Task<SubTopic> Update(int id, SubTopicUpdateDto dto);
         public Task<SubTopic> SaveSubTopicResources(int id, SubTopicResourcesDto dto);
         public Task<SubTopic> SaveSubTopicVideo(int id, SubTopicVideoDto dto);
     }
