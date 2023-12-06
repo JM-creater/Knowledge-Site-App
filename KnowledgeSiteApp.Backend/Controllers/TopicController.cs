@@ -47,10 +47,10 @@ namespace KnowledgeSiteApp.Backend.Controllers
             return Ok(topic);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetByIdTopic([FromRoute] int id)
+        [HttpGet("{topicId}")]
+        public async Task<IActionResult> GetByIdTopic([FromRoute] int topicId)
         {
-            var topic = await service.GetById(id);
+            var topic = await service.GetById(topicId);
 
             return Ok(topic);
         }

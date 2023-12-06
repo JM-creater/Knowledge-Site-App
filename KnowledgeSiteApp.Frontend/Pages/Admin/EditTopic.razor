@@ -1,7 +1,208 @@
 ﻿@page "/editTopic/{TopicId:int}"
+@inject HttpClient http
+@inject IJSRuntime js
+@inject NavigationManager navigate
+@using Blazored.Toast.Configuration
+@inject IToastService toastService
+@layout AdminMainLayout
 
-<h3>EditTopic</h3>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" type="text/css" href="css/topics-stylesheet.css" />
+
+<BlazoredToasts Position="ToastPosition.BottomRight"
+                Timeout="3"
+                IconType="IconType.FontAwesome"
+                SuccessClass="success-toast-override"
+                SuccessIcon="fa fa-thumbs-up"
+                ErrorIcon="fa fa-bug" />
+
+<div class="container-full">
+    <!-- Add Video -->
+    <div class="container-half">
+        <h3 style="font-weight: 700; margin-bottom: 20px">Add Video</h3>
+        <div class="container-upload">
+            @if (!string.IsNullOrEmpty(editTopic.Video))
+            {
+                <iframe src=@($"https://localhost:7095/{editTopic.Video}")></iframe>
+            }
+            else
+            {
+                <i class="fa fa-cloud-upload" style="color: #ffc95f; font-size: 8em; margin-bottom: 50px" aria-hidden="true"></i>
+            }
+            <div class="input-group upload-group" style="width: 70%">
+                <InputFile OnChange="@OnVideoFileChanged" class="form-control" />
+                <button type="button" class="btn btn-clear" id="clear-video">
+                    Clear
+                </button>
+            </div>
+        </div>
+        <h6 style="text-align: center; margin: 1.5em 0">
+            ----------- or -----------
+        </h6>
+        <div style="text-align: center">
+            <label for="vid-link" style="font-weight: 600; font-size: 17px">Youtube Link:</label>
+            <input type="text" id="vid-link" @bind="editTopic.YouTubeUrl" />
+        </div>
+    </div>
+    <!-- Topic Title & Description -->
+    <div class="container-half">
+        <div class="topic">
+            <label for="topic" style="font-weight: 600; font-size: 20px">Topic</label>
+            <input type="text" id="topic" @bind="editTopic.Title" />
+        </div>
+        <div class="description">
+            <label for="description" style="font-weight: 600; font-size: 20px">Description</label>
+            <input type="text" id="description" @bind="editTopic.Description" />
+        </div>
+        <label for="files-upload" style="font-weight: 600; font-size: 20px">Upload resources/activities:</label>
+        <div class="input-group upload-group" style="width: 100%; margin: 10px 0 50px">
+            <InputFile OnChange="@OnResourceFilesChanged" class="form-control" multiple accept=".xlsx,.xls,.doc, .docx,.ppt, .pptx,.txt,.pdf" />
+            <button type="button" class="btn btn-clear" id="clear-files">
+                Clear
+            </button>
+        </div>
+        <button class="btn btn-add" style="background-color: #862b0d" onclick="@HandleButtonCreate">
+            Edit Topic
+        </button>
+        <button class="btn btn-update" style="background-color: #898989">
+            Cancel
+        </button>
+    </div>
+</div>
 
 @code {
+    [Parameter]
+    public int TopicId { get; set; }
+
+
+    private Topic editTopic = new Topic();
+    private string errorMessage = string.Empty;
+    private IReadOnlyList<IBrowserFile> uploadedVideoFiles;
+    private IReadOnlyList<IBrowserFile> uploadedResourceFiles;
+
+    private async Task HandleButtonCreate()
+    {
+        if (editTopic.Title != null && editTopic.Description != null && editTopic.YouTubeUrl != null && uploadedResourceFiles != null && uploadedVideoFiles != null)
+        {
+            editTopic.TrainingId = editTopic.TrainingId;
+            var response = await SendAuthorizedRequest(HttpMethod.Put, $"https://localhost:7095/api/Topic/{TopicId}", JsonContent.Create(editTopic));
+            if (response.IsSuccessStatusCode)
+            {
+                var editedSubTopic = await response.Content.ReadFromJsonAsync<Topic>();
+
+                await UploadVideo(editedSubTopic.TopicId);
+                await UploadResources(editedSubTopic.TopicId);
+                toastService.ShowSuccess("Topic edited successfully.");
+                await Task.Delay(3000);
+                navigate.NavigateTo($"/viewTopics/{editTopic.TrainingId}");
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest || response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                toastService.ShowError("Title already exist.");
+            }
+            else
+            {
+                var errorResponse = await response.Content.ReadFromJsonAsync<ValidationErrorResponse>();
+                errorMessage = String.Join(" ", errorResponse?.Errors.SelectMany(err => err.Value));
+            }
+        }
+        else if (editTopic.Title == null && editTopic.Description != null && editTopic.YouTubeUrl != null && uploadedResourceFiles != null && uploadedVideoFiles != null)
+        {
+            toastService.ShowError("Please input Title.");
+        }
+        else if (editTopic.Title != null && editTopic.Description == null && editTopic.YouTubeUrl != null && uploadedResourceFiles != null && uploadedVideoFiles != null)
+        {
+            toastService.ShowError("Please input Description.");
+        }
+        else if (editTopic.Title != null && editTopic.Description != null && editTopic.YouTubeUrl == null && uploadedResourceFiles != null && uploadedVideoFiles != null)
+        {
+            toastService.ShowError("Please input YouTubeUrl.");
+        }
+        else if (editTopic.Title != null && editTopic.Description != null && editTopic.YouTubeUrl != null && uploadedResourceFiles == null && uploadedVideoFiles != null)
+        {
+            toastService.ShowError("Please upload Resources.");
+        }
+        else if (editTopic.Title != null && editTopic.Description != null && editTopic.YouTubeUrl != null && uploadedResourceFiles != null && uploadedVideoFiles == null)
+        {
+            toastService.ShowError("Please upload Video.");
+        }
+        else
+        {
+            toastService.ShowError("Fill up all fields");
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTopicForEdit();
+    }
+
+    private async Task LoadTopicForEdit()
+    {
+        var topicResponse = await http.GetFromJsonAsync<Topic>($"https://localhost:7095/api/Topic/{TopicId}");
+
+        if (topicResponse != null)
+        {
+            editTopic = topicResponse;
+        }
+    }
+
+    private void OnVideoFileChanged(InputFileChangeEventArgs e)
+    {
+        uploadedVideoFiles = e.GetMultipleFiles();
+    }
+
+    private void OnResourceFilesChanged(InputFileChangeEventArgs e)
+    {
+        uploadedResourceFiles = e.GetMultipleFiles();
+    }
+
+    private async Task UploadVideo(int topicId)
+    {
+        if (uploadedVideoFiles != null && uploadedVideoFiles.Count > 0)
+        {
+            var videoFile = uploadedVideoFiles.First();
+            var stream = videoFile.OpenReadStream();
+            var content = new MultipartFormDataContent();
+            content.Add(new StreamContent(stream), "Video", videoFile.Name);
+
+            var response = await http.PostAsync($"https://localhost:7095/api/Topic/SaveTopicVideo/{topicId}", content);
+        }
+    }
+
+    private async Task UploadResources(int topicId)
+    {
+        if (uploadedResourceFiles != null && uploadedResourceFiles.Count > 0)
+        {
+            var formData = new MultipartFormDataContent();
+            foreach (var file in uploadedResourceFiles)
+            {
+                var stream = file.OpenReadStream();
+                formData.Add(new StreamContent(stream), "Resource", file.Name);
+            }
+
+            var response = await http.PostAsync($"https://localhost:7095/api/Topic/SaveTopicResources/{topicId}", formData);
+        }
+    }
+
+    private async Task<HttpResponseMessage> SendAuthorizedRequest(HttpMethod method, string url, HttpContent content = null)
+    {
+        var request = new HttpRequestMessage(method, url);
+        request.Headers.Add("X-API-KEY", "KNOWLEDGESITEAPPAPI");
+
+        if (content != null)
+        {
+            request.Content = content;
+        }
+
+        return await http.SendAsync(request);
+    }
+
+    public class ValidationErrorResponse
+    {
+        public Dictionary<string, string[]> Errors { get; set; }
+    }
 
 }
