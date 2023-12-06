@@ -114,7 +114,8 @@ namespace KnowledgeSiteApp.Backend.Migrations
                     YouTubeUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Resource = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TrainingId = table.Column<int>(type: "int", nullable: false),
-                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -138,7 +139,8 @@ namespace KnowledgeSiteApp.Backend.Migrations
                     YouTubeUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Resource = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TopicId = table.Column<int>(type: "int", nullable: false),
-                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {

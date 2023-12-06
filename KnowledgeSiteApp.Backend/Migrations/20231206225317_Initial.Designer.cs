@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KnowledgeSiteApp.Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231205064249_Initial")]
+    [Migration("20231206225317_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -68,6 +68,9 @@ namespace KnowledgeSiteApp.Backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Resource")
                         .HasColumnType("nvarchar(max)");
 
@@ -107,6 +110,9 @@ namespace KnowledgeSiteApp.Backend.Migrations
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Resource")
                         .HasColumnType("nvarchar(max)");

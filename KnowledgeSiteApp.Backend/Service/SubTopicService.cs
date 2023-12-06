@@ -45,7 +45,7 @@ namespace KnowledgeSiteApp.Backend.Service
         public async Task<SubTopic> GetById(int subTopicId)
             => await context.SubTopics
                             .Include(st => st.Topic)
-                            .Where(st => st.Id == subTopicId)   
+                            .Where(st => st.Id == subTopicId)
                             .FirstOrDefaultAsync();
 
         public async Task<SubTopic> Update(int id, SubTopicUpdateDto dto)
@@ -61,6 +61,40 @@ namespace KnowledgeSiteApp.Backend.Service
             subTopic.Title = dto.Title;
             subTopic.Description = dto.Description;
             subTopic.YouTubeUrl = dto.YouTubeUrl;
+
+            context.SubTopics.Update(subTopic);
+            await context.SaveChangesAsync();
+
+            return subTopic;
+        }
+
+        public async Task<SubTopic> Activate(int id)
+        {
+            var subTopic = await context.SubTopics
+                                     .Where(t => t.Id == id)
+                                     .FirstOrDefaultAsync();
+
+            if (subTopic == null)
+                throw new InvalidOperationException("Sub Topic not found");
+
+            subTopic.IsActive = true;
+
+            context.SubTopics.Update(subTopic);
+            await context.SaveChangesAsync();
+
+            return subTopic;
+        }
+
+        public async Task<SubTopic> Deactivate(int id)
+        {
+            var subTopic = await context.SubTopics
+                                     .Where(t => t.Id == id)
+                                     .FirstOrDefaultAsync();
+
+            if (subTopic == null)
+                throw new InvalidOperationException("Topic not found");
+
+            subTopic.IsActive = false;
 
             context.SubTopics.Update(subTopic);
             await context.SaveChangesAsync();

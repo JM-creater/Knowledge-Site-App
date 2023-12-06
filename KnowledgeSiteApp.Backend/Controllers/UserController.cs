@@ -39,6 +39,27 @@ namespace KnowledgeSiteApp.Backend.Controllers
             return Ok(user);
         }
 
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword(string email)
+        {
+            var user = await service.ForgotPassword(email);
+
+            return Ok(user);
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
+        {
+            var user = await service.ResetPassword(dto);
+
+            if (user != null)
+            {
+                return Ok(user);
+            }
+
+            return BadRequest("Failed to reset password");
+        }
+
         [HttpGet("search")]
         public async Task<IActionResult> SearchUsers(string search)
         {
@@ -71,39 +92,6 @@ namespace KnowledgeSiteApp.Backend.Controllers
             return Ok(user);
         }
 
-        [HttpPost("forgot-password")]
-        public async Task<IActionResult> ForgotPassword(string email)
-        {
-            try
-            {
-                var user = await service.ForgotPassword(email);
-
-                return Ok(user);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
-        }
-
-        [HttpPost("reset-password")]
-        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
-        {
-            try
-            {
-                var user = await service.ResetPassword(dto);
-                if (user != null)
-                {
-                    return Ok(user);
-                }
-                return BadRequest("Failed to reset password");
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
-        }
-
         [HttpPut("{id}/profile-pic")]
         public async Task<IActionResult> UpdateProfilePic(int userId, string newProfilePicture)
         {
@@ -128,14 +116,6 @@ namespace KnowledgeSiteApp.Backend.Controllers
             return Ok(user);
         }
 
-        [HttpDelete]
-        public async Task<IActionResult> DeleteUser(string userName)
-        {
-            var user = await service.Delete(userName);
-
-            return Ok("Sucessfully Deleted a Author");
-        }
-
         [HttpPut("activate/{id}")]
         public async Task<IActionResult> ActivationUser(int id)
         {
@@ -150,6 +130,14 @@ namespace KnowledgeSiteApp.Backend.Controllers
             var user = await service.DeactivateUser(id);
 
             return Ok(user);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteUser(string userName)
+        {
+            var user = await service.Delete(userName);
+
+            return Ok("Sucessfully Deleted a Author");
         }
     }
 }

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace KnowledgeSiteApp.Backend.Controllers
 {
     [ApiController, Route("api/[controller]")]
-    public class SubTopicsController : ControllerBase
+    public class SubTopicsController : Controller
     {
         private readonly ISubTopicService service;
         public SubTopicsController(ISubTopicService _service)
@@ -27,6 +27,14 @@ namespace KnowledgeSiteApp.Backend.Controllers
         public async Task<IActionResult> SaveSubTopicResources(int id, [FromForm] SubTopicResourcesDto dto)
         {
             var updatedTraining = await service.SaveSubTopicResources(id, dto);
+
+            return Ok(updatedTraining);
+        }
+
+        [HttpPost("SaveSubTopicVideo/{id}")]
+        public async Task<IActionResult> SaveSubTopicVideo(int id, [FromForm] SubTopicVideoDto dto)
+        {
+            var updatedTraining = await service.SaveSubTopicVideo(id, dto);
 
             return Ok(updatedTraining);
         }
@@ -55,12 +63,20 @@ namespace KnowledgeSiteApp.Backend.Controllers
             return Ok(subTopic);
         }
 
-        [HttpPost("SaveSubTopicVideo/{id}")]
-        public async Task<IActionResult> SaveSubTopicVideo(int id, [FromForm] SubTopicVideoDto dto)
+        [HttpPut("activate/{id}")]
+        public async Task<IActionResult> Activation(int id)
         {
-            var updatedTraining = await service.SaveSubTopicVideo(id, dto);
+            var subTopic = await service.Activate(id);
 
-            return Ok(updatedTraining);
+            return Ok(subTopic);
+        }
+
+        [HttpPut("deactivate/{id}")]
+        public async Task<IActionResult> Deactivation(int id)
+        {
+            var subTopic = await service.Deactivate(id);
+
+            return Ok(subTopic);
         }
     }
 }

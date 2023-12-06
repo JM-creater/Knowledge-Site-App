@@ -14,6 +14,7 @@ public class Topic
     public int? TrainingId { get; set; }
     public virtual Training Training { get; set; }
     public DateTime DateCreated { get; set; }
+    public bool IsActive { get; set; }
     
     public virtual ICollection<SubTopic> SubTopics { get; set; } = new List<SubTopic>();
 }
