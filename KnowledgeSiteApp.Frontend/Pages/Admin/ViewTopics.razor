@@ -49,7 +49,8 @@
                                         @foreach (var subTopic in topic.SubTopics)
                                         {
                                             <li class="inner-row">
-                                                <a class="table-row-click">@subTopic.Title</a><span class="icons">
+                                                <a class="table-row-click">@subTopic.Title</a>
+                                                <span class="icons">
                                                     <button class="icon-click">
                                                         <i class="fa-solid fa-pen"></i>
                                                     </button><button class="icon-click">
@@ -66,7 +67,7 @@
                             <span class="icons">
                                 <button class="icon-click" @onclick="() => GoToAddSubTopic(topic.TopicId)">
                                     <i class="fa-solid fa-plus"></i>
-                                </button><button class="icon-click">
+                                </button><button class="icon-click" @onclick="() => GoToEditTopic(topic.TopicId)">
                                     <i class="fa-solid fa-pen"></i>
                                 </button><button class="icon-click">
                                     <i class="fa-solid fa-trash"></i>
@@ -88,7 +89,7 @@
 
 @code {
 
-    [CascadingParameter] 
+    [Parameter] 
     public int AdminId { get; set; }
 
     [Parameter] 
@@ -115,9 +116,14 @@
         navigate.NavigateTo($"/addTopic/{TrainingId}");
     }
 
-    private void GoToAddSubTopic(int topicId) // Added parameter to pass topicId
+    private void GoToAddSubTopic(int topicId) 
     {
         navigate.NavigateTo($"/addSubTopic/{topicId}");
+    }
+
+    private void GoToEditTopic(int topicId)
+    {
+        navigate.NavigateTo($"/editTopic/{topicId}");
     }
 
 

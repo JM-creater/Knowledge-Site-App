@@ -44,13 +44,13 @@ namespace KnowledgeSiteApp.Backend.Service
                             .Include(t => t.SubTopics)
                             .ToListAsync();
 
-        public async Task<List<Topic>> GetById(int id)
+        public async Task<Topic> GetById(int topicId)
             => await context.Topics
                             .Include(t => t.Training)
                                 .ThenInclude(t => t.Category)
                             .Include(t => t.SubTopics)  
-                            .Where(t => t.TopicId == id)
-                            .ToListAsync();
+                            .Where(t => t.TopicId == topicId)
+                            .FirstOrDefaultAsync();
 
         public async Task<List<Topic>> GetTopicsByTrainingId(int trainingId)
         {
@@ -74,9 +74,10 @@ namespace KnowledgeSiteApp.Backend.Service
 
             mapper.Map(dto, topic);
             topic.Title = dto.Title;
-            topic.Resource = dto.Resource;
-            topic.TrainingId = dto.TrainingId;
+            topic.Description = dto.Description;
+            topic.YouTubeUrl = dto.YouTubeUrl;
 
+            context.Topics.Update(topic);
             await context.SaveChangesAsync();
 
             return topic;
