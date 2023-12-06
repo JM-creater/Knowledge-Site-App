@@ -66,8 +66,8 @@ namespace KnowledgeSiteApp.Backend.Service
         public async Task<Topic> Update(int id, TopicUpdateDto dto)
         {
             var topic = await context.Topics
-                                        .Where(t => t.TopicId == id)
-                                        .FirstOrDefaultAsync();
+                                     .Where(t => t.TopicId == id)
+                                     .FirstOrDefaultAsync();
 
             if (topic == null)
                 throw new InvalidOperationException("Topic not found");

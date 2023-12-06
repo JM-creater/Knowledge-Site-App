@@ -39,10 +39,18 @@ namespace KnowledgeSiteApp.Backend.Controllers
             return Ok(subTopic);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetByIdSubTopic(int id)
+        [HttpGet("{subTopicId}")]
+        public async Task<IActionResult> GetByIdSubTopic([FromRoute] int subTopicId)
         {
-            var subTopic = await service.GetById(id);
+            var subTopic = await service.GetById(subTopicId);
+
+            return Ok(subTopic);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateSubTopic([FromRoute] int id, [FromBody] SubTopicUpdateDto dto)
+        {
+            var subTopic = await service.Update(id, dto);
 
             return Ok(subTopic);
         }

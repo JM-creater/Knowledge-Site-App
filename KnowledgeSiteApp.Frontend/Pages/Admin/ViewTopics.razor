@@ -51,7 +51,7 @@
                                             <li class="inner-row">
                                                 <a class="table-row-click">@subTopic.Title</a>
                                                 <span class="icons">
-                                                    <button class="icon-click">
+                                                    <button class="icon-click" @onclick="() => GoToEditSubTopic(subTopic.Id)">
                                                         <i class="fa-solid fa-pen"></i>
                                                     </button><button class="icon-click">
                                                         <i class="fa-solid fa-trash"></i>
@@ -124,6 +124,11 @@
     private void GoToEditTopic(int topicId)
     {
         navigate.NavigateTo($"/editTopic/{topicId}");
+    }
+
+    private void GoToEditSubTopic(int subTopicId)
+    {
+        navigate.NavigateTo($"/editSubTopic/{subTopicId}");
     }
 
 

@@ -29,6 +29,7 @@ namespace KnowledgeSiteApp.Backend.Core.AutoMapperProfile
 
             //Sub Topic
             CreateMap<CreateSubTopicDto, SubTopic>();
+            CreateMap<SubTopicUpdateDto, SubTopic>();
         }
     }
 }
