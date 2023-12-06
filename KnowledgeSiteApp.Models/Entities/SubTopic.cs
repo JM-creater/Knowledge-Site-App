@@ -14,4 +14,5 @@ public class SubTopic
     public int? TopicId { get; set; }
     public virtual Topic Topic { get; set; }
     public DateTime DateCreated { get; set; }
+    public bool IsActive { get; set; }
 }

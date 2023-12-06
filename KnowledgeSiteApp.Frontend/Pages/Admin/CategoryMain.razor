@@ -40,7 +40,7 @@
                         </button>
                         <div class="@GetDropdownMenuClass(ct.Id)" aria-labelledby="dropdownMenuButton">
                             <a class="dropdown-item" @onclick="() => EditCategory(ct)" data-bs-toggle="modal" data-bs-target="#staticBackdropEdit">Edit</a>
-                            <a @onclick="() => ActivateDeactivateUser(ct.Id)" class="dropdown-item" style="color: @(ct.IsActive ? "green" : "red")">
+                            <a @onclick="() => ActivateDeactivateCategory(ct.Id)" class="dropdown-item" style="color: @(ct.IsActive ? "green" : "red")">
                                 @if (ct.IsActive)
                                 {
                                     <span>Active</span>
@@ -229,7 +229,7 @@
         }
     }
 
-    private async Task ActivateDeactivateUser(int id)
+    private async Task ActivateDeactivateCategory(int id)
     {
         var categoryStatus = trainingcategory.FirstOrDefault(u => u.Id == id);
 

@@ -10,6 +10,8 @@ namespace KnowledgeSiteApp.Backend.Service
         public Task<List<Topic>> GetAll();
         public Task<Topic> GetById(int topicId);
         public Task<List<Topic>> GetTopicsByTrainingId(int trainingId);
+        public Task<Topic> Activate(int id);
+        public Task<Topic> Deactivate(int id);
         public Task<Topic> Update(int id, TopicUpdateDto dto);
         public Task<Topic> Delete(int id);
         public Task<Topic> SaveTopicResources(int id, TopicResources dto);

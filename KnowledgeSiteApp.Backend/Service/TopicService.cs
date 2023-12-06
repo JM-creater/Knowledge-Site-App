@@ -83,6 +83,40 @@ namespace KnowledgeSiteApp.Backend.Service
             return topic;
         }
 
+        public async Task<Topic> Activate(int id)
+        {
+            var topic = await context.Topics
+                                     .Where(t => t.TopicId == id)
+                                     .FirstOrDefaultAsync();
+
+            if (topic == null)
+                throw new InvalidOperationException("Topic not found");
+
+            topic.IsActive = true;
+
+            context.Topics.Update(topic);
+            await context.SaveChangesAsync();
+
+            return topic;
+        }
+
+        public async Task<Topic> Deactivate(int id)
+        {
+            var topic = await context.Topics
+                                     .Where(t => t.TopicId == id)
+                                     .FirstOrDefaultAsync();
+
+            if (topic == null)
+                throw new InvalidOperationException("Topic not found");
+
+            topic.IsActive = false;
+
+            context.Topics.Update(topic);
+            await context.SaveChangesAsync();
+
+            return topic;
+        }
+
         public async Task<Topic> Delete(int id)
         {
             var topic = await context.Topics

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace KnowledgeSiteApp.Backend.Controllers
 {
     [ApiController, Route("api/[controller]")]
-    public class TrainingCategoryController : ControllerBase
+    public class TrainingCategoryController : Controller
     {
         private readonly ITrainingCategoryService service;
         public TrainingCategoryController(ITrainingCategoryService _service)

@@ -53,8 +53,9 @@
                                                 <span class="icons">
                                                     <button class="icon-click" @onclick="() => GoToEditSubTopic(subTopic.Id)">
                                                         <i class="fa-solid fa-pen"></i>
-                                                    </button><button class="icon-click">
-                                                        <i class="fa-solid fa-trash"></i>
+                                                    </button>
+                                                    <button class="icon-click" @onclick="() => ActivateDeactivateSubTopic(subTopic.Id)">
+                                                        <i class="fa-solid @(subTopic.IsActive ? "fa-toggle-on" : "fa-toggle-off")"></i>
                                                     </button>
                                                 </span>
                                             </li>
@@ -67,10 +68,12 @@
                             <span class="icons">
                                 <button class="icon-click" @onclick="() => GoToAddSubTopic(topic.TopicId)">
                                     <i class="fa-solid fa-plus"></i>
-                                </button><button class="icon-click" @onclick="() => GoToEditTopic(topic.TopicId)">
+                                </button>
+                                <button class="icon-click" @onclick="() => GoToEditTopic(topic.TopicId)">
                                     <i class="fa-solid fa-pen"></i>
-                                </button><button class="icon-click">
-                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                                <button class="icon-click" @onclick="() => ActivateDeactivateTopic(topic.TopicId)">
+                                    <i class="fa-solid @(topic.IsActive ? "fa-toggle-on" : "fa-toggle-off")"></i>
                                 </button>
                             </span>
                         </td>
@@ -99,7 +102,7 @@
 
     private Topic[] getTopics { get; set; } = Array.Empty<Topic>();
 
-    private Topic topics = new Topic();
+    private SubTopic[] getSubTopics { get; set; } = Array.Empty<SubTopic>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -131,6 +134,65 @@
         navigate.NavigateTo($"/editSubTopic/{subTopicId}");
     }
 
+    private async Task ActivateDeactivateTopic(int id)
+    {
+        var topicStatus = getTopics.FirstOrDefault(u => u.TopicId == id);
+
+        if (topicStatus == null)
+        {
+            throw new InvalidOperationException("Topic not found");
+        }
+
+        var confirmationMessage = topicStatus.IsActive ?
+            $"Do you want to deactivate {topicStatus.Title}'s ({topicStatus.TopicId})?" :
+            $"Do you want to activate {topicStatus.Title}'s ({topicStatus.TopicId})?";
+
+        if (await js.InvokeAsync<bool>("confirm", confirmationMessage))
+        {
+            topicStatus.IsActive = !topicStatus.IsActive;
+            var endpoint = topicStatus.IsActive ? $"api/Topic/activate/{id}" : $"api/Topic/deactivate/{id}";
+            var response = await SendAuthorizedRequest(HttpMethod.Put, $"https://localhost:7095/{endpoint}", null);
+            if (response.IsSuccessStatusCode)
+            {
+                StateHasChanged();
+            }
+            else
+            {
+                topicStatus.IsActive = !topicStatus.IsActive;
+                await js.InvokeVoidAsync("alert", "Failed to update topic status.");
+            }
+        }
+    }
+
+    private async Task ActivateDeactivateSubTopic(int id)
+    {
+        var subTopicStatus = getSubTopics.FirstOrDefault(u => u.Id == id);
+
+        if (subTopicStatus == null)
+        {
+            throw new InvalidOperationException("Sub Topic not found");
+        }
+
+        var confirmationMessage = subTopicStatus.IsActive ?
+            $"Do you want to deactivate {subTopicStatus.Title}'s ({subTopicStatus.Id})?" :
+            $"Do you want to activate {subTopicStatus.Title}'s ({subTopicStatus.Id})?";
+
+        if (await js.InvokeAsync<bool>("confirm", confirmationMessage))
+        {
+            subTopicStatus.IsActive = !subTopicStatus.IsActive;
+            var endpoint = subTopicStatus.IsActive ? $"api/SubTopic/activate/{id}" : $"api/SubTopic/deactivate/{id}";
+            var response = await SendAuthorizedRequest(HttpMethod.Put, $"https://localhost:7095/{endpoint}", null);
+            if (response.IsSuccessStatusCode)
+            {
+                StateHasChanged();
+            }
+            else
+            {
+                subTopicStatus.IsActive = !subTopicStatus.IsActive;
+                await js.InvokeVoidAsync("alert", "Failed to update sub topic status.");
+            }
+        }
+    }
 
     private void ToggleDropdown(int dropdownId)
     {

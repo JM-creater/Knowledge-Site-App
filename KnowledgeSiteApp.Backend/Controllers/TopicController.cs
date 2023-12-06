@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace KnowledgeSiteApp.Backend.Controllers
 {
     [ApiController, Route("api/[controller]")]
-    public class TopicController : ControllerBase
+    public class TopicController : Controller
     {
         private readonly ITopicService service;
         public TopicController(ITopicService _service)
@@ -29,6 +29,14 @@ namespace KnowledgeSiteApp.Backend.Controllers
             var updateTopicResources = await service.SaveTopicResources(id, dto);
 
             return Ok(updateTopicResources);
+        }
+
+        [HttpPost("SaveTopicVideo/{id}")]
+        public async Task<IActionResult> SaveTopicVideo(int id, [FromForm] TopicVideo dto)
+        {
+            var updateTopicVide = await service.SaveTopicVideo(id, dto);
+
+            return Ok(updateTopicVide);
         }
 
         [HttpGet]
@@ -63,20 +71,28 @@ namespace KnowledgeSiteApp.Backend.Controllers
             return Ok(topic);
         }
 
+        [HttpPut("activate/{id}")]
+        public async Task<IActionResult> ActivateTopic([FromRoute] int id)
+        {
+            var topic = await service.Activate(id);
+
+            return Ok(topic);
+        }
+
+        [HttpPut("deactivate/{id}")]
+        public async Task<IActionResult> DeactivateTopic([FromRoute] int id)
+        {
+            var topic = await service.Deactivate(id);
+
+            return Ok(topic);
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTopic([FromRoute] int id)
         {
             var topic = await service.Delete(id);
 
             return Ok(topic);   
-        }
-
-        [HttpPost("SaveTopicVideo/{id}")]
-        public async Task<IActionResult> SaveTopicVideo(int id, [FromForm] TopicVideo dto)
-        {
-            var updateTopicVide = await service.SaveTopicVideo(id, dto);
-
-            return Ok(updateTopicVide);
         }
     }
 }
