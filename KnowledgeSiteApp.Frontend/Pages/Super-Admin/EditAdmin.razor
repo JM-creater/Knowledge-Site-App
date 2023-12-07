@@ -158,10 +158,13 @@
                 await Task.Delay(3000);
                 navigate.NavigateTo("/viewAdmin");
             }
+            else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest || response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                toastService.ShowError("Full name already exists");
+            }
             else
             {
-                var errorResponse = await response.Content.ReadFromJsonAsync<ValidationErrorResponse>();
-                errorMessage = String.Join(" ", errorResponse?.Errors.SelectMany(err => err.Value));
+                toastService.ShowError("An error occured while updating the admin. Please try again later.");
             }
         }
         else if (editUser.Username == null && editUser.FirstName != null && editUser.LastName != null && editUser.Email != null && editUser.Password != null )
@@ -186,7 +189,7 @@
         }
         else if (editUser.Username != null && editUser.FirstName != null && editUser.LastName != null && editUser.Email != null && editUser.Password != null)
         {
-            toastService.ShowError("Please Upload Imag.e");
+            toastService.ShowError("Please Upload Image.");
         }
         else if (editUser.Username != null && editUser.FirstName != null && editUser.LastName != null && editUser.Email != null && editUser.Password != null)
         {

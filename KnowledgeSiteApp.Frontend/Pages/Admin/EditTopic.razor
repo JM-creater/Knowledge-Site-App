@@ -98,6 +98,8 @@
 
     private async Task HandleButtonCreate()
     {
+        toastService.ClearAll();
+
         if (editTopic.Title != null && editTopic.Description != null && editTopic.YouTubeUrl != null && uploadedResourceFiles != null && uploadedVideoFiles != null)
         {
             editTopic.TrainingId = editTopic.TrainingId;
@@ -112,13 +114,13 @@
                 await Task.Delay(3000);
                 navigate.NavigateTo($"/viewTopics/{editTopic.TrainingId}");
             }
-            else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest || response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
                 toastService.ShowError("Title already exist.");
             }
             else
             {
-                toastService.ShowError("An error occured while adding the topic. Please try again later.");
+                toastService.ShowError("An error occured while updating the topic. Please try again later.");
             }
         }
         else if (editTopic.Title == null && editTopic.Description != null && editTopic.YouTubeUrl != null && uploadedResourceFiles != null && uploadedVideoFiles != null)

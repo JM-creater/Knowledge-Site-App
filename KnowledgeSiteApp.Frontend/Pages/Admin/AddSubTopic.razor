@@ -5,6 +5,7 @@
 @using Blazored.Toast.Configuration
 @inject IToastService toastService
 @layout AdminMainLayout
+@inject AdminService service
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -72,6 +73,7 @@
     [Parameter]
     public int TrainingId { get; set; }
 
+    private int? AdminId;
     private CreateSubTopicDto newSubTopic = new CreateSubTopicDto();
     private SubTopic[] getSubTopic { get; set; } = Array.Empty<SubTopic>();
     private Topic[] getTopic { get; set; } = Array.Empty<Topic>();
@@ -79,8 +81,24 @@
     private IReadOnlyList<IBrowserFile> uploadedVideoFiles;
     private IReadOnlyList<IBrowserFile> uploadedResourceFiles;
 
+    protected override async Task OnInitializedAsync()
+    {
+        if (!await service.IsUserAuthenticatedAsync())
+        {
+            navigate.NavigateTo("/unauthorized");
+        }
+        else
+        {
+            AdminId = await service.GetUserIdAsync() ?? 0;
+            await LoadSubTopicData();
+            await LoadTopicData();
+        }
+    }
+
     private async Task HandleButtonCreate()
     {
+        toastService.ClearAll();
+
         if(newSubTopic.Title != null && newSubTopic.Description != null && newSubTopic.YouTubeUrl != null && uploadedResourceFiles != null && uploadedVideoFiles != null)
         {
             newSubTopic.TopicId = TopicId;
@@ -105,8 +123,7 @@
             }
             else
             {
-                var errorResponse = await response.Content.ReadFromJsonAsync<ValidationErrorResponse>();
-                errorMessage = String.Join(" ", errorResponse?.Errors.SelectMany(err => err.Value));
+                toastService.ShowError("An error occured while adding the sub topic. Please try again later.");
             }
         }
         else if (newSubTopic.Title == null && newSubTopic.Description != null && newSubTopic.YouTubeUrl != null && uploadedResourceFiles != null && uploadedVideoFiles != null)
@@ -131,7 +148,7 @@
         }
     }
 
-    protected override async Task OnInitializedAsync()
+    private async Task LoadSubTopicData()
     {
         var subTopicResponse = await SendAuthorizedRequest(HttpMethod.Get, "https://localhost:7095/api/SubTopics");
 
@@ -139,7 +156,10 @@
         {
             getSubTopic = await subTopicResponse.Content.ReadFromJsonAsync<SubTopic[]>() ?? Array.Empty<SubTopic>();
         }
+    }
 
+    private async Task LoadTopicData()
+    {
         var topicResponse = await SendAuthorizedRequest(HttpMethod.Get, "https://localhost:7095/api/Topic");
 
         if (topicResponse.IsSuccessStatusCode)
@@ -198,10 +218,4 @@
 
         return await http.SendAsync(request);
     }
-
-    public class ValidationErrorResponse
-    {
-        public Dictionary<string, string[]> Errors { get; set; }
-    }
-
 }

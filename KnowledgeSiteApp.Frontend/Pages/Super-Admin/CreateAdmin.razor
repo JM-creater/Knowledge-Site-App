@@ -180,13 +180,13 @@
                 await Task.Delay(3000);
                 navigate.NavigateTo("/viewAdmin");
             }
-            else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest || response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
                 toastService.ShowError("Full Name Already Exist!");
             }
             else
             {
-                toastService.ShowError("An error occured while adding the training. Please try again later.");
+                toastService.ShowError("An error occured while adding the admin. Please try again later.");
             }
         }
         else if (newUser.Username == null && newUser.FirstName != null && newUser.LastName != null && newUser.Email != null && newUser.Password != null && uploadedImage != null && newUser.Password == conPass)
