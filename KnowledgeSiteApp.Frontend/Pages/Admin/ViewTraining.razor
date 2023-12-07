@@ -116,10 +116,8 @@ else
 
 
 @code {
-    [Parameter] 
-    public int AdminId { get; set; }
-
-    private Training[] trainings;
+    private int? AdminId;
+    private Training[] trainings { get; set; } = Array.Empty<Training>();
     private int currentIndex = 0;
     private Training currentTraining => currentIndex >= 0 && currentIndex < trainings?.Length
                                         ? trainings[currentIndex]
@@ -127,11 +125,19 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        if (AdminId == 0)
+        if (!await service.IsUserAuthenticatedAsync())
+        {
+            navigate.NavigateTo("/unauthorized");
+        }
+        else
         {
             AdminId = await service.GetUserIdAsync() ?? 0;
+            await LoadTrainingData();
         }
+    }
 
+    private async Task LoadTrainingData()
+    {
         var response = await http.GetFromJsonAsync<Training[]>($"https://localhost:7095/api/Training/trainingByAdminId/{AdminId}");
 
         trainings = response ?? Array.Empty<Training>();

@@ -91,14 +91,13 @@
                 await Task.Delay(3000);
                 navigate.NavigateTo($"/viewTopics/{TrainingId}");
             }
-            else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest || response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
             {
                 toastService.ShowError("Title already exist.");
             }
             else
             {
-                var errorResponse = await response.Content.ReadFromJsonAsync<ValidationErrorResponse>();
-                errorMessage = String.Join(" ", errorResponse?.Errors.SelectMany(err => err.Value));
+                toastService.ShowError("An error occured while adding the topic. Please try again later.");
             }
         }
         else if (newTopic.Title == null && newTopic.Description != null && newTopic.YouTubeUrl != null && uploadedResourceFiles != null && uploadedVideoFiles != null)
