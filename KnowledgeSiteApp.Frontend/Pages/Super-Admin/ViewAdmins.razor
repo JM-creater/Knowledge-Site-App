@@ -152,8 +152,8 @@
 
         var title = "User Status Change";
         var message1 = userToChange.IsActive
-            ? $"Do you want to deactivate {userToChange.FirstName} {userToChange.LastName} (ID: {userToChange.Id})?"
-            : $"Do you want to activate {userToChange.FirstName} {userToChange.LastName} (ID: {userToChange.Id})?";
+            ? $"Do you want to deactivate {userToChange.FirstName} {userToChange.LastName}?"
+            : $"Do you want to activate {userToChange.FirstName} {userToChange.LastName}?";
 
         var options = new ConfirmDialogOptions
         {
