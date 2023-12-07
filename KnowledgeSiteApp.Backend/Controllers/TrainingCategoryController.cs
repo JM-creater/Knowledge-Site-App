@@ -38,6 +38,14 @@ namespace KnowledgeSiteApp.Backend.Controllers
             return Ok(category);
         }
 
+        [HttpGet("categoryByAdmin/{adminId}")]
+        public async Task<IActionResult> GetCategoryByAdmin(int adminId)
+        {
+            var category = await service.GetCategoryByAdmin(adminId);
+
+            return Ok(category);
+        }
+
         [HttpGet("search")]
         public async Task<IActionResult> Search(string searchTerm)
         {

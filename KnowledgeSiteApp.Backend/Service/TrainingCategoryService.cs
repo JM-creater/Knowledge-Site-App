@@ -50,6 +50,12 @@ namespace KnowledgeSiteApp.Backend.Service
                             .Where(t => t.Id == id)
                             .FirstOrDefaultAsync();
 
+        public async Task<List<TrainingCategory>> GetCategoryByAdmin(int adminId)
+            => await context.TrainingCategories
+                            .Include(t => t.Trainings)
+                            .Where(t => t.AdminId == adminId)
+                            .ToListAsync();
+
         public async Task<IEnumerable<TrainingCategory>> SearchCategory(string search)
         {
             var category = await context.TrainingCategories

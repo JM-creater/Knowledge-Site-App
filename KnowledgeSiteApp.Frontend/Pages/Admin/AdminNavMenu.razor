@@ -1,0 +1,89 @@
+﻿@inject HttpClient http
+@inject IJSRuntime js
+@inject NavigationManager navigate
+@inject AdminService service
+
+<nav class="navbar navbar-expand-md navbar-toggleable-sm navbar-light border-bottom box-shadow mb-3" style="height: 90px; background-color: #FFC95F;">
+    <div class="container" style="max-width: 90% !important;">
+        <img src="/origami bold.png" class="" style="width: 100px; height: 100px;">
+        <a class="navbar-brand" href="" style="font-family: Montserrat, sans-serif; font-size: 30px; color: #862B0D; margin: 5px !important;"><b>LearnNest</b></a>
+
+        <button class="navbar-toggler" type="button" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="@NavMenuCssClass" style="padding-right: 100px !important;" @onclick="ToggleNavMenu">
+            <ul class="navbar-nav mx-auto">
+                <li class="nav-item">
+                    <NavLink class="nav-link text-dark" style="color: #862B0D !important;" href="" Match="NavLinkMatch.All">
+                        <span class="oi oi-home" aria-hidden="true"></span> Home
+                    </NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link text-dark" style="color: #862B0D !important;" href="counter">
+                        <span class="oi oi-plus" aria-hidden="true"></span> Training
+                    </NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link text-dark" style="color: #862B0D !important;" href="fetchdata">
+                        <span class="oi oi-list-rich" aria-hidden="true"></span> Category
+                    </NavLink>
+                </li>
+            </ul>
+        </div>
+        <div class="ml-auto d-flex align-items-center">
+            <span class="text-dark" style="margin-right: 20px !important;">@getUser.FirstName @getUser.LastName</span>
+            <img src=@($"https://localhost:7095/{getUser.Image}") alt="Profile Picture" class="rounded-circle mr-2" style="width: 60px; height: 60px;">
+        </div>
+    </div>
+</nav>
+
+@code {
+    private int? AdminId;
+    private User getUser = new User();
+    bool collapseNavMenu = true;
+
+    string baseMenuClass = "navbar-collapse d-sm-inline-flex flex-sm-row-reverse";
+
+    string NavMenuCssClass => baseMenuClass + (collapseNavMenu ? " collapse" : "");
+
+    void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!await service.IsUserAuthenticatedAsync())
+        {
+            navigate.NavigateTo("/unauthorized");
+        }
+        else
+        {
+            AdminId = await service.GetUserIdAsync() ?? 0;
+            await LoadAdminData();
+        }
+    }
+
+    private async Task LoadAdminData()
+    {
+        var response = await SendAuthorizedRequest(HttpMethod.Get, $"https://localhost:7095/api/User/{AdminId}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            getUser = await response.Content.ReadFromJsonAsync<User>();
+        }
+    }
+
+    private async Task<HttpResponseMessage> SendAuthorizedRequest(HttpMethod method, string url, HttpContent content = null)
+    {
+        var request = new HttpRequestMessage(method, url);
+        request.Headers.Add("X-API-KEY", "KNOWLEDGESITEAPPAPI");
+
+        if (content != null)
+        {
+            request.Content = content;
+        }
+
+        return await http.SendAsync(request);
+    }
+}

@@ -12,21 +12,6 @@ namespace KnowledgeSiteApp.Backend.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "TrainingCategories",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    CategoryName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TrainingCategories", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -48,6 +33,27 @@ namespace KnowledgeSiteApp.Backend.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TrainingCategories",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    AdminId = table.Column<int>(type: "int", nullable: false),
+                    CategoryName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TrainingCategories", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TrainingCategories_Users_AdminId",
+                        column: x => x.AdminId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -155,7 +161,7 @@ namespace KnowledgeSiteApp.Backend.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "DateCreated", "DateUpdated", "Email", "FirstName", "Image", "IsActive", "LastName", "Password", "PasswordResetToken", "ResetTokenExpires", "Role", "Username" },
-                values: new object[] { 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin0123@gmail.com", "Admin", null, true, "Admin", "jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=", null, null, 2, "Admin123" });
+                values: new object[] { 1, new DateTime(2023, 12, 7, 20, 27, 38, 42, DateTimeKind.Local).AddTicks(1554), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin0123@gmail.com", "Admin", null, true, "Admin", "jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=", null, null, 2, "Admin123" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Ratings_TrainingId",
@@ -171,6 +177,11 @@ namespace KnowledgeSiteApp.Backend.Migrations
                 name: "IX_Topics_TrainingId",
                 table: "Topics",
                 column: "TrainingId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TrainingCategories_AdminId",
+                table: "TrainingCategories",
+                column: "AdminId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Trainings_AdminId",

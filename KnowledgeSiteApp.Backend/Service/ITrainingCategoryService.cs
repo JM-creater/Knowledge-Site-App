@@ -8,6 +8,7 @@ namespace KnowledgeSiteApp.Backend.Service
         public Task<TrainingCategory> Create(TrainingCategoryCreateDto dto);
         public Task<TrainingCategory> GetById(int id);
         public Task<List<TrainingCategory>> GetAll();
+        public Task<List<TrainingCategory>> GetCategoryByAdmin(int adminId);
         public Task<IEnumerable<TrainingCategory>> SearchCategory(string search);
         public Task<TrainingCategory> Update(int id, TrainingCategoryUpdateDto dto);
         public Task<TrainingCategory> Delete(int id);
