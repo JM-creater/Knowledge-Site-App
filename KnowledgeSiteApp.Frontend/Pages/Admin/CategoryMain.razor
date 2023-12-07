@@ -2,12 +2,29 @@
 @inject HttpClient http
 @inject IJSRuntime js
 @inject NavigationManager navigate
+@using Blazored.Toast.Configuration
+@inject IToastService toastService
 @layout AdminMainLayout
+@inject AdminService service
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" type="text/css" href="css/main.css" />
 <link rel="stylesheet" type="text/css" href="css/categories-stylesheet.css" />
+<link rel="stylesheet" type="text/css" href="css/components-stylesheet.css" />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+
+<BlazoredToasts Position="ToastPosition.BottomRight"
+                Timeout="5"
+                IconType="IconType.FontAwesome"
+                SuccessClass="success-toast-override"
+                SuccessIcon="fa fa-thumbs-up"
+                ErrorIcon="fa fa-bug" />
+
+<ConfirmDialog @ref="dialog" />
 
 <div class="container">
     <!-- Search Bar -->
@@ -20,7 +37,8 @@
         <div class="category-box add-new">
             <span class="add-category-button"
                   data-bs-toggle="modal"
-                  data-bs-target="#staticBackdrop">
+                  data-bs-target="#staticBackdrop"
+                  @onclick="() => closeModal = true">
                 <i class="fa fa-plus"></i>
                 Add New Category
             </span>
@@ -36,7 +54,7 @@
                 <div class="dropdown-container">
                     <div class="dropdown" @onclick="() => ToggleDropdown(ct.Id)">
                         <button class="dropdown-toggle dropdown-custom" type="button" data-bs-toggle="dropdown" id="dropdownMenuButton">
-                            <i class="fa fa-ellipsis-h"></i>
+                            <Icon Name="IconName.ThreeDots" />
                         </button>
                         <div class="@GetDropdownMenuClass(ct.Id)" aria-labelledby="dropdownMenuButton">
                             <a class="dropdown-item" @onclick="() => EditCategory(ct)" data-bs-toggle="modal" data-bs-target="#staticBackdropEdit">Edit</a>
@@ -57,8 +75,9 @@
         }
 
         <!-- Add Category Modal -->
-        <div class="modal fade"
+        <div class="modal fade @(closeModal ? "show" : "")"
              id="staticBackdrop"
+             style="display: @(closeModal ? "block" : "none");"
              data-bs-backdrop="static"
              data-bs-keyboard="false"
              tabindex="-1">
@@ -75,13 +94,15 @@
                         <button type="button"
                                 class="btn-close"
                                 data-bs-dismiss="modal"
-                                aria-label="Close"></button>
+                                aria-label="Close"
+                                @onclick="() => closeModal = false">
+                        </button>
                     </div>
                     <div class="modal-body">
                         <input type="text"
                                class="form-control"
                                id="newCategoryInput"
-                        @bind="category.CategoryName"
+                               @bind="category.CategoryName"
                                placeholder="Enter Category Name" />
                     </div>
                     <div class="modal-footer">
@@ -97,8 +118,9 @@
         </div>
 
         <!-- Edit Category Modal -->
-        <div class="modal fade"
+        <div class="modal fade  @(closeEditModal ? "show" : "")"
              id="staticBackdropEdit"
+             style="display: @(closeEditModal ? "block" : "none");"
              data-bs-backdrop="static"
              data-bs-keyboard="false"
              tabindex="-1">
@@ -115,7 +137,9 @@
                         <button type="button"
                                 class="btn-close"
                                 data-bs-dismiss="modal"
-                                aria-label="Close"></button>
+                                aria-label="Close"
+                                @onclick="() => closeEditModal = false">
+                        </button>
                     </div>
                     <div class="modal-body">
                         <input type="text"
@@ -140,46 +164,95 @@
 </div>
 
 @code {
-    [CascadingParameter] public int AdminId { get; set; }
+    private int? AdminId;
     private TrainingCategory category = new TrainingCategory();
     private TrainingCategory[] trainingcategory { get; set; } = Array.Empty<TrainingCategory>();
     private Dictionary<int, bool> dropdownStates = new Dictionary<int, bool>();
     private string searchTerm = string.Empty;
-    private string errorMessage;
-
-    [Parameter]
-    public EventCallback<int> OnEdit { get; set; }
-
-    [Parameter]
-    public EventCallback<int> OnDelete { get; set; }
+    private string errorMessage = string.Empty;
+    private ConfirmDialog dialog = default!;
+    private bool closeModal = false;
+    private bool closeEditModal = false;
 
     private async Task HandleAddCategory()
     {
-        var response = await SendAuthorizedRequest(HttpMethod.Post, "https://localhost:7095/api/TrainingCategory/add", JsonContent.Create(category));
+        toastService.ClearAll();
 
-        if (response.IsSuccessStatusCode)
+        if (category.CategoryName != null)
         {
-            await js.InvokeVoidAsync("alert", "Category created successfully");
-            await ReloadCategories();
-        }
-        else
-        {
-            if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            var response = await SendAuthorizedRequest(HttpMethod.Post, "https://localhost:7095/api/TrainingCategory/add", JsonContent.Create(category));
+
+            if (response.IsSuccessStatusCode)
             {
-                var errorResponse = await response.Content.ReadFromJsonAsync<ValidationErrorResponse>();
-                errorMessage = String.Join(" ", errorResponse?.Errors.SelectMany(err => err.Value));
+                toastService.ShowSuccess("Category created successfully");
+                await ReloadCategories();
+                closeModal = false;
+                await Task.Delay(300);
+                RefreshPage();
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                toastService.ShowError("Category Name Already Exist!");
             }
             else
             {
-                errorMessage = "An error occurred while adding the category. Please try again later.";
+                toastService.ShowError("An error occurred while adding the category. Please try again later.");
             }
-
+        }
+        else
+        {
+            toastService.ShowError("Please fill-up the category name field.");
         }
     }
 
-    protected override async Task OnParametersSetAsync()
+    private async Task HandleEditCategory()
+    {
+        toastService.ClearAll();
+
+        if (!string.IsNullOrWhiteSpace(category.CategoryName))
+        {
+            var response = await SendAuthorizedRequest(HttpMethod.Put, $"https://localhost:7095/api/TrainingCategory/update/{category.Id}", JsonContent.Create(category));
+
+            if (response.IsSuccessStatusCode)
+            {
+                toastService.ShowSuccess("Category edited successfully");
+                await ReloadCategories();
+                closeEditModal = false;
+                await Task.Delay(300);
+                RefreshPage();
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                toastService.ShowError("Category Name Already Exist!");
+            }
+            else
+            {
+                toastService.ShowError("An error occurred while adding the category. Please try again later.");
+            }
+        }
+        else
+        {
+            toastService.ShowError("Please fill-up the category name field.");
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!await service.IsUserAuthenticatedAsync())
+        {
+            navigate.NavigateTo("/unauthorized");
+        }
+        else
+        {
+            AdminId = await service.GetUserIdAsync() ?? 0;
+            await LoadCategoryData();
+        }
+    }
+
+    private async Task LoadCategoryData()
     {
         var response = await SendAuthorizedRequest(HttpMethod.Get, "https://localhost:7095/api/TrainingCategory");
+
         if (response.IsSuccessStatusCode)
         {
             trainingcategory = await response.Content.ReadFromJsonAsync<TrainingCategory[]>() ?? Array.Empty<TrainingCategory>();
@@ -206,29 +279,6 @@
         StateHasChanged(); 
     }
 
-    private async Task HandleEditCategory()
-    {
-        var response = await SendAuthorizedRequest(HttpMethod.Put, $"https://localhost:7095/api/TrainingCategory/update/{category.Id}", JsonContent.Create(category));
-
-        if (response.IsSuccessStatusCode)
-        {
-            await js.InvokeVoidAsync("alert", "Category edited successfully");
-            await ReloadCategories();
-        }
-        else
-        {
-            if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
-            {
-                var errorResponse = await response.Content.ReadFromJsonAsync<ValidationErrorResponse>();
-                errorMessage = String.Join(" ", errorResponse?.Errors.SelectMany(err => err.Value));
-            }
-            else
-            {
-                errorMessage = "An error occurred while editing the category. Please try again later.";
-            }
-        }
-    }
-
     private async Task ActivateDeactivateCategory(int id)
     {
         var categoryStatus = trainingcategory.FirstOrDefault(u => u.Id == id);
@@ -238,24 +288,41 @@
             throw new InvalidOperationException("Training Category not found");
         }
 
-        var confirmationMessage = categoryStatus.IsActive ?
-            $"Do you want to deactivate {categoryStatus.CategoryName}'s ({categoryStatus.Id})?" :
-            $"Do you want to activate {categoryStatus.CategoryName}'s ({categoryStatus.Id})?";
+        var title = "Category Status Change";
+        var message1 = categoryStatus.IsActive ?
+            $"Do you want to deactivate {categoryStatus.CategoryName}?" :
+            $"Do you want to activate {categoryStatus.CategoryName}?";
 
-        if (await js.InvokeAsync<bool>("confirm", confirmationMessage))
+        var options = new ConfirmDialogOptions
+        {
+            YesButtonText = "OK",
+            YesButtonColor = ButtonColor.Success,
+            NoButtonText = "CANCEL",
+            NoButtonColor = ButtonColor.Danger
+        };
+
+        var confirmation = await dialog.ShowAsync(title, message1, options);
+
+        if (confirmation)
+        {
+            await ToggleCategoryStatus(categoryStatus);
+        }
+    }
+
+    private async Task ToggleCategoryStatus(TrainingCategory categoryStatus)
+    {
+        categoryStatus.IsActive = !categoryStatus.IsActive;
+        var endpoint = categoryStatus.IsActive ? $"api/TrainingCategory/activate/{categoryStatus.Id}" : $"api/TrainingCategory/deactivate/{categoryStatus.Id}";
+        var response = await SendAuthorizedRequest(HttpMethod.Put, $"https://localhost:7095/{endpoint}", null);
+
+        if (response.IsSuccessStatusCode)
+        {
+            StateHasChanged();
+        }
+        else
         {
             categoryStatus.IsActive = !categoryStatus.IsActive;
-            var endpoint = categoryStatus.IsActive ? $"api/TrainingCategory/activate/{id}" : $"api/TrainingCategory/deactivate/{id}";
-            var response = await SendAuthorizedRequest(HttpMethod.Put, $"https://localhost:7095/{endpoint}", null);
-            if (response.IsSuccessStatusCode)
-            {
-                StateHasChanged();
-            }
-            else
-            {
-                categoryStatus.IsActive = !categoryStatus.IsActive;
-                await js.InvokeVoidAsync("alert", "Failed to update category status.");
-            }
+            await js.InvokeVoidAsync("alert", "Failed to update category status.");
         }
     }
 
@@ -306,6 +373,11 @@
         return dropdownStates.TryGetValue(categoryId, out var isOpen) && isOpen ? "dropdown-menu show" : "dropdown-menu";
     }
 
+    private void RefreshPage()
+    {
+        navigate.NavigateTo(navigate.Uri, forceLoad: true);
+    }
+
     private async Task<HttpResponseMessage> SendAuthorizedRequest(HttpMethod method, string url, HttpContent content = null)
     {
         var request = new HttpRequestMessage(method, url);
@@ -317,10 +389,5 @@
         }
 
         return await http.SendAsync(request);
-    }
-
-    public class ValidationErrorResponse
-    {
-        public Dictionary<string, string[]> Errors { get; set; }
     }
 }
