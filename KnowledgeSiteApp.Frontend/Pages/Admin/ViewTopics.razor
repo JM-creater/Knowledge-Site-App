@@ -2,7 +2,10 @@
 @inject HttpClient http
 @inject IJSRuntime js
 @inject NavigationManager navigate
+@using Blazored.Toast.Configuration
+@inject IToastService toastService
 @layout AdminMainLayout
+@inject AdminService service
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -12,6 +15,15 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+
+<BlazoredToasts Position="ToastPosition.BottomRight"
+                Timeout="3"
+                IconType="IconType.FontAwesome"
+                SuccessClass="success-toast-override"
+                SuccessIcon="fa fa-thumbs-up"
+                ErrorIcon="fa fa-bug" />
+
+<ConfirmDialog @ref="dialog" />
 
 <div class="container-full"
      style="flex-direction: column; justify-content: flex-start">
@@ -48,17 +60,26 @@
                                     <ul class="sub-topics show">
                                         @foreach (var subTopic in topic.SubTopics)
                                         {
-                                            <li class="inner-row">
-                                                <a class="table-row-click">@subTopic.Title</a>
-                                                <span class="icons">
-                                                    <button class="icon-click" @onclick="() => GoToEditSubTopic(subTopic.Id)">
-                                                        <i class="fa-solid fa-pen"></i>
-                                                    </button>
-                                                    <button class="icon-click" @onclick="() => ActivateDeactivateSubTopic(subTopic.Id)">
-                                                        <i class="fa-solid @(subTopic.IsActive ? "fa-toggle-on" : "fa-toggle-off")"></i>
-                                                    </button>
-                                                </span>
-                                            </li>
+                                            if (subTopic != null)
+                                            {
+                                                <li class="inner-row">
+                                                    <a class="table-row-click">@subTopic.Title</a>
+                                                    <span class="icons">
+                                                        <button class="icon-click" @onclick="() => GoToEditSubTopic(subTopic.Id)">
+                                                            <i class="fa-solid fa-pen"></i>
+                                                        </button>
+                                                        <button class="icon-click" @onclick="() => ActivateDeactivateSubTopic(subTopic.Id)">
+                                                            <i class="fa-solid @(subTopic.IsActive ? "fa-toggle-on" : "fa-toggle-off")"></i>
+                                                        </button>
+                                                    </span>
+                                                </li>
+                                            }
+                                            else
+                                            {
+                                                <li class="inner-row">
+                                                    <span>No sub-topic available</span>
+                                                </li>
+                                            }
                                         }
                                     </ul>
                                 }
@@ -91,20 +112,28 @@
 </div>
 
 @code {
-
-    [Parameter] 
-    public int AdminId { get; set; }
-
     [Parameter] 
     public int TrainingId { get; set; }
-
+    private int? AdminId;
     private Dictionary<int, bool> dropdownStates = new Dictionary<int, bool>();
-
     private Topic[] getTopics { get; set; } = Array.Empty<Topic>();
-
     private SubTopic[] getSubTopics { get; set; } = Array.Empty<SubTopic>();
+    private ConfirmDialog dialog = default!;
 
     protected override async Task OnInitializedAsync()
+    {
+        if (!await service.IsUserAuthenticatedAsync())
+        {
+            navigate.NavigateTo("/unauthorized");
+        }
+        else
+        {
+            AdminId = await service.GetUserIdAsync() ?? 0;
+            await LoadTopicsData();
+        }
+    }
+
+    private async Task LoadTopicsData()
     {
         var response = await SendAuthorizedRequest(HttpMethod.Get, $"https://localhost:7095/api/Topic/byTrainingId/{TrainingId}");
 
@@ -143,24 +172,41 @@
             throw new InvalidOperationException("Topic not found");
         }
 
-        var confirmationMessage = topicStatus.IsActive ?
-            $"Do you want to deactivate {topicStatus.Title}'s ({topicStatus.TopicId})?" :
-            $"Do you want to activate {topicStatus.Title}'s ({topicStatus.TopicId})?";
+        var title = "Topic Status Change";
+        var message1 = topicStatus.IsActive
+            ? $"Do you want to deactivate {topicStatus.Title}?" 
+            : $"Do you want to activate {topicStatus.Title}?";
 
-        if (await js.InvokeAsync<bool>("confirm", confirmationMessage))
+        var options = new ConfirmDialogOptions
         {
-            topicStatus.IsActive = !topicStatus.IsActive;
-            var endpoint = topicStatus.IsActive ? $"api/Topic/activate/{id}" : $"api/Topic/deactivate/{id}";
-            var response = await SendAuthorizedRequest(HttpMethod.Put, $"https://localhost:7095/{endpoint}", null);
-            if (response.IsSuccessStatusCode)
-            {
-                StateHasChanged();
-            }
-            else
-            {
-                topicStatus.IsActive = !topicStatus.IsActive;
-                await js.InvokeVoidAsync("alert", "Failed to update topic status.");
-            }
+            YesButtonText = "OK",
+            YesButtonColor = ButtonColor.Success,
+            NoButtonText = "CANCEL",
+            NoButtonColor = ButtonColor.Danger
+        };
+
+        var confirmation = await dialog.ShowAsync(title, message1, options);
+
+        if (confirmation)
+        {
+            await ToggleTopicStatus(topicStatus);
+        }
+    }
+
+    private async Task ToggleTopicStatus(Topic topicToChange)
+    {
+        topicToChange.IsActive = !topicToChange.IsActive;
+        var endpoint = topicToChange.IsActive ? $"api/Topic/activate/{topicToChange.TopicId}" : $"api/Topic/deactivate/{topicToChange.TopicId}";
+        var response = await SendAuthorizedRequest(HttpMethod.Put, $"https://localhost:7095/{endpoint}", null);
+        if (response.IsSuccessStatusCode)
+        {
+            toastService.ShowSuccess("Topic successfully changed the status");
+            StateHasChanged();
+        }
+        else
+        {
+            topicToChange.IsActive = !topicToChange.IsActive;
+            toastService.ShowError("Failed to update topic status.");
         }
     }
 
@@ -173,24 +219,41 @@
             throw new InvalidOperationException("Sub Topic not found");
         }
 
-        var confirmationMessage = subTopicStatus.IsActive ?
-            $"Do you want to deactivate {subTopicStatus.Title}'s ({subTopicStatus.Id})?" :
-            $"Do you want to activate {subTopicStatus.Title}'s ({subTopicStatus.Id})?";
+        var title = "Sub Topic Status Change";
+        var message1 = subTopicStatus.IsActive 
+            ? $"Do you want to deactivate {subTopicStatus.Title}?" 
+            : $"Do you want to activate {subTopicStatus.Title}?";
 
-        if (await js.InvokeAsync<bool>("confirm", confirmationMessage))
+        var options = new ConfirmDialogOptions
         {
-            subTopicStatus.IsActive = !subTopicStatus.IsActive;
-            var endpoint = subTopicStatus.IsActive ? $"api/SubTopic/activate/{id}" : $"api/SubTopic/deactivate/{id}";
-            var response = await SendAuthorizedRequest(HttpMethod.Put, $"https://localhost:7095/{endpoint}", null);
-            if (response.IsSuccessStatusCode)
-            {
-                StateHasChanged();
-            }
-            else
-            {
-                subTopicStatus.IsActive = !subTopicStatus.IsActive;
-                await js.InvokeVoidAsync("alert", "Failed to update sub topic status.");
-            }
+            YesButtonText = "OK",
+            YesButtonColor = ButtonColor.Success,
+            NoButtonText = "CANCEL",
+            NoButtonColor = ButtonColor.Danger
+        };
+
+        var confirmation = await dialog.ShowAsync(title, message1, options);
+
+        if (confirmation)
+        {
+            await ToggleSubTopicStatus(subTopicStatus);
+        }
+    }
+
+    private async Task ToggleSubTopicStatus(SubTopic subTopicToChange)
+    {
+        subTopicToChange.IsActive = !subTopicToChange.IsActive;
+        var endpoint = subTopicToChange.IsActive ? $"api/SubTopic/activate/{subTopicToChange.Id}" : $"api/SubTopic/deactivate/{subTopicToChange.Id}";
+        var response = await SendAuthorizedRequest(HttpMethod.Put, $"https://localhost:7095/{endpoint}", null);
+        if (response.IsSuccessStatusCode)
+        {
+            toastService.ShowSuccess("Sub Topic successfully changed the status");
+            StateHasChanged();
+        }
+        else
+        {
+            subTopicToChange.IsActive = !subTopicToChange.IsActive;
+            toastService.ShowError("Failed to update sub topic status.");
         }
     }
 

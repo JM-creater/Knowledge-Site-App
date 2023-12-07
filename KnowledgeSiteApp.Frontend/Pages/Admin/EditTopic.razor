@@ -5,6 +5,7 @@
 @using Blazored.Toast.Configuration
 @inject IToastService toastService
 @layout AdminMainLayout
+@inject AdminService service
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -76,11 +77,24 @@
     [Parameter]
     public int TopicId { get; set; }
 
-
+    private int? AdminId;
     private Topic editTopic = new Topic();
     private string errorMessage = string.Empty;
     private IReadOnlyList<IBrowserFile> uploadedVideoFiles;
     private IReadOnlyList<IBrowserFile> uploadedResourceFiles;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!await service.IsUserAuthenticatedAsync())
+        {
+            navigate.NavigateTo("/unauthorized");
+        }
+        else
+        {
+            AdminId = await service.GetUserIdAsync() ?? 0;
+            await LoadTopicForEdit();
+        }
+    }
 
     private async Task HandleButtonCreate()
     {
@@ -98,14 +112,13 @@
                 await Task.Delay(3000);
                 navigate.NavigateTo($"/viewTopics/{editTopic.TrainingId}");
             }
-            else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest || response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
             {
                 toastService.ShowError("Title already exist.");
             }
             else
             {
-                var errorResponse = await response.Content.ReadFromJsonAsync<ValidationErrorResponse>();
-                errorMessage = String.Join(" ", errorResponse?.Errors.SelectMany(err => err.Value));
+                toastService.ShowError("An error occured while adding the topic. Please try again later.");
             }
         }
         else if (editTopic.Title == null && editTopic.Description != null && editTopic.YouTubeUrl != null && uploadedResourceFiles != null && uploadedVideoFiles != null)
@@ -132,11 +145,6 @@
         {
             toastService.ShowError("Fill up all fields");
         }
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadTopicForEdit();
     }
 
     private async Task LoadTopicForEdit()

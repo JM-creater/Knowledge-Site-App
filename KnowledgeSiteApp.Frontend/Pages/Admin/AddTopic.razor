@@ -5,6 +5,7 @@
 @using Blazored.Toast.Configuration
 @inject IToastService toastService
 @layout AdminMainLayout
+@inject AdminService service
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -56,7 +57,7 @@
                 Clear
             </button>
         </div>
-        <button class="btn btn-add" style="background-color: #862b0d" onclick="@HandleButtonCreate">
+        <button class="btn btn-add" style="background-color: #862b0d" @onclick="HandleButtonCreate">
             Add Topic
         </button>
         <button class="btn btn-update" style="background-color: #898989">
@@ -68,12 +69,28 @@
 @code {
     [Parameter] 
     public int TrainingId { get; set; }
+
+    private int? AdminId;
     private CreateTopicDto newTopic = new CreateTopicDto();
     private Topic[] getTopic { get; set; } = Array.Empty<Topic>();
     private Training[] getTraining { get; set; } = Array.Empty<Training>();
     private string errorMessage = string.Empty;
     private IReadOnlyList<IBrowserFile> uploadedVideoFiles;
     private IReadOnlyList<IBrowserFile> uploadedResourceFiles;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!await service.IsUserAuthenticatedAsync())
+        {
+            navigate.NavigateTo("/unauthorized");
+        }
+        else
+        {
+            AdminId = await service.GetUserIdAsync() ?? 0;
+            await LoadTrainingData();
+            await LoadTopicData();
+        }
+    }
 
     private async Task HandleButtonCreate()
     {
@@ -126,7 +143,7 @@
         }
     }
 
-    protected override async Task OnInitializedAsync()
+    private async Task LoadTrainingData()
     {
         var trainingResponse = await SendAuthorizedRequest(HttpMethod.Get, "https://localhost:7095/api/Training");
 
@@ -134,7 +151,10 @@
         {
             getTraining = await trainingResponse.Content.ReadFromJsonAsync<Training[]>() ?? Array.Empty<Training>();
         }
+    }
 
+    private async Task LoadTopicData()
+    {
         var topicResponse = await SendAuthorizedRequest(HttpMethod.Get, "https://localhost:7095/api/Topic");
 
         if (topicResponse.IsSuccessStatusCode)
