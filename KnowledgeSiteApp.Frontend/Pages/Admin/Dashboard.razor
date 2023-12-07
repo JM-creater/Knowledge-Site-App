@@ -73,7 +73,6 @@
 
 @code {
     private int? AdminId;
-    private User users = new User();
     private User[] countUsers { get; set; } = Array.Empty<User>();
     private int TotalAdmin;
     private int DeactivatedAdmin;
@@ -82,33 +81,52 @@
 
     protected override async Task OnInitializedAsync()
     {
-        AdminId = await service.GetUserIdAsync() ?? 0;
+        if (!await service.IsUserAuthenticatedAsync())
+        {
+            navigate.NavigateTo("/unauthorized");
+        }
+        else
+        {
+            AdminId = await service.GetUserIdAsync() ?? 0;
+            await LoadAdminData();
+        }
     }
 
-    protected override async Task OnParametersSetAsync()
+    private async Task LoadAdminData()
     {
-        var response = await SendAuthorizedRequest(HttpMethod.Get, "https://localhost:7095/api/User/getAllAdmins");
+        try
+        {
+            var response = await SendAuthorizedRequest(HttpMethod.Get, "https://localhost:7095/api/User/getAllAdmins");
 
-        if(response.IsSuccessStatusCode)
-        {
-            countUsers = await response.Content.ReadFromJsonAsync<User[]>();
-        }
-        foreach(var user in countUsers)
-        {
-            TotalAdmin++;
-        }
-        foreach (var user in countUsers)
-        {
-            if(user.IsActive == false)
+            if (response.IsSuccessStatusCode)
             {
-                DeactivatedAdmin++;
+                countUsers = await response.Content.ReadFromJsonAsync<User[]>();
+                ProcessAdminData();
+            }
+            else
+            {
+                errorMessage = $"Failed to load data: {response.ReasonPhrase}";
             }
         }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error occurred: {ex.Message}";
+        }
+    }
+
+    private void ProcessAdminData()
+    {
         foreach (var user in countUsers)
         {
-            if (user.IsActive == true)
+            TotalAdmin++;
+
+            if (user.IsActive)
             {
                 ActivatedAdmin++;
+            }
+            else
+            {
+                DeactivatedAdmin++;
             }
         }
     }

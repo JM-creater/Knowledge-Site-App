@@ -31,6 +31,12 @@ namespace KnowledgeSiteApp.Frontend.Pages
             return await _sessionStorage.GetItemAsync<int?>("UserId");
         }
 
+        public async Task<bool> IsUserAuthenticatedAsync()
+        {
+            var userId = await GetUserIdAsync();
+            return userId.HasValue;
+        }
+
         public async Task Login(LoginUserDto loginUser)
         {
             try
