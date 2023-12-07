@@ -317,12 +317,13 @@
 
         if (response.IsSuccessStatusCode)
         {
+            toastService.ShowSuccess("Category successfully changed the status");
             StateHasChanged();
         }
         else
         {
             categoryStatus.IsActive = !categoryStatus.IsActive;
-            await js.InvokeVoidAsync("alert", "Failed to update category status.");
+            toastService.ShowError("Failed to update category status.");
         }
     }
 

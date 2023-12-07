@@ -2,6 +2,8 @@
 @inject HttpClient http
 @inject IJSRuntime js
 @inject NavigationManager navigate
+@using Blazored.Toast.Configuration
+@inject IToastService toastService
 @layout SuperAdminMainLayout
 @inject AdminService service
 
@@ -60,6 +62,13 @@
     }
 
 </style>
+
+<BlazoredToasts Position="ToastPosition.BottomRight"
+                Timeout="3"
+                IconType="IconType.FontAwesome"
+                SuccessClass="success-toast-override"
+                SuccessIcon="fa fa-thumbs-up"
+                ErrorIcon="fa fa-bug" />
 
 <ConfirmDialog @ref="dialog" />
 
@@ -179,12 +188,13 @@
 
         if (response.IsSuccessStatusCode)
         {
+            toastService.ShowSuccess("Admin successfully changed the status");
             StateHasChanged();
         }
         else
         {
             userToChange.IsActive = !userToChange.IsActive;
-            await js.InvokeVoidAsync("alert", "Failed to update user status.");
+            toastService.ShowError("Failed to update admin status.");
         }
     }
 
