@@ -6,7 +6,7 @@
 <nav class="navbar navbar-expand-md navbar-toggleable-sm navbar-light border-bottom box-shadow mb-3" style="height: 90px; background-color: #FFC95F;">
     <div class="container" style="max-width: 90% !important;">
         <img src="/origami bold.png" class="" style="width: 100px; height: 100px;">
-        <a class="navbar-brand" href="" style="font-family: Montserrat, sans-serif; font-size: 30px; color: #862B0D; margin: 5px !important;"><b>LearnNest</b></a>
+        <a class="navbar-brand" href="dashboardadmin" style="font-family: Montserrat, sans-serif; font-size: 30px; color: #862B0D; margin: 5px !important;"><b>LearnNest</b></a>
 
         <button class="navbar-toggler" type="button" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
@@ -14,8 +14,8 @@
         <div class="@NavMenuCssClass" style="padding-right: 100px !important;" @onclick="ToggleNavMenu">
             <ul class="navbar-nav mx-auto">
                 <li class="nav-item">
-                    <NavLink class="nav-link text-dark" style="color: #862B0D !important;" href="" Match="NavLinkMatch.All">
-                        <span class="oi oi-home" aria-hidden="true"></span> Home
+                    <NavLink class="nav-link text-dark" style="color: #862B0D !important;" href="dashboardadmin" Match="NavLinkMatch.All">
+                        <span class="oi oi-home" aria-hidden="true"></span> Dashboard
                     </NavLink>
                 </li>
                 <li class="nav-item">
@@ -30,10 +30,19 @@
                 </li>
             </ul>
         </div>
+
         <div class="ml-auto d-flex align-items-center">
-            <span class="text-dark" style="margin-right: 20px !important;">@getUser.FirstName @getUser.LastName</span>
-            <img src=@($"https://localhost:7095/{getUser.Image}") alt="Profile Picture" class="rounded-circle mr-2" style="width: 60px; height: 60px;">
+            <div class="dropdown">
+                <a class="nav-link dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="text-dark" style="margin-right: 20px !important;">@getUser.FirstName @getUser.LastName</span>
+                    <img src=@($"https://localhost:7095/{getUser.Image}") alt="Profile Picture" class="rounded-circle mr-2" style="width: 60px; height: 60px;">
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <li><a class="dropdown-item" @onclick="Logout">Logout</a></li>
+                </ul>
+            </div>
         </div>
+
     </div>
 </nav>
 
@@ -62,6 +71,12 @@
             AdminId = await service.GetUserIdAsync() ?? 0;
             await LoadAdminData();
         }
+    }
+
+    private async Task Logout()
+    {
+        await service.Logout();
+        navigate.NavigateTo("/");
     }
 
     private async Task LoadAdminData()

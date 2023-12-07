@@ -14,25 +14,32 @@
         <div class="@NavMenuCssClass" style="padding-right: 100px !important;" @onclick="ToggleNavMenu">
             <ul class="navbar-nav mx-auto">
                 <li class="nav-item">
-                    <NavLink class="nav-link text-dark" style="color: #862B0D !important;" href="" Match="NavLinkMatch.All">
-                        <span class="oi oi-home" aria-hidden="true"></span> Home
+                    <NavLink class="nav-link text-dark" style="color: #862B0D !important;" href="dashboard" Match="NavLinkMatch.All">
+                        <span class="oi oi-home" aria-hidden="true"></span> Dashboard
                     </NavLink>
                 </li>
                 <li class="nav-item">
-                    <NavLink class="nav-link text-dark" style="color: #862B0D !important;" href="counter">
+                    <NavLink class="nav-link text-dark" style="color: #862B0D !important;" href="viewAdmin">
                         <span class="oi oi-plus" aria-hidden="true"></span> View Admin
                     </NavLink>
                 </li>
                 <li class="nav-item">
-                    <NavLink class="nav-link text-dark" style="color: #862B0D !important;" href="fetchdata">
+                    <NavLink class="nav-link text-dark" style="color: #862B0D !important;" href="createAdmin">
                         <span class="oi oi-list-rich" aria-hidden="true"></span> Add Admin
                     </NavLink>
                 </li>
             </ul>
         </div>
         <div class="ml-auto d-flex align-items-center">
-            <span class="text-dark" style="margin-right: 20px !important;">@getUser.FirstName @getUser.LastName</span>
-            <img src=@($"https://localhost:7095/{getUser.Image}") alt="Profile Picture" class="rounded-circle mr-2" style="width: 60px; height: 60px;">
+            <div class="dropdown">
+                <a class="nav-link dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="text-dark" style="margin-right: 20px !important;">@getUser.FirstName @getUser.LastName</span>
+                    <img src=@($"https://localhost:7095/{getUser.Image}") alt="Profile Picture" class="rounded-circle mr-2" style="width: 60px; height: 60px;">
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <li><a class="dropdown-item" @onclick="Logout">Logout</a></li>
+                </ul>
+            </div>
         </div>
     </div>
 </nav>
@@ -62,6 +69,12 @@
             AdminId = await service.GetUserIdAsync() ?? 0;
             await LoadAdminData();
         }
+    }
+
+    private async Task Logout()
+    {
+        await service.Logout();
+        navigate.NavigateTo("/");
     }
 
     private async Task LoadAdminData()

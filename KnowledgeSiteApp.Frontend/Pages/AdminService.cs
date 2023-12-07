@@ -76,5 +76,12 @@ namespace KnowledgeSiteApp.Frontend.Pages
             var userId = await GetUserIdAsync();
             return userId.HasValue;
         }
+
+        public async Task Logout()
+        {
+            await _sessionStorage.RemoveItemAsync("AdminId");
+            User = new User();
+            IsAuthenticated = false;
+        }
     }
 }
