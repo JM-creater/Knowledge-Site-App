@@ -3,6 +3,7 @@
 @inject IJSRuntime js
 @inject NavigationManager navigate
 @layout SuperAdminMainLayout
+@inject AdminService service
 
 <link rel="icon" type="image/x-icon" href="origami_bold_ico.ico" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -60,11 +61,10 @@
 
 </style>
 
+<ConfirmDialog @ref="dialog" />
+
 <div class="primary-container">
     <div class="container-actions">
-        <button class="primary-button" @onclick="NavigateToCreateAdmin">
-            <span style="font-weight: 700; color: #862b0d">Add New Admin +</span>
-        </button>
         <span class="search-container">
             <input type="text" placeholder="Search" @bind="searchTerm" @bind:event="oninput" />
             <i class="fa fa-search" @onclick="HandleSearch"></i>
@@ -109,12 +109,27 @@
 
 
 @code {
+    private int? AdminId;
     private User[] user { get; set; } = Array.Empty<User>();
     private string searchTerm = string.Empty;
+    private ConfirmDialog dialog = default!;
 
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnInitializedAsync()
     {
-        var response = await SendAuthorizedRequest(HttpMethod.Get, "https://localhost:7095/api/User");
+        if (!await service.IsUserAuthenticatedAsync())
+        {
+            navigate.NavigateTo("/unauthorized");
+        }
+        else
+        {
+            AdminId = await service.GetUserIdAsync() ?? 0;
+            await LoadViewAdminData();
+        }
+    }
+
+    private async Task LoadViewAdminData()
+    {
+        var response = await SendAuthorizedRequest(HttpMethod.Get, "https://localhost:7095/api/User/getAllAdmins");
 
         if (response.IsSuccessStatusCode)
         {
@@ -129,32 +144,47 @@
 
     private async Task ActivateDeactivateUser(int id)
     {
-        var userStatus = user.FirstOrDefault(u => u.Id == id);
-
-        if (userStatus == null)
+        var userToChange = user.FirstOrDefault(u => u.Id == id);
+        if (userToChange == null)
         {
             throw new InvalidOperationException("User not found");
         }
 
-        var confirmationMessage = userStatus.IsActive ?
-            $"Do you want to deactivate {userStatus.FirstName}'s ({userStatus.Id})?" :
-            $"Do you want to activate {userStatus.FirstName}'s ({userStatus.Id})?";
+        var title = "User Status Change";
+        var message1 = userToChange.IsActive
+            ? $"Do you want to deactivate {userToChange.FirstName} {userToChange.LastName} (ID: {userToChange.Id})?"
+            : $"Do you want to activate {userToChange.FirstName} {userToChange.LastName} (ID: {userToChange.Id})?";
 
-        if (await js.InvokeAsync<bool>("confirm", confirmationMessage))
+        var options = new ConfirmDialogOptions
         {
-            userStatus.IsActive = !userStatus.IsActive;
-            var endpoint = userStatus.IsActive ? $"api/User/activate/{id}" : $"api/User/deactivate/{id}";
-            var response = await SendAuthorizedRequest(HttpMethod.Put, $"https://localhost:7095/{endpoint}", null);
+            YesButtonText = "OK",
+            YesButtonColor = ButtonColor.Success,
+            NoButtonText = "CANCEL",
+            NoButtonColor = ButtonColor.Danger
+        };
 
-            if (response.IsSuccessStatusCode)
-            {
-                StateHasChanged();
-            }
-            else
-            {
-                userStatus.IsActive = !userStatus.IsActive;
-                await js.InvokeVoidAsync("alert", "Failed to update user status.");
-            }
+        var confirmation = await dialog.ShowAsync(title, message1, options);
+
+        if (confirmation)
+        {
+            await ToggleUserStatus(userToChange);
+        }
+    }
+
+    private async Task ToggleUserStatus(User userToChange)
+    {
+        userToChange.IsActive = !userToChange.IsActive;
+        var endpoint = userToChange.IsActive ? $"api/User/activate/{userToChange.Id}" : $"api/User/deactivate/{userToChange.Id}";
+        var response = await SendAuthorizedRequest(HttpMethod.Put, $"https://localhost:7095/{endpoint}", null);
+
+        if (response.IsSuccessStatusCode)
+        {
+            StateHasChanged();
+        }
+        else
+        {
+            userToChange.IsActive = !userToChange.IsActive;
+            await js.InvokeVoidAsync("alert", "Failed to update user status.");
         }
     }
 

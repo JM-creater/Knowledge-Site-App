@@ -1,23 +1,145 @@
 ﻿@page "/dashboardadmin"
 @layout AdminMainLayout
+@inject HttpClient http
+@inject IJSRuntime js
+@inject NavigationManager navigate
 @inject AdminService service
 
-<h3>DashboardAdmin</h3>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<link href="css/main.css" rel="stylesheet" />
+<link href="css/dashboard-stylesheet.css" rel="stylesheet" />
+<script language="javascript" type="text/javascript" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
 
-@if (AdminId > 0)
-{
-    <p>Welcome, Admin with ID: @AdminId</p>
-}
-else
-{
-    <p>Please log in to view this page.</p>
-}
+<div class="centered-container">
+    <div>
+        <h1>
+            Hello, Super Admin!
+        </h1>
+    </div>
+    <div class="container">
+        <div class="item container-inside" style="background-color: #efebe0">
+            <div class="item-inside">
+            <h2
+                style="
+                padding-top: 50%;
+                padding-bottom: auto;
+                font-weight: 700;
+                font-size: 10vh;
+                text-align: center;
+                "
+            >
+                @TotalAdmin
+            </h2>
+            <h4>
+                Total Admins
+            </h4>
+            </div>
+        </div>
+        <div class="item">
+            <div
+                class="container-inside"
+                style="background-color: #efebe0; margin-bottom: 10px"
+            >
+            <div class="item-inside">
+                <h2 style="font-weight: 700; font-size: 8vh; text-align: center">
+                    @ActivatedAdmin
+                </h2>
+                <h4
+                    style="font-weight: 600; font-size: 2.5vh; text-align: center"
+                >
+                    Admin Activated
+                </h4>
+            </div>
+            </div>
+            <div class="container-inside" style="background-color: #efebe0">
+                <div class="item-inside">
+                    <h2 style="font-weight: 700; font-size: 8vh; text-align: center">
+                        @DeactivatedAdmin
+                    </h2>
+                    <h4
+                        style="font-weight: 600; font-size: 2.5vh; text-align: center"
+                    >
+                        Admins Deactivated
+                    </h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 @code {
     private int? AdminId;
+    private User[] countUsers { get; set; } = Array.Empty<User>();
+    private int TotalAdmin;
+    private int DeactivatedAdmin;
+    private int ActivatedAdmin;
+    private string errorMessage = string.Empty;
+
 
     protected override async Task OnInitializedAsync()
     {
-        AdminId = await service.GetUserIdAsync();
+        if (!await service.IsUserAuthenticatedAsync())
+        {
+            navigate.NavigateTo("/unauthorized");
+        }
+        else
+        {
+            AdminId = await service.GetUserIdAsync() ?? 0;
+            await LoadAdminData();
+        }
+    }
+
+    private async Task LoadAdminData()
+    {
+        try
+        {
+            var response = await SendAuthorizedRequest(HttpMethod.Get, "https://localhost:7095/api/User/getAllAdmins");
+
+            if (response.IsSuccessStatusCode)
+            {
+                countUsers = await response.Content.ReadFromJsonAsync<User[]>();
+                ProcessAdminData();
+            }
+            else
+            {
+                errorMessage = $"Failed to load data: {response.ReasonPhrase}";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error occurred: {ex.Message}";
+        }
+    }
+
+    private void ProcessAdminData()
+    {
+        foreach (var user in countUsers)
+        {
+            TotalAdmin++;
+
+            if (user.IsActive)
+            {
+                ActivatedAdmin++;
+            }
+            else
+            {
+                DeactivatedAdmin++;
+            }
+        }
+    }
+
+    private async Task<HttpResponseMessage> SendAuthorizedRequest(HttpMethod method, string url, HttpContent content = null)
+    {
+        var request = new HttpRequestMessage(method, url);
+        request.Headers.Add("X-API-KEY", "KNOWLEDGESITEAPPAPI");
+
+        if (content != null)
+        {
+            request.Content = content;
+        }
+
+        return await http.SendAsync(request);
     }
 }

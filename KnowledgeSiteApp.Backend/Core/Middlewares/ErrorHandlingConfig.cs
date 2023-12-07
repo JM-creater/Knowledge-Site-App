@@ -1,5 +1,4 @@
 ﻿using KnowledgeSiteApp.Models.ErrorHandling;
-using Microsoft.AspNetCore.Http;
 
 namespace KnowledgeSiteApp.Backend.Core.ErrorHandlingMiddleware
 {
@@ -30,26 +29,30 @@ namespace KnowledgeSiteApp.Backend.Core.ErrorHandlingMiddleware
 
         private static Task HandleExceptionAsync(HttpContext context, Exception e) 
         {
-            context.Response.ContentType = "application/json";
-            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-
-            return context.Response.WriteAsync(new ErrorDetails
+            var errorDetails = new ErrorDetails
             {
-                StatusCode = context.Response.StatusCode,
-                Message = "An internal server error occurred."
-            }.ToString());
+                StatusCode = StatusCodes.Status500InternalServerError,
+                Message = e.Message
+            };
+
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = errorDetails.StatusCode;
+
+            return context.Response.WriteAsync(errorDetails.ToString());
         }
 
         private static Task HandleCustomInvalidnAsync(HttpContext context, Exception e)
         {
-            context.Response.ContentType = "application/json";
-            context.Response.StatusCode = StatusCodes.Status400BadRequest;
-
-            return context.Response.WriteAsync(new ErrorDetails
+            var errorDetails = new ErrorDetails
             {
-                StatusCode = context.Response.StatusCode,
+                StatusCode = StatusCodes.Status400BadRequest,
                 Message = e.Message
-            }.ToString());
+            };
+
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = errorDetails.StatusCode;
+
+            return context.Response.WriteAsync(errorDetails.ToString());
         }
 
     }

@@ -5,6 +5,7 @@
 @using Blazored.Toast.Configuration
 @inject IToastService toastService
 @layout SuperAdminMainLayout
+@inject AdminService service
 
 <link rel="icon" type="image/x-icon" href="origami_bold_ico.ico" />
 <link rel="stylesheet" type="text/css" href="css/main.css" />
@@ -133,15 +134,9 @@
 
         <!-- Login button only -->
         <div>
-            <button type="submit"
-                    class="btn button btn-primary"
-                    disabled="@isRequestInProgress">
+            <button type="submit" class="btn button btn-primary">
                 Add Admin
             </button>
-        </div>
-
-        <div>
-            <a href="/viewAdmin" class="content-link-center">Return to Account Management</a>
         </div>
     </EditForm>
 </div>
@@ -149,20 +144,27 @@
 
 
 @code {
+    private int? AdminId;
     private RegisterUserDto newUser = new RegisterUserDto();
     private string uploadedImage = string.Empty;
     private string errorMessage = string.Empty;
     private string conPass = string.Empty;
-    private bool isRequestInProgress = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!await service.IsUserAuthenticatedAsync())
+        {
+            navigate.NavigateTo("/unauthorized");
+        }
+        else
+        {
+            AdminId = await service.GetUserIdAsync() ?? 0;
+        }
+    }
 
     private async Task HandleAddAdmin()
     {
-        if (isRequestInProgress)
-        {
-            return;
-        }
-
-        isRequestInProgress = true;
+        toastService.ClearAll();
 
         if (newUser.Username != null && newUser.FirstName != null && newUser.LastName != null && newUser.Email != null && newUser.Password != null && uploadedImage != "" && newUser.Password == conPass)
         {
@@ -178,7 +180,7 @@
                 await Task.Delay(3000);
                 navigate.NavigateTo("/viewAdmin");
             }
-            else if(response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+            else if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
             {
                 toastService.ShowError("Full Name Already Exist!");
             }
@@ -224,7 +226,6 @@
         {
             toastService.ShowError("Please fill-up all fields.");
         }
-        isRequestInProgress = false;
     }
 
     private async Task UploadImage(InputFileChangeEventArgs e)

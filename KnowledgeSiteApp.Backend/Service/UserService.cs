@@ -69,11 +69,14 @@ namespace KnowledgeSiteApp.Backend.Service
                                                   || u.Email == dto.UsernameOrEmail)
                                          .FirstOrDefaultAsync();
 
+                if (user == null)
+                    throw new InvalidOperationException("User not found");
+
                 if (string.IsNullOrWhiteSpace(dto.UsernameOrEmail))
                     throw new AuthenticationException("Either Email or Username must be provided.");
 
-                if (user == null)
-                    throw new InvalidOperationException("User not found");
+                if (!user.IsActive)
+                    throw new AuthenticationException("Account is deactivated");
 
                 if (!PasswordHasher.VerifyPassword(dto.Password, user.Password))
                     throw new AuthenticationException("Invalid password");
