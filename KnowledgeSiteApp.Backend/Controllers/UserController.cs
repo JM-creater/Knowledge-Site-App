@@ -40,9 +40,14 @@ namespace KnowledgeSiteApp.Backend.Controllers
         }
 
         [HttpPost("forgot-password")]
-        public async Task<IActionResult> ForgotPassword(string email)
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
         {
-            var user = await service.ForgotPassword(email);
+            var user = await service.ForgotPassword(dto);
+
+            if(user == null)
+            {
+                return NotFound("Email not registered.");
+            }
 
             return Ok(user);
         }
@@ -92,7 +97,7 @@ namespace KnowledgeSiteApp.Backend.Controllers
             return Ok(user);
         }
 
-        [HttpPut("{id}/profile-pic")]
+        [HttpPut("{userId}/profile-pic")]
         public async Task<IActionResult> UpdateProfilePic(int userId, string newProfilePicture)
         {
             var user = await service.UpdateProfilePic(userId, newProfilePicture);
