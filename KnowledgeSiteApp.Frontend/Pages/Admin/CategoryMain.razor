@@ -190,7 +190,7 @@
                 await Task.Delay(300);
                 RefreshPage();
             }
-            else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest || response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
                 toastService.ShowError("Category Name Already Exist!");
             }
@@ -221,13 +221,13 @@
                 await Task.Delay(300);
                 RefreshPage();
             }
-            else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest || response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
                 toastService.ShowError("Category Name Already Exist!");
             }
             else
             {
-                toastService.ShowError("An error occurred while adding the category. Please try again later.");
+                toastService.ShowError("An error occurred while updating the category. Please try again later.");
             }
         }
         else

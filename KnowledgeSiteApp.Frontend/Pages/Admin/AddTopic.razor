@@ -94,6 +94,8 @@
 
     private async Task HandleButtonCreate()
     {
+        toastService.ClearAll();
+
         if (newTopic.Title != null && newTopic.Description != null && newTopic.YouTubeUrl != null && uploadedResourceFiles != null && uploadedVideoFiles != null)
         {
             newTopic.TrainingId = TrainingId;
@@ -108,7 +110,7 @@
                 await Task.Delay(3000);
                 navigate.NavigateTo($"/viewTopics/{TrainingId}");
             }
-            else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest || response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
                 toastService.ShowError("Title already exist.");
             }

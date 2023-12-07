@@ -119,6 +119,7 @@
 
 @code {
     [Parameter] public int Id { get; set; }
+
     private int? AdminId;
     private Training editTraining = new Training();
     private TrainingCategory[] getCategory { get; set; } = Array.Empty<TrainingCategory>();
@@ -158,13 +159,13 @@
                 await Task.Delay(3000);
                 navigate.NavigateTo("/viewTraining");
             }
-            else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest || response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
                 toastService.ShowError("Title already exists");
             }
             else
             {
-                toastService.ShowError("An error occured while adding the training. Please try again later.");
+                toastService.ShowError("An error occured while updating the training. Please try again later.");
             }
         }
         else if (editTraining.Title == null && editTraining.Description != null && selectedCategory != 0 && uploadedImage != "")
