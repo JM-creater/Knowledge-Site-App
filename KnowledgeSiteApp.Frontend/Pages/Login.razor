@@ -3,7 +3,7 @@
 @inject IJSRuntime js
 @inject NavigationManager navigate
 @layout LoginLayout
-@inject AdminService adminService
+@inject AdminService service
 
 <link href="css/login-stylesheet.css" rel="stylesheet" />
 <link href="css/main.css" rel="stylesheet" />
@@ -52,13 +52,24 @@
     {
         try
         {
-            await adminService.Login(loginUser);
+            await service.Login(loginUser);
 
-            if (adminService.IsAuthenticated)
+            if (service.IsAuthenticated)
             {
-                await adminService.SaveUserIdAsync(adminService.User.Id);
+                await service.SaveUserIdAsync(service.User.Id);
 
-                navigate.NavigateTo($"/dashboardadmin");
+                if (service.User.Role == 1)
+                {
+                    navigate.NavigateTo("/dashboardadmin");
+                }
+                else if (service.User.Role == 2)
+                {
+                    navigate.NavigateTo("/dashboard");
+                }
+                else
+                {
+                    navigate.NavigateTo("/unauthorized"); 
+                }
             }
             else
             {
@@ -74,6 +85,7 @@
     private async Task<HttpResponseMessage> SendAuthorizedRequest(HttpMethod method, string url, HttpContent content = null)
     {
         var request = new HttpRequestMessage(method, url);
+
         request.Headers.Add("X-API-KEY", "KNOWLEDGESITEAPPAPI");
 
         if (content != null)

@@ -1,4 +1,5 @@
-﻿using KnowledgeSiteApp.Models.Entities;
+﻿using KnowledgeSiteApp.Backend.Core.Encryption;
+using KnowledgeSiteApp.Models.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,18 +23,20 @@ namespace KnowledgeSiteApp.Backend.Core.Context
         {
             base.OnModelCreating(modelBuilder);
 
-            //modelBuilder.Entity<User>().HasData(
-            //    new User
-            //    {
-            //        UserId = 1,
-            //        FirstName = "Admin",
-            //        LastName = "Admin",
-            //        Email = "admin0123@gmail.com",
-            //        Role = 3,
-            //        IsActive = true,
-            //        IsValidate = true
-            //    }
-            //    );
+            modelBuilder.Entity<User>().HasData(
+                new User
+                {
+                    Id = 1,
+                    Username = "Admin123",
+                    FirstName = "Admin",
+                    LastName = "Admin",
+                    Email = "admin0123@gmail.com",
+                    Password = PasswordHasher.EncryptPassword("123456"),
+                    Role = 2,
+                    IsActive = true,
+                    DateCreated = DateTime.Now
+                }
+           );
 
             modelBuilder.Entity<Training>()
                 .HasOne(t => t.Rating)
