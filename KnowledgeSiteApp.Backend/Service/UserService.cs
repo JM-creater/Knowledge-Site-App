@@ -164,24 +164,24 @@ namespace KnowledgeSiteApp.Backend.Service
 
         public async Task SendPasswordResetEmail(string email, string token) 
         {
-            string resetLink = $"http://127.0.0.1:5173/forgot_password?email={Uri.EscapeDataString(email)}&token={Uri.EscapeDataString(token)}";
+            string resetLink = $"https://localhost:7148/forgotPassword?email={Uri.EscapeDataString(email)}&token={Uri.EscapeDataString(token)}";
             string subject = "Password Reset Request";
             string message = $"Please click on the link to reset your password: <a href='{resetLink}'>Reset Password</a>";
 
             await SendEmailAsync(email, subject, message);
         }
 
-        public async Task<User> ForgotPassword(string email)
+        public async Task<User> ForgotPassword(ForgotPasswordDto dto)
         {
             try
             {
                 var user = await context.Users
-                                        .Where(u => u.Email == email)
+                                        .Where(u => u.Email == dto.Email)
                                         .FirstOrDefaultAsync();
 
                 if (user == null)
                 {
-                    throw new InvalidOperationException("User not found");
+                    return null;
                 }
 
                 user.PasswordResetToken = RandomToken.CreateRandomToken();
