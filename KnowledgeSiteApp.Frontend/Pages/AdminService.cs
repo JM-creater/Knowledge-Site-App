@@ -1,7 +1,8 @@
 ﻿using System.Net.Http.Json;
-using Blazored.LocalStorage;
 using Blazored.SessionStorage;
 using KnowledgeSiteApp.Models.Dto;
+using KnowledgeSiteApp.Models.ErrorHandling;
+using KnowledgeSiteApp.Models.Entities;
 
 namespace KnowledgeSiteApp.Frontend.Pages
 {
@@ -11,30 +12,15 @@ namespace KnowledgeSiteApp.Frontend.Pages
         private readonly ILogger<AdminService> _logger;
         private readonly ISessionStorageService _sessionStorage;
 
-        public Models.Entities.User User { get; private set; } = new Models.Entities.User();
+        public User User { get; private set; } = new User();
         public bool IsAuthenticated { get; private set; }
+        public string ErrorMessage { get; private set; }
 
         public AdminService(HttpClient httpClient, ILogger<AdminService> logger, ISessionStorageService sessionStorage)
         {
             _httpClient = httpClient;
             _logger = logger;
             _sessionStorage = sessionStorage;
-        }
-
-        public async Task SaveUserIdAsync(int userId)
-        {
-            await _sessionStorage.SetItemAsync("UserId", userId);
-        }
-
-        public async Task<int?> GetUserIdAsync()
-        {
-            return await _sessionStorage.GetItemAsync<int?>("UserId");
-        }
-
-        public async Task<bool> IsUserAuthenticatedAsync()
-        {
-            var userId = await GetUserIdAsync();
-            return userId.HasValue;
         }
 
         public async Task Login(LoginUserDto loginUser)
@@ -45,18 +31,19 @@ namespace KnowledgeSiteApp.Frontend.Pages
 
                 if (response.IsSuccessStatusCode)
                 {
-                    User = await response.Content.ReadFromJsonAsync<Models.Entities.User>();
+                    User = await response.Content.ReadFromJsonAsync<User>();
                     IsAuthenticated = true;
                 }
                 else
                 {
-                    _logger.LogError($"Login failed with status code: {response.StatusCode}");
+                    var errorResponse = await response.Content.ReadFromJsonAsync<ErrorDetails>();
+                    ErrorMessage = errorResponse.Message;
                     IsAuthenticated = false;
                 }
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                _logger.LogError($"An error occurred during login: {ex.Message}");
+                ErrorMessage = $"An error occurred during login: {e.Message}";
                 IsAuthenticated = false;
             }
         }
@@ -72,6 +59,22 @@ namespace KnowledgeSiteApp.Frontend.Pages
             }
 
             return await _httpClient.SendAsync(request);
+        }
+
+        public async Task SaveUserIdAsync(int userId)
+        {
+            await _sessionStorage.SetItemAsync("AdminId", userId);
+        }
+
+        public async Task<int?> GetUserIdAsync()
+        {
+            return await _sessionStorage.GetItemAsync<int?>("AdminId");
+        }
+
+        public async Task<bool> IsUserAuthenticatedAsync()
+        {
+            var userId = await GetUserIdAsync();
+            return userId.HasValue;
         }
     }
 }

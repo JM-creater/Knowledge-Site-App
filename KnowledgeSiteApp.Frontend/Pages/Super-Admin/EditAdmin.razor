@@ -5,6 +5,7 @@
 @using Blazored.Toast.Configuration
 @inject IToastService toastService
 @layout SuperAdminMainLayout
+@inject AdminService service
 
 <link rel="icon" type="image/x-icon" href="origami_bold_ico.ico" />
 <link rel="stylesheet" type="text/css" href="css/main.css" />
@@ -48,7 +49,7 @@
         <div class="form-group form-group-element"
              style="align-items: baseline; margin-left: 30%">
             <div style="margin-left: 5vh">
-                <img src="@editUser.Image"
+                <img src=@($"https://localhost:7095/{editUser.Image}")
                      id="output"
                      style="
                         display: inline-flex;
@@ -110,10 +111,6 @@
                 Change Details
             </button>
         </div>
-
-        <div>
-            <a href="login.html" class="content-link-center">Return to Account Management</a>
-        </div>
     </EditForm>
 </div>
 
@@ -121,10 +118,24 @@
 
 @code {
     [Parameter] public int id { get; set; }
+    private int? AdminId;
     private User editUser = new User();
-    private string errorMessage;
+    private string errorMessage = string.Empty;
 
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnInitializedAsync()
+    {
+        if (!await service.IsUserAuthenticatedAsync())
+        {
+            navigate.NavigateTo("/unauthorized");
+        }
+        else
+        {
+            AdminId = await service.GetUserIdAsync() ?? 0;
+            await LoadEditAdminData();
+        }
+    }
+
+    private async Task LoadEditAdminData()
     {
         var response = await SendAuthorizedRequest(HttpMethod.Get, $"https://localhost:7095/api/User/{id}");
 
@@ -136,6 +147,8 @@
 
     private async Task HandleEditUser()
     {
+        toastService.ClearAll();
+
         if (editUser.Username != null && editUser.FirstName != null && editUser.LastName != null && editUser.Email != null && editUser.Password != null )
         {
             var response = await SendAuthorizedRequest(HttpMethod.Put, $"https://localhost:7095/api/User/updateDetails/{id}", JsonContent.Create(editUser));
@@ -144,7 +157,6 @@
                 toastService.ShowSuccess("Admin updated successfully");
                 await Task.Delay(3000);
                 navigate.NavigateTo("/viewAdmin");
-
             }
             else
             {

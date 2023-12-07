@@ -23,7 +23,7 @@
 
         @if (!string.IsNullOrEmpty(errorMessage))
         {
-            <div class="alert alert-danger" role="alert">
+            <div class="alert alert-danger" role="alert" style="text-align: center;">
                 @errorMessage
             </div>
         }
@@ -46,7 +46,7 @@
 
 @code {
     private LoginUserDto loginUser = new LoginUserDto();
-    private string errorMessage;
+    private string errorMessage = string.Empty;
 
     private async Task HandleLoginSubmit()
     {
@@ -58,46 +58,27 @@
             {
                 await service.SaveUserIdAsync(service.User.Id);
 
-                if (service.User.Role == 1)
+                switch (service.User.Role)
                 {
-                    navigate.NavigateTo("/dashboardadmin");
-                }
-                else if (service.User.Role == 2)
-                {
-                    navigate.NavigateTo("/dashboard");
-                }
-                else
-                {
-                    navigate.NavigateTo("/unauthorized"); 
+                    case 1: 
+                        navigate.NavigateTo("/dashboardadmin");
+                        break;
+                    case 2:
+                        navigate.NavigateTo("/dashboard");
+                        break;
+                    default:
+                        navigate.NavigateTo("/unauthorized");
+                        break;
                 }
             }
             else
             {
-                errorMessage = "Invalid username or password.";
+                errorMessage = "Login failed. Please check your credentials.";
             }
         }
-        catch (Exception ex)
+        catch (Exception e)
         {
-            errorMessage = "An error occurred: " + ex.Message;
+            errorMessage = "An error occurred: " + e.Message;
         }
-    }
-
-    private async Task<HttpResponseMessage> SendAuthorizedRequest(HttpMethod method, string url, HttpContent content = null)
-    {
-        var request = new HttpRequestMessage(method, url);
-
-        request.Headers.Add("X-API-KEY", "KNOWLEDGESITEAPPAPI");
-
-        if (content != null)
-        {
-            request.Content = content;
-        }
-
-        return await http.SendAsync(request);
-    }
-
-    public class ValidationErrorResponse
-    {
-        public Dictionary<string, string[]> Errors { get; set; }
     }
 }

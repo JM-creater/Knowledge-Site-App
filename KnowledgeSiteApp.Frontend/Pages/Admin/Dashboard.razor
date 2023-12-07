@@ -88,11 +88,11 @@
         else
         {
             AdminId = await service.GetUserIdAsync() ?? 0;
-            await LoadAdminData();
+            await LoadSuperAdminData();
         }
     }
 
-    private async Task LoadAdminData()
+    private async Task LoadSuperAdminData()
     {
         try
         {
