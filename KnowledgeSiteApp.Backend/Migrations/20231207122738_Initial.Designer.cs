@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KnowledgeSiteApp.Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231207011144_Initial")]
+    [Migration("20231207122738_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -191,6 +191,9 @@ namespace KnowledgeSiteApp.Backend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("AdminId")
+                        .HasColumnType("int");
+
                     b.Property<string>("CategoryName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -202,6 +205,8 @@ namespace KnowledgeSiteApp.Backend.Migrations
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AdminId");
 
                     b.ToTable("TrainingCategories");
                 });
@@ -258,7 +263,7 @@ namespace KnowledgeSiteApp.Backend.Migrations
                         new
                         {
                             Id = 1,
-                            DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateCreated = new DateTime(2023, 12, 7, 20, 27, 38, 42, DateTimeKind.Local).AddTicks(1554),
                             DateUpdated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin0123@gmail.com",
                             FirstName = "Admin",
@@ -325,6 +330,17 @@ namespace KnowledgeSiteApp.Backend.Migrations
                     b.Navigation("Category");
 
                     b.Navigation("Rating");
+                });
+
+            modelBuilder.Entity("KnowledgeSiteApp.Models.Entities.TrainingCategory", b =>
+                {
+                    b.HasOne("KnowledgeSiteApp.Models.Entities.User", "Admin")
+                        .WithMany()
+                        .HasForeignKey("AdminId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Admin");
                 });
 
             modelBuilder.Entity("KnowledgeSiteApp.Models.Entities.Topic", b =>

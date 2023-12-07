@@ -3,6 +3,8 @@
 @inject HttpClient http
 @inject IJSRuntime js
 @inject NavigationManager navigate
+@using Blazored.Toast.Configuration
+@inject IToastService toastService
 @inject AdminService service
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -30,10 +32,10 @@
                 text-align: center;
                 "
             >
-                @TotalAdmin
+                @TotalTrainings
             </h2>
             <h4>
-                Total Admins
+                Total Trainings
             </h4>
             </div>
         </div>
@@ -44,24 +46,20 @@
             >
             <div class="item-inside">
                 <h2 style="font-weight: 700; font-size: 8vh; text-align: center">
-                    @ActivatedAdmin
+                    @TotalCategories
                 </h2>
-                <h4
-                    style="font-weight: 600; font-size: 2.5vh; text-align: center"
-                >
-                    Admin Activated
+                <h4 style="font-weight: 600; font-size: 2.5vh; text-align: center">
+                    Categories
                 </h4>
             </div>
             </div>
             <div class="container-inside" style="background-color: #efebe0">
                 <div class="item-inside">
                     <h2 style="font-weight: 700; font-size: 8vh; text-align: center">
-                        @DeactivatedAdmin
+                      0
                     </h2>
-                    <h4
-                        style="font-weight: 600; font-size: 2.5vh; text-align: center"
-                    >
-                        Admins Deactivated
+                    <h4 style="font-weight: 600; font-size: 2.5vh; text-align: center">
+                        Training Ratings
                     </h4>
                 </div>
             </div>
@@ -71,10 +69,10 @@
 
 @code {
     private int? AdminId;
-    private User[] countUsers { get; set; } = Array.Empty<User>();
-    private int TotalAdmin;
-    private int DeactivatedAdmin;
-    private int ActivatedAdmin;
+    private Training[] countTrainings { get; set; } = Array.Empty<Training>();
+    private TrainingCategory[] countCategories { get; set; } = Array.Empty<TrainingCategory>();
+    private int TotalTrainings;
+    private int TotalCategories;
     private string errorMessage = string.Empty;
 
     protected override async Task OnInitializedAsync()
@@ -86,46 +84,47 @@
         else
         {
             AdminId = await service.GetUserIdAsync() ?? 0;
-            await LoadAdminData();
+            await LoadCountTraining();
+            await LoadCountCategory();
         }
     }
 
-    private async Task LoadAdminData()
+    private async Task LoadCountTraining()
     {
-        try
-        {
-            var response = await SendAuthorizedRequest(HttpMethod.Get, "https://localhost:7095/api/User/getAllAdmins");
+        var response = await SendAuthorizedRequest(HttpMethod.Get, $"https://localhost:7095/api/Training/trainingByAdminId/{AdminId}");
 
-            if (response.IsSuccessStatusCode)
+        if (response.IsSuccessStatusCode)
+        {
+            countTrainings = await response.Content.ReadFromJsonAsync<Training[]>();
+
+            foreach (var user in countTrainings)
             {
-                countUsers = await response.Content.ReadFromJsonAsync<User[]>();
-                ProcessAdminData();
-            }
-            else
-            {
-                errorMessage = $"Failed to load data: {response.ReasonPhrase}";
+                TotalTrainings++;
             }
         }
-        catch (Exception ex)
+        else
         {
-            errorMessage = $"Error occurred: {ex.Message}";
+            toastService.ShowError($"Failed to load data: {response.ReasonPhrase}");
         }
     }
 
-    private void ProcessAdminData()
+    private async Task LoadCountCategory()
     {
-        foreach (var user in countUsers)
-        {
-            TotalAdmin++;
+   
+        var response = await SendAuthorizedRequest(HttpMethod.Get, $"https://localhost:7095/api/TrainingCategory/categoryByAdmin/{AdminId}");
 
-            if (user.IsActive)
+        if (response.IsSuccessStatusCode)
+        {
+            countCategories = await response.Content.ReadFromJsonAsync<TrainingCategory[]>();
+
+            foreach (var user in countCategories)
             {
-                ActivatedAdmin++;
+                TotalCategories++;
             }
-            else
-            {
-                DeactivatedAdmin++;
-            }
+        }
+        else
+        {
+            toastService.ShowError($"Failed to load data: {response.ReasonPhrase}");
         }
     }
 
