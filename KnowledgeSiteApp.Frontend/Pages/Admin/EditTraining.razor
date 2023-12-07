@@ -2,7 +2,10 @@
 @inject HttpClient http
 @inject IJSRuntime js
 @inject NavigationManager navigate
+@using Blazored.Toast.Configuration
+@inject IToastService toastService
 @layout AdminMainLayout
+@inject AdminService service
 
 <link rel="icon" type="image/x-icon" href="origami_bold_ico.ico" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -12,6 +15,13 @@
 <link rel="stylesheet" type="text/css" href="css/add-trainings-stylesheet.css" />
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 <script language="javascript" type="text/javascript" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+
+<BlazoredToasts Position="ToastPosition.BottomRight"
+                Timeout="5"
+                IconType="IconType.FontAwesome"
+                SuccessClass="success-toast-override"
+                SuccessIcon="fa fa-thumbs-up"
+                ErrorIcon="fa fa-bug" />
 
 <div style="margin-left: 2vh; margin-right: auto"
      class="centered-container">
@@ -96,7 +106,7 @@
                     <button type="submit"
                             style="width: 50vh; margin-left: auto; margin-right: auto"
                             class="btn button btn-primary"
-                            onclick="@HandleEditTraining">
+                            @onclick="HandleEditTraining">
                         Edit Training
                     </button>
                 </div>
@@ -108,9 +118,9 @@
 
 
 @code {
-    [Parameter] public int adminId { get; set; }
     [Parameter] public int Id { get; set; }
-    private Training editTraining;
+    private int? AdminId;
+    private Training editTraining = new Training();
     private TrainingCategory[] getCategory { get; set; } = Array.Empty<TrainingCategory>();
     private string uploadedImage = string.Empty;
     private string errorMessage = string.Empty;
@@ -118,54 +128,64 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadCategories();
-        await LoadTrainingForEdit();
-    }
-
-    private async Task LoadCategories()
-    {
-        var response = await http.GetFromJsonAsync<TrainingCategory[]>("https://localhost:7095/api/TrainingCategory");
-
-        if (response != null)
+        if (!await service.IsUserAuthenticatedAsync())
         {
-            getCategory = response;
+            navigate.NavigateTo("/unauthorized");
         }
-    }
-
-    private async Task LoadTrainingForEdit()
-    {
-        var trainingResponse = await http.GetFromJsonAsync<Training>($"https://localhost:7095/api/Training/{Id}");
-        if (trainingResponse != null)
+        else
         {
-            editTraining = trainingResponse;
-            selectedCategory = editTraining.CategoryId; 
+            AdminId = await service.GetUserIdAsync() ?? 0;
+            await LoadCategories();
+            await LoadTrainingForEdit();
         }
     }
 
     private async Task HandleEditTraining()
     {
-        editTraining.CategoryId = selectedCategory;
-        var response = await SendAuthorizedRequest(HttpMethod.Put, $"https://localhost:7095/api/Training/{Id}", JsonContent.Create(editTraining));
+        toastService.ClearAll();
 
-        if (response.IsSuccessStatusCode)
+        if (editTraining.Title != null && editTraining.Description != null && selectedCategory != 0 && uploadedImage != "")
         {
-            var createdTraining = await response.Content.ReadFromJsonAsync<Training>();
-            if (createdTraining != null && !string.IsNullOrWhiteSpace(uploadedImage))
+            editTraining.CategoryId = selectedCategory;
+            var response = await SendAuthorizedRequest(HttpMethod.Put, $"https://localhost:7095/api/Training/{Id}", JsonContent.Create(editTraining));
+
+            if (response.IsSuccessStatusCode)
             {
+                var createdTraining = await response.Content.ReadFromJsonAsync<Training>();
+
                 await UploadTrainingImage(createdTraining.Id);
+                await js.InvokeVoidAsync("alert", "Training created successfully");
+                await Task.Delay(3000);
+                navigate.NavigateTo("/viewTraining");
             }
-            await js.InvokeVoidAsync("alert", "Training created successfully");
-            await Task.Delay(3000);
-            navigate.NavigateTo("/viewAdmin");
+            else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                toastService.ShowError("Title already exists");
+            }
+            else
+            {
+                toastService.ShowError("An error occured while adding the training. Please try again later.");
+            }
+        }
+        else if (editTraining.Title == null && editTraining.Description != null && selectedCategory != 0 && uploadedImage != "")
+        {
+            toastService.ShowError("Please input title.");
+        }
+        else if (editTraining.Title != null && editTraining.Description == null && selectedCategory != 0 && uploadedImage != "")
+        {
+            toastService.ShowError("Please input description.");
+        }
+        else if (editTraining.Title != null && editTraining.Description != null && selectedCategory == 0 && uploadedImage != "")
+        {
+            toastService.ShowError("Please choose category.");
+        }
+        else if (editTraining.Title != null && editTraining.Description != null && selectedCategory != 0 && uploadedImage == "")
+        {
+            toastService.ShowError("Please upload a training image.");
         }
         else
         {
-            if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
-            {
-                var errorResponse = await response.Content.ReadFromJsonAsync<ValidationErrorResponse>();
-                errorMessage = String.Join(" ", errorResponse?.Errors.SelectMany(err => err.Value));
-            }
-            errorMessage = "An error occured while adding the training. Please try again later.";
+            toastService.ShowError("Please fill-up all fields.");
         }
     }
 
@@ -191,6 +211,26 @@
         }
     }
 
+    private async Task LoadCategories()
+    {
+        var response = await http.GetFromJsonAsync<TrainingCategory[]>("https://localhost:7095/api/TrainingCategory");
+
+        if (response != null)
+        {
+            getCategory = response;
+        }
+    }
+
+    private async Task LoadTrainingForEdit()
+    {
+        var trainingResponse = await http.GetFromJsonAsync<Training>($"https://localhost:7095/api/Training/{Id}");
+        if (trainingResponse != null)
+        {
+            editTraining = trainingResponse;
+            selectedCategory = editTraining.CategoryId;
+        }
+    }
+
     private async Task<HttpResponseMessage> SendAuthorizedRequest(HttpMethod method, string url, HttpContent content = null)
     {
         var request = new HttpRequestMessage(method, url);
@@ -203,10 +243,4 @@
 
         return await http.SendAsync(request);
     }
-
-    public class ValidationErrorResponse
-    {
-        public Dictionary<string, string[]> Errors { get; set; }
-    }
-
 }
