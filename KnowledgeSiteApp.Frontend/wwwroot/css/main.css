@@ -22,12 +22,12 @@
     color: black;
 }
 
-    .content-link:hover {
-        display: block;
-        font-weight: 700;
-        font-size: 10pt;
-        color: #ae431e;
-    }
+.content-link:hover {
+    display: block;
+    font-weight: 700;
+    font-size: 10pt;
+    color: #ae431e;
+}
 
 .content-title {
     text-align: center;
