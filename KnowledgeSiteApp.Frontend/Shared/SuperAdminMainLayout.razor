@@ -1,4 +1,5 @@
 ﻿@inherits LayoutComponentBase
+@inject AdminService service
 
 <div class="bb-page">
 
@@ -27,24 +28,24 @@
 
     private async Task<SidebarDataProviderResult> SidebarDataProvider(SidebarDataProviderRequest request)
     {
+        var userId = await service.GetUserIdAsync() ?? 0;
         if (navItems is null)
-            navItems = GetNavItems();
+            navItems = await GetNavItems(userId);
 
         return await Task.FromResult(request.ApplyTo(navItems));
     }
 
-    private IEnumerable<NavItem> GetNavItems()
+    private async Task<IEnumerable<NavItem>> GetNavItems(int userId)
     {
-        navItems = new List<NavItem>
+        return new List<NavItem>
         {
-            new NavItem { Id = "1", Href = "/dashboard/{adminId:int}", IconName = IconName.HouseDoorFill, Text = "Dashboard", Match=NavLinkMatch.All},
+            new NavItem { Id = "1", Href = "/dashboard", IconName = IconName.HouseDoorFill, Text = "Dashboard", Match=NavLinkMatch.All},
 
             new NavItem { Id = "2", IconName = IconName.LayoutSidebarInset, Text = "User" },
             new NavItem { Id = "3", Href = "/viewAdmin", IconName = IconName.CheckCircleFill, Text = "View Admin", ParentId="2"},
             new NavItem { Id = "4", Href = "/createAdmin", IconName = IconName.CheckCircleFill, Text = "Add Admin", ParentId="2"},
         };
 
-        return navItems;
     }
 }
 

@@ -1,0 +1,53 @@
+﻿@page "/unauthorized"
+
+<style>
+    body {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .unauthorized-container {
+        text-align: center;
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+        color: #ff6b6b;
+        margin-bottom: 20px;
+    }
+
+    p {
+        color: #333;
+        font-size: 18px;
+    }
+
+    a {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #ff6b6b;
+        color: white;
+        border-radius: 5px;
+        text-decoration: none;
+        transition: background-color 0.3s;
+    }
+
+        a:hover {
+            background-color: #e55a5a;
+        }
+</style>
+
+<div class="unauthorized-container">
+    <h1>Unauthorized Access</h1>
+    <p>Sorry, you do not have permission to view this page.</p>
+    <a href="/">Return Home</a>
+</div>

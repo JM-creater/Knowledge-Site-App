@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KnowledgeSiteApp.Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231206225317_Initial")]
+    [Migration("20231207011144_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -253,6 +253,21 @@ namespace KnowledgeSiteApp.Backend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateUpdated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "admin0123@gmail.com",
+                            FirstName = "Admin",
+                            IsActive = true,
+                            LastName = "Admin",
+                            Password = "jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=",
+                            Role = 2,
+                            Username = "Admin123"
+                        });
                 });
 
             modelBuilder.Entity("KnowledgeSiteApp.Models.Entities.Rating", b =>

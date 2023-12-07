@@ -1,8 +1,9 @@
-﻿@page "/dashboard/{adminId:int}"
+﻿@page "/dashboard"
 @inject HttpClient http
 @inject IJSRuntime js
 @inject NavigationManager navigate
 @layout SuperAdminMainLayout
+@inject AdminService service
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -71,6 +72,7 @@
 
 
 @code {
+    private int? AdminId;
     private User users = new User();
     private User[] countUsers { get; set; } = Array.Empty<User>();
     private int TotalAdmin;
@@ -78,7 +80,10 @@
     private int ActivatedAdmin;
     private string errorMessage = string.Empty;
 
-
+    protected override async Task OnInitializedAsync()
+    {
+        AdminId = await service.GetUserIdAsync() ?? 0;
+    }
 
     protected override async Task OnParametersSetAsync()
     {
