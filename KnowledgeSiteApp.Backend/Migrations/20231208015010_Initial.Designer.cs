@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KnowledgeSiteApp.Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231207122738_Initial")]
+    [Migration("20231208015010_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -263,7 +263,7 @@ namespace KnowledgeSiteApp.Backend.Migrations
                         new
                         {
                             Id = 1,
-                            DateCreated = new DateTime(2023, 12, 7, 20, 27, 38, 42, DateTimeKind.Local).AddTicks(1554),
+                            DateCreated = new DateTime(2023, 12, 8, 9, 50, 10, 258, DateTimeKind.Local).AddTicks(6222),
                             DateUpdated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin0123@gmail.com",
                             FirstName = "Admin",

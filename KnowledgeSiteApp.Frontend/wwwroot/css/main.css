@@ -6,12 +6,18 @@
 @media (max-height: 1080px) {
     .centered-container {
         margin-top: 5%;
+        overflow: hidden;
+        width: 100%;
+        height: auto;
     }
 }
 
 @media (max-height: 768px) {
     .centered-container {
         margin-top: 3%;
+        overflow: hidden;
+        width: 100%;
+        height: auto;
     }
 }
 

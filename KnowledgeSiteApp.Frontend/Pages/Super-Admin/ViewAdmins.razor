@@ -10,8 +10,8 @@
 <link rel="icon" type="image/x-icon" href="origami_bold_ico.ico" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="css/main.css" rel="stylesheet" />
-<link href="css/users-stylesheet.css" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" href="styles/main.css" />
+<link rel="stylesheet" type="text/css" href="styles/users-stylesheet.css" />
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 <script language="javascript" type="text/javascript" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
@@ -21,7 +21,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        margin: 32px;
+        margin: 32px; /* Add margin to the primary container */
     }
 
     .container-actions {
@@ -29,7 +29,7 @@
         justify-content: space-between;
         align-items: center;
         width: 100%;
-        margin-bottom: 20px;
+        margin-bottom: 20px; /* Add margin at the bottom of the container actions */
     }
 
     .search-container {
@@ -61,6 +61,7 @@
         width: 100%;
     }
 
+    /* Adjust other styles as needed */
 </style>
 
 <BlazoredToasts Position="ToastPosition.BottomRight"
@@ -73,51 +74,144 @@
 <ConfirmDialog @ref="dialog" />
 
 <div class="primary-container">
-    <div class="container-actions">
+      <div class="container-actions">
+        <button class="primary-button" onclick="createAccount()">
+          <span style="font-weight: 700; color: #862b0d">Add New Admin +</span>
+        </button>
         <span class="search-container">
-            <input type="text" placeholder="Search" @bind="searchTerm" @bind:event="oninput" />
-            <i class="fa fa-search" @onclick="HandleSearch"></i>
+          <input type="text" placeholder="Search" />
+          <i class="fa fa-search"></i>
         </span>
-    </div>
-    <div class="table-container">
+      </div>
+      <div class="table-container">
         <table class="table">
-            <thead class="thead-dark">
-                <tr class="header">
-                    <th scope="col">Name</th>
-                    <th scope="col">Username</th>
-                    <th scope="col">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (User userItem in FilteredUser)
-                {
-                    <tr>
-                        <td>@userItem.FirstName @userItem.LastName</td>
-                        <td>@userItem.Username</td>
-                        <td>
-                            <button class="clickable-action">
-                                <a class="fas fa-edit" href="editadmin/@userItem.Id">Edit</a>
-                            </button>
-                            <button @onclick="() => ActivateDeactivateUser(userItem.Id)" class="clickable-action">
-                                @if (userItem.IsActive)
-                                {
-                                    <Icon Name="IconName.Toggle2On" Color="IconColor.Success" />
-                                }
-                                else
-                                {
-                                    <Icon Name="IconName.Toggle2Off" Color="IconColor.Danger" />
-                                }
-                            </button>
-                        </td>
-                    </tr>
-                }
-            </tbody>
+          <thead class="thead-dark">
+            <tr class="header">
+              <th scope="col">Name</th>
+              <th scope="col">Username</th>
+              <th scope="col">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <span class="material-symbols-outlined"> person </span>Estelle
+                Marie Pepino
+              </td>
+              <td>alex@learnest.com</td>
+              <td>
+                <button class="clickable-action" onclick="{editAccount()}">
+                  <span class="material-symbols-outlined"> edit </span>
+                </button>
+                <button class="clickable-action" onclick="{deleteAccount()}">
+                  <span class="material-symbols-outlined"> delete </span>
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <span class="material-symbols-outlined"> person </span>Angeli
+                Mhiriel Severo
+              </td>
+              <td>angeli@learnest.com</td>
+              <td>
+                <button class="clickable-action" onclick="{editAccount()}">
+                  <span class="material-symbols-outlined"> edit </span>
+                </button>
+                <button class="clickable-action" onclick="{deleteAccount()}">
+                  <span class="material-symbols-outlined"> delete </span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
         </table>
+      </div>
+    <div
+      class="container-full"
+      style="flex-direction: column; justify-content: flex-start"
+    >
+      <form class="search-container" style="margin: 0">
+        <input type="text" placeholder="Search" />
+        <i class="fa fa-search"></i>
+      </form>
+      <table class="table">
+        <thead>
+          <tr
+            class="header"
+            style="text-align: center; border: 3px solid #ffc95f"
+          >
+            <th scope="col" style="width: 10%"></th>
+            <th scope="col" style="width: 40%; text-align: center">Name</th>
+            <th scope="col" style="width: 40%; text-align: center">Username</th>
+            <th scope="col" style="width: 10%; text-align: right">
+              <button class="icon-click">
+                <i class="fa-solid fa-plus"></i>
+                New
+              </button>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="text-align: center">
+              <img
+                src="https://www.bollywoodshaadis.com/img/article-20231131716324259562000.jpg"
+                style="
+                  max-width: 1.5em;
+                  max-height: 1.5em;
+                  object-fit: cover;
+                  aspect-ratio: 1/1;
+                  border-radius: 50%;
+                "
+              />
+            </td>
+            <td style="text-align: center">Jennie Kim</td>
+            <td style="text-align: center">jenniekim</td>
+            <td style="text-align: center">
+              <span class="icons"
+                ><button class="icon-click">
+                  <i class="fa-solid fa-pen"></i></button
+                ><button class="icon-click">
+                  <i class="fa-solid fa-trash"></i></button
+              ></span>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center">
+              <img
+                src="https://pm1.aminoapps.com/6943/5f1eca01c922770baf1e97d452c059254c09159er1-1080-1080v2_hq.jpg"
+                style="
+                  max-width: 1.5em;
+                  max-height: 1.5em;
+                  object-fit: cover;
+                  aspect-ratio: 1/1;
+                  border-radius: 50%;
+                "
+              />
+            </td>
+            <td style="text-align: center">Kang Seulgi</td>
+            <td style="text-align: center">kseulgi</td>
+            <td style="text-align: center">
+              <span class="icons"
+                ><button class="icon-click">
+                  <i class="fa-solid fa-pen"></i></button
+                ><button class="icon-click">
+                  <i class="fa-solid fa-trash"></i></button
+              ></span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 </div>
-
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"
+    ></script>
 
 @code {
+     
     private int? AdminId;
     private User[] user { get; set; } = Array.Empty<User>();
     private string searchTerm = string.Empty;
@@ -228,5 +322,4 @@
 
         return await http.SendAsync(request);
     }
-
 }
