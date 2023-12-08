@@ -1,4 +1,4 @@
-﻿@page "/introtrainingsview/{TopicId:int}"
+﻿@page "/introtrainingsview/{TrainingId:int}/{TopicId:int}"
 @inject HttpClient http
 @inject IJSRuntime js
 @inject NavigationManager navigate
@@ -15,13 +15,11 @@
 
 
 <div class="container-fluid d-flex flex-column justify-content-center align-items-center">
-    @if (selectedTopic != null && selectedTopic.Any())
+    @if (selectedTopic != null)
     {
-        foreach (Topic tp in selectedTopic)
-        {
             <div>
                 <h2 style="font-weight: 700; text-align: center">
-                    Introduction to @tp.Title
+                    Introduction to @selectedTopic.Title
                 </h2>
             </div>
 
@@ -29,7 +27,7 @@
                 <div class="ratio ratio-16x9">
                     <iframe style="max-width: 100%; height: 100%"
                             class="embed-responsive-item"
-                            src=@tp.YouTubeUrl
+                        src=@selectedTopic.YouTubeUrl
                             allowfullscreen>
                     </iframe>
                 </div>
@@ -40,7 +38,7 @@
                     Description
                 </h4>
                 <p style="text-align: center">
-                    @tp.Description
+                @selectedTopic.Description
                 </p>
             </div>
             <div class="footer-container">
@@ -48,9 +46,9 @@
                     <i class="fa-solid fa-circle-arrow-left"></i>
                 </button>
 
-                @if (tp.SubTopics.Any())
+            @if (selectedTopic.SubTopics.Any())
                 {
-                    <button class="btn-arrow" @onclick="() => NavigateToFirstSubTopic(tp.SubTopics.FirstOrDefault().Id)">
+                <button class="btn-arrow" @onclick="() => NavigateToFirstSubTopic(selectedTopic.SubTopics.FirstOrDefault().Id)">
                         <i class="fa-solid fa-circle-arrow-right"></i>
                     </button>
                 }
@@ -61,13 +59,13 @@
                     </button>
                 }
             </div>
-        }
     }
 </div>
 
 @code {
+    [Parameter] public int TrainingId { get; set; }
     [Parameter] public int TopicId { get; set; }
-    private Topic[] selectedTopic { get; set; } = Array.Empty<Topic>();
+    private Topic selectedTopic = new Topic();
 
     private void NavigateToFirstSubTopic(int subTopicId)
     {
@@ -85,7 +83,7 @@
 
         if (topicByIdResponse.IsSuccessStatusCode)
         {
-            selectedTopic = new Topic[] { await topicByIdResponse.Content.ReadFromJsonAsync<Topic>() };
+            selectedTopic = await topicByIdResponse.Content.ReadFromJsonAsync<Topic>();
         }
     }
 

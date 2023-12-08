@@ -93,10 +93,17 @@
     [Parameter] public int TrainingId { get; set; }
     private Training[] selectedTraining { get; set; } = Array.Empty<Training>();
 
-    private void NavigateToTopic(int topicId)
+    private void NavigateToTopic(int trainingId)
     {
-        navigate.NavigateTo($"/introtrainingsview/{topicId}");
+        if (selectedTraining != null && selectedTraining.Length > 0)
+        {
+            var firstTraining = selectedTraining[0];
+            var firstTopicId = firstTraining.Topics.FirstOrDefault()?.TopicId ?? 0;
+            navigate.NavigateTo($"/introtrainingsview/{trainingId}/{firstTopicId}");
+        }
     }
+
+
 
     protected override async Task OnParametersSetAsync()
     {
