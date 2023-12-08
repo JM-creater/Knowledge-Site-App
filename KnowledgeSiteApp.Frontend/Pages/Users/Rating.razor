@@ -16,24 +16,12 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
 
-<script>
-    const ratingContainer = document.querySelector(".rating-container");
-    const ratingInputs = ratingContainer.querySelectorAll(
-        'input[name="rating"]'
-    );
-    let ratingDisplay = document.querySelector(".rating-display");
-
-    ratingContainer.addEventListener("change", function () {
-        let selectedRating = 0;
-        for (let i = 0; i < ratingInputs.length; i++) {
-            if (ratingInputs[i].checked) {
-                selectedRating = ratingInputs[i].value;
-                break;
-            }
-        }
-        ratingDisplay.textContent = `Rating: ${selectedRating}/5`; 
-    });
-</script>
+<BlazoredToasts Position="ToastPosition.BottomRight"
+                Timeout="5"
+                IconType="IconType.FontAwesome"
+                SuccessClass="success-toast-override"
+                SuccessIcon="fa fa-thumbs-up"
+                ErrorIcon="fa fa-bug" />
 
 <div class="container-full">
     <h2>Congratulations!</h2>
@@ -56,7 +44,6 @@
             <input type="radio" id="star1" name="rating" value="1" @onchange="@(() => ratingDto.Stars = 1)" />
             <label for="star1"><i class="fas fa-star"></i></label>
         </div>
-        <p class="rating-display">Rating: 0/5</p>
         <h5>Comment:</h5>
         <div>
             <textarea class="comment-input" @bind="ratingDto.Comment"></textarea>
@@ -64,6 +51,7 @@
         </div>
     </div>
 </div>
+
 
 @code {
     [Parameter]
@@ -73,16 +61,19 @@
 
     private async Task SubmitRating()
     {
+        toastService.ClearAll();
+
         if (ratingDto.Stars != 0 && ratingDto.Comment != null)
         {
             ratingDto.TrainingId = TrainingId;
 
             var response = await http.PostAsJsonAsync("https://localhost:7095/api/Rating", ratingDto);
+
             if (response.IsSuccessStatusCode)
             {
                 toastService.ShowSuccess("Rating submitted successfully");
                 await Task.Delay(3000);
-                navigate.NavigateTo("/userCategories");
+                navigate.NavigateTo("/");
             }
             else
             {
