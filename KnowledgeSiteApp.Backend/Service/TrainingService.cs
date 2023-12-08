@@ -122,7 +122,6 @@ namespace KnowledgeSiteApp.Backend.Service
             if (training == null)
                 throw new InvalidOperationException("Training does not exist");
 
-
             training.Title = dto.Title;
             training.Description = dto.Description;
             training.CategoryId = dto.CategoryId;
