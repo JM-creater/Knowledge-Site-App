@@ -57,6 +57,36 @@ namespace KnowledgeSiteApp.Backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Trainings",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AdminId = table.Column<int>(type: "int", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CategoryId = table.Column<int>(type: "int", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Trainings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Trainings_TrainingCategories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "TrainingCategories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Trainings_Users_AdminId",
+                        column: x => x.AdminId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Ratings",
                 columns: table => new
                 {
@@ -70,42 +100,12 @@ namespace KnowledgeSiteApp.Backend.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Ratings", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Trainings",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AdminId = table.Column<int>(type: "int", nullable: true),
-                    RatingId = table.Column<int>(type: "int", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CategoryId = table.Column<int>(type: "int", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Trainings", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Trainings_Ratings_RatingId",
-                        column: x => x.RatingId,
-                        principalTable: "Ratings",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Trainings_TrainingCategories_CategoryId",
-                        column: x => x.CategoryId,
-                        principalTable: "TrainingCategories",
+                        name: "FK_Ratings_Trainings_TrainingId",
+                        column: x => x.TrainingId,
+                        principalTable: "Trainings",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Trainings_Users_AdminId",
-                        column: x => x.AdminId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -161,7 +161,7 @@ namespace KnowledgeSiteApp.Backend.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "DateCreated", "DateUpdated", "Email", "FirstName", "Image", "IsActive", "LastName", "Password", "PasswordResetToken", "ResetTokenExpires", "Role", "Username" },
-                values: new object[] { 1, new DateTime(2023, 12, 7, 20, 27, 38, 42, DateTimeKind.Local).AddTicks(1554), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin0123@gmail.com", "Admin", null, true, "Admin", "jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=", null, null, 2, "Admin123" });
+                values: new object[] { 1, new DateTime(2023, 12, 8, 13, 46, 3, 605, DateTimeKind.Local).AddTicks(2205), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin0123@gmail.com", "Admin", null, true, "Admin", "jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=", null, null, 2, "Admin123" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Ratings_TrainingId",
@@ -192,26 +192,13 @@ namespace KnowledgeSiteApp.Backend.Migrations
                 name: "IX_Trainings_CategoryId",
                 table: "Trainings",
                 column: "CategoryId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Trainings_RatingId",
-                table: "Trainings",
-                column: "RatingId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Ratings_Trainings_TrainingId",
-                table: "Ratings",
-                column: "TrainingId",
-                principalTable: "Trainings",
-                principalColumn: "Id");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Ratings_Trainings_TrainingId",
-                table: "Ratings");
+            migrationBuilder.DropTable(
+                name: "Ratings");
 
             migrationBuilder.DropTable(
                 name: "SubTopics");
@@ -221,9 +208,6 @@ namespace KnowledgeSiteApp.Backend.Migrations
 
             migrationBuilder.DropTable(
                 name: "Trainings");
-
-            migrationBuilder.DropTable(
-                name: "Ratings");
 
             migrationBuilder.DropTable(
                 name: "TrainingCategories");

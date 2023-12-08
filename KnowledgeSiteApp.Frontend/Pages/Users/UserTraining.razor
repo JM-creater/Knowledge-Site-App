@@ -7,34 +7,34 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" type="text/css" href="css/main.css" />
-<link rel="stylesheet" type="text/css" href="css/categories-stylesheet.css" />
+<link rel="stylesheet" type="text/css" href="css/trainings-stylsheet.css" />
 
 <div class="container">
-    <!-- Search Bar -->
+    <h1 style="margin-top: 30px;">Trainings</h1>
     <form class="search-container">
         <input type="text" placeholder="Search" @bind="searchTerm" @bind:event="oninput" />
         <i class="fa fa-search" @onclick="HandleSearch"></i>
     </form>
     <div class="category-container">
-
-        <!-- Training -->
         @foreach (Training tr in FilteredTrainings)
         {
-            <div class="category-box">
-                <button @onclick="() => NavigateToStartTraining(tr.Id)" class="category-content">
+            <a @onclick="() => NavigateToStartTraining(tr.Id)" class="category-box">
+                <img src="@($"https://localhost:7095/{tr.Image}")" class="category-image" />
+                <div class="category-content">
                     <h4>@tr.Title</h4>
-                </button>
-            </div>
+                </div>
+            </a>
         }
-
     </div>
 </div>
+
 
 @code {
     [Parameter] public int CategoryId { get; set; }
     private Training[] training { get; set; } = Array.Empty<Training>();
+    private Training getTraining;
     private string searchTerm = string.Empty;
-    private string errorMessage;
+    private string errorMessage = string.Empty;
 
     private void NavigateToStartTraining(int trainingId)
     {

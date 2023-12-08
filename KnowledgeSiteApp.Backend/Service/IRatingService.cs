@@ -6,5 +6,6 @@ namespace KnowledgeSiteApp.Backend.Service
     public interface IRatingService
     {
         public Task<Rating> SubmitRating(RatingCreateDto dto);
+        public Task<Rating> GetById(int id);
     }
 }

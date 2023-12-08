@@ -1,0 +1,42 @@
+Figma UIs
+To be confirmed by the back end devs
+
+Lacking:
+-Add topics admin UI
+-Edit topics
+ 
+To be discussed:
+-topic side bar for every training
+
+Categories with no training added
+- not shown on users end
+
+Topic UI (admin side):
+
+Title
+-required
+
+Description 
+-scroll view
+-view images button
+-required
+
+One video
+-can be embedded from youtube or uploaded
+-required
+
+Multiple pictures (to be confirmed by back end devs)
+-Text editor???? (lisod daw huhu)
+-upload pictures
+-pictures can be viewed in a carousel 
+
+Resources (PPT, PDF)
+-every topic has a section with the resources that can be downloaded (like cisco)
+-practical assesments
+
+Each topic can contain short quiz (3 questions)
+
+To be fixed:
+Forgot password UI
+-How? Notifications for super admin for the requests?
+

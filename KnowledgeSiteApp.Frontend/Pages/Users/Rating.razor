@@ -1,0 +1,110 @@
+﻿@page "/rating/{TrainingId:int}"
+@inject HttpClient http
+@inject IJSRuntime js
+@inject NavigationManager navigate
+@using Blazored.Toast.Configuration
+@inject IToastService toastService
+@layout UserCategoriesLayout
+@inject AdminService service
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" type="text/css" href="css/main.css" />
+<link rel="stylesheet" type="text/css" href="css/rating-stylesheet.css" />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+
+<script>
+    const ratingContainer = document.querySelector(".rating-container");
+    const ratingInputs = ratingContainer.querySelectorAll(
+        'input[name="rating"]'
+    );
+    let ratingDisplay = document.querySelector(".rating-display");
+
+    ratingContainer.addEventListener("change", function () {
+        let selectedRating = 0;
+        for (let i = 0; i < ratingInputs.length; i++) {
+            if (ratingInputs[i].checked) {
+                selectedRating = ratingInputs[i].value;
+                break;
+            }
+        }
+        ratingDisplay.textContent = `Rating: ${selectedRating}/5`; 
+    });
+</script>
+
+<div class="container-full">
+    <h2>Congratulations!</h2>
+    <h2>You have completed Javascript training!</h2>
+    <div class="center-container">
+        <h4>Rate Training</h4>
+        <div class="rating-container">
+            <input type="radio" id="star5" name="rating" value="5" @onchange="@(() => ratingDto.Stars = 5)" />
+            <label for="star5"><i class="fas fa-star"></i></label>
+
+            <input type="radio" id="star4" name="rating" value="4" @onchange="@(() => ratingDto.Stars = 4)" />
+            <label for="star4"><i class="fas fa-star"></i></label>
+
+            <input type="radio" id="star3" name="rating" value="3" @onchange="@(() => ratingDto.Stars = 3)" />
+            <label for="star3"><i class="fas fa-star"></i></label>
+
+            <input type="radio" id="star2" name="rating" value="2" @onchange="@(() => ratingDto.Stars = 2)" />
+            <label for="star2"><i class="fas fa-star"></i></label>
+
+            <input type="radio" id="star1" name="rating" value="1" @onchange="@(() => ratingDto.Stars = 1)" />
+            <label for="star1"><i class="fas fa-star"></i></label>
+        </div>
+        <p class="rating-display">Rating: 0/5</p>
+        <h5>Comment:</h5>
+        <div>
+            <textarea class="comment-input" @bind="ratingDto.Comment"></textarea>
+            <button class="btn btn-submit" @onclick="SubmitRating">Submit</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int TrainingId { get; set; }
+
+    private CreateRatingDto ratingDto = new CreateRatingDto();
+
+    private async Task SubmitRating()
+    {
+        if (ratingDto.Stars != 0 && ratingDto.Comment != null)
+        {
+            ratingDto.TrainingId = TrainingId;
+
+            var response = await http.PostAsJsonAsync("https://localhost:7095/api/Rating", ratingDto);
+            if (response.IsSuccessStatusCode)
+            {
+                toastService.ShowSuccess("Rating submitted successfully");
+                await Task.Delay(3000);
+                navigate.NavigateTo("/userCategories");
+            }
+            else
+            {
+                toastService.ShowError("Error submitting rating");
+            }
+        }
+        else
+        {
+            toastService.ShowError("Please input the field.");
+        }
+    }
+
+    private async Task<HttpResponseMessage> SendAuthorizedRequest(HttpMethod method, string url, HttpContent content = null)
+    {
+        var request = new HttpRequestMessage(method, url);
+        request.Headers.Add("X-API-KEY", "KNOWLEDGESITEAPPAPI");
+
+        if (content != null)
+        {
+            request.Content = content;
+        }
+
+        return await http.SendAsync(request);
+    }
+}

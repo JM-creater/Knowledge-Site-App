@@ -6,25 +6,25 @@
 <nav class="navbar navbar-expand-md navbar-toggleable-sm navbar-light border-bottom box-shadow mb-3" style="height: 90px; background-color: #FFC95F;">
     <div class="container" style="max-width: 90% !important;">
         <img src="/origami bold.png" class="" style="width: 100px; height: 100px;">
-        <a class="navbar-brand" href="dashboardadmin" style="font-family: Montserrat, sans-serif; font-size: 30px; color: #862B0D; margin: 5px !important;"><b>LearnNest</b></a>
+        <a class="navbar-brand" href="dashboardadmin" style="font-family: 'Montserrat', sans-serif; font-size: 30px; color: #862B0D; margin: 5px;"><b>LearnNest</b></a>
 
         <button class="navbar-toggler" type="button" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="@NavMenuCssClass" style="padding-right: 100px !important;" @onclick="ToggleNavMenu">
+        <div class="@NavMenuCssClass" style="padding-right: 100px;">
             <ul class="navbar-nav mx-auto">
                 <li class="nav-item">
-                    <NavLink class="nav-link text-dark" style="color: #862B0D !important;" href="dashboardadmin" Match="NavLinkMatch.All">
+                    <NavLink class="nav-link text-dark" href="dashboardadmin" Match="NavLinkMatch.All" style="color: #862B0D;">
                         <span class="oi oi-home" aria-hidden="true"></span> Dashboard
                     </NavLink>
                 </li>
                 <li class="nav-item">
-                    <NavLink class="nav-link text-dark" style="color: #862B0D !important;" href="counter">
+                    <NavLink class="nav-link text-dark" href="viewTraining" style="color: #862B0D;">
                         <span class="oi oi-plus" aria-hidden="true"></span> Training
                     </NavLink>
                 </li>
                 <li class="nav-item">
-                    <NavLink class="nav-link text-dark" style="color: #862B0D !important;" href="fetchdata">
+                    <NavLink class="nav-link text-dark" href="categoryMain" style="color: #862B0D;">
                         <span class="oi oi-list-rich" aria-hidden="true"></span> Category
                     </NavLink>
                 </li>
@@ -33,27 +33,26 @@
 
         <div class="ml-auto d-flex align-items-center">
             <div class="dropdown">
-                <a class="nav-link dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                    <span class="text-dark" style="margin-right: 20px !important;">@getUser.FirstName @getUser.LastName</span>
-                    <img src=@($"https://localhost:7095/{getUser.Image}") alt="Profile Picture" class="rounded-circle mr-2" style="width: 60px; height: 60px;">
+                <a class="nav-link dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="text-dark">@getUser.FirstName @getUser.LastName</span>
+                    <img src=@($"https://localhost:7095/{getUser.Image}") alt="Profile Picture" class="rounded-circle" style="width: 60px; height: 60px;">
                 </a>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                    <li><a class="dropdown-item" href="profile">Profile</a></li>
                     <li><a class="dropdown-item" @onclick="Logout">Logout</a></li>
                 </ul>
             </div>
         </div>
-
     </div>
 </nav>
 
 @code {
     private int? AdminId;
     private User getUser = new User();
-    bool collapseNavMenu = true;
+    private bool collapseNavMenu = true;
 
-    string baseMenuClass = "navbar-collapse d-sm-inline-flex flex-sm-row-reverse";
-
-    string NavMenuCssClass => baseMenuClass + (collapseNavMenu ? " collapse" : "");
+    string NavMenuCssClass => collapseNavMenu ? "collapse navbar-collapse" : "navbar-collapse";
 
     void ToggleNavMenu()
     {

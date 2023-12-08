@@ -22,6 +22,7 @@ builder.Services.AddScoped<ITrainingService, TrainingService>();
 builder.Services.AddScoped<ITrainingCategoryService, TrainingCategoryService>();
 builder.Services.AddScoped<ITopicService, TopicService>();
 builder.Services.AddScoped<ISubTopicService, SubTopicService>();
+builder.Services.AddScoped<IRatingService, RatingService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

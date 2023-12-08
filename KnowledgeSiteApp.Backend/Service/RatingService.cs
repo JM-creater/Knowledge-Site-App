@@ -1,31 +1,37 @@
-﻿using KnowledgeSiteApp.Backend.Core.Context;
+﻿using AutoMapper;
+using KnowledgeSiteApp.Backend.Core.Context;
 using KnowledgeSiteApp.Backend.Core.Dto;
 using KnowledgeSiteApp.Models.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace KnowledgeSiteApp.Backend.Service
 {
     public class RatingService : IRatingService
     {
         private readonly AppDbContext context;
-        public RatingService(AppDbContext dbcontext)
+        private readonly IMapper mapper;
+        public RatingService(AppDbContext dbcontext, IMapper _mapper)
         {
             context = dbcontext;
+            mapper = _mapper;
         }
 
         public async Task<Rating> SubmitRating(RatingCreateDto dto)
         {
-            var rating = new Rating
-            {
-                TrainingId = dto.TrainingId,
-                Stars = dto.Stars,
-                Comment = dto.Comment,
-                DateCreated = DateTime.Now
-            };
+            var addRating = mapper.Map<Rating>(dto);
+            addRating.Comment = dto.Comment;
+            addRating.Stars = dto.Stars;
+            addRating.DateCreated = DateTime.Now;
 
-            context.Ratings.Add(rating);
+            context.Ratings.Add(addRating);
             await context.SaveChangesAsync();
 
-            return rating;
+            return addRating;
         }
+
+        public async Task<Rating> GetById(int id)
+            => await context.Ratings
+                            .Where(r => r.Id == id)
+                            .FirstOrDefaultAsync();
     }
 }
