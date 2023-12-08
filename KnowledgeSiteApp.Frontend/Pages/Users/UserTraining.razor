@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" type="text/css" href="css/main.css" />
-<link rel="stylesheet" type="text/css" href="css/trainings-stylsheet.css" />
+<link rel="stylesheet" type="text/css" href="css/categories-stylesheet.css" />
 
 <div class="container">
     <h1 style="margin-top: 30px;">Trainings</h1>
@@ -18,12 +18,11 @@
     <div class="category-container">
         @foreach (Training tr in FilteredTrainings)
         {
-            <a @onclick="() => NavigateToStartTraining(tr.Id)" class="category-box">
-                <img src="@($"https://localhost:7095/{tr.Image}")" class="category-image" />
-                <div class="category-content">
+            <div class="category-box">
+                <button @onclick="() => NavigateToStartTraining(tr.Id)" class="category-content">
                     <h4>@tr.Title</h4>
-                </div>
-            </a>
+                </button>
+            </div>
         }
     </div>
 </div>

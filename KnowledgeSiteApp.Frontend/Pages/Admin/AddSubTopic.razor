@@ -99,7 +99,7 @@
     {
         toastService.ClearAll();
 
-        if(newSubTopic.Title != null && newSubTopic.Description != null && newSubTopic.YouTubeUrl != null && uploadedResourceFiles != null && uploadedVideoFiles != null)
+        if(newSubTopic.Title != null && newSubTopic.Description != null && newSubTopic.YouTubeUrl != null && uploadedResourceFiles != null)
         {
             newSubTopic.TopicId = TopicId;
             var response = await SendAuthorizedRequest(HttpMethod.Post, "https://localhost:7095/api/SubTopics", JsonContent.Create(newSubTopic));
@@ -126,23 +126,23 @@
                 toastService.ShowError("An error occured while adding the sub topic. Please try again later.");
             }
         }
-        else if (newSubTopic.Title == null && newSubTopic.Description != null && newSubTopic.YouTubeUrl != null && uploadedResourceFiles != null && uploadedVideoFiles != null)
+        else if (newSubTopic.Title == null && newSubTopic.Description != null && newSubTopic.YouTubeUrl != null && uploadedResourceFiles != null)
         {
             toastService.ShowError("Please input Title.");
         }
-        else if (newSubTopic.Title != null && newSubTopic.Description == null && newSubTopic.YouTubeUrl != null && uploadedResourceFiles != null && uploadedVideoFiles != null)
+        else if (newSubTopic.Title != null && newSubTopic.Description == null && newSubTopic.YouTubeUrl != null && uploadedResourceFiles != null)
         {
             toastService.ShowError("Please input Description.");
         }
-        else if (newSubTopic.Title != null && newSubTopic.Description != null && newSubTopic.YouTubeUrl == null && uploadedResourceFiles != null && uploadedVideoFiles != null)
+        else if (newSubTopic.Title != null && newSubTopic.Description != null && newSubTopic.YouTubeUrl == null && uploadedResourceFiles != null)
         {
             toastService.ShowError("Please input YouTubeUrl.");
         }
-        else if (newSubTopic.Title != null && newSubTopic.Description != null && newSubTopic.YouTubeUrl != null && uploadedResourceFiles == null && uploadedVideoFiles != null)
+        else if (newSubTopic.Title != null && newSubTopic.Description != null && newSubTopic.YouTubeUrl != null && uploadedResourceFiles == null)
         {
             toastService.ShowError("Please upload Resources.");
         }
-        else if (newSubTopic.Title != null && newSubTopic.Description != null && newSubTopic.YouTubeUrl != null && uploadedResourceFiles != null && uploadedVideoFiles == null)
+        else if (newSubTopic.Title != null && newSubTopic.Description != null && newSubTopic.YouTubeUrl != null && uploadedResourceFiles != null)
         {
             toastService.ShowError("Please upload Video.");
         }

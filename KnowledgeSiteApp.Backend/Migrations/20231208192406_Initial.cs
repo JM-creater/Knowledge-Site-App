@@ -161,7 +161,7 @@ namespace KnowledgeSiteApp.Backend.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "DateCreated", "DateUpdated", "Email", "FirstName", "Image", "IsActive", "LastName", "Password", "PasswordResetToken", "ResetTokenExpires", "Role", "Username" },
-                values: new object[] { 1, new DateTime(2023, 12, 8, 13, 46, 3, 605, DateTimeKind.Local).AddTicks(2205), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin0123@gmail.com", "Admin", null, true, "Admin", "jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=", null, null, 2, "Admin123" });
+                values: new object[] { 1, new DateTime(2023, 12, 9, 3, 24, 5, 962, DateTimeKind.Local).AddTicks(5883), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin0123@gmail.com", "Admin", null, true, "Admin", "jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=", null, null, 2, "Admin123" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Ratings_TrainingId",
