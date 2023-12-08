@@ -34,38 +34,47 @@
     }
 </style>
 
-<div class="container-full-pg-1">
-    @if (selectedTraining != null && selectedTraining.Any())
+@if (selectedTraining != null && selectedTraining.Any())
+{
+    @foreach (Training tr in selectedTraining)
     {
-        foreach (Training tr in selectedTraining)
-        {
-            <div class="description-container">
-                <h2 style="font-weight: 700; align-self: flex-start; justify-self: normal">
-                    @tr.Title
-                </h2>
-                @foreach (var topic in tr.Topics)
-                {
-                    <ul>
-                        <li>@topic.Title</li>
-                        <ul>
-                            @foreach (var subTopic in topic.SubTopics)
-                            {
-                                <li>@subTopic.Title</li>
-                            }
-                        </ul>
-                    </ul>
-                }
-                <div style=" display: flex; column-gap: 10px; align-items: center; margin-top: 1em;">
-                    <h6 style="font-weight: 700; margin: 0">@tr.Admin.FirstName @tr.Admin.LastName</h6>
-                    <img src=@($"https://localhost:7095/{tr.Admin.Image}")
-                            style="
-                            max-width: 2em;
-                            max-height: 2em;
-                            object-fit: cover;
-                            aspect-ratio: 1/1;
-                            border-radius: 50%;"/>
+        <div class="container-full-pg-1">
+                <div class="description-container">
+                    <h2 style="font-weight: 700; align-self: flex-start; justify-self: normal">
+                        @tr.Title
+                    </h2>
+                    <div class="list-container">
+                        @foreach (var topic in tr.Topics)
+                        {
+                            <ul>
+                                <li>@topic.Title</li>
+                                <ul>
+                                    @foreach (var subTopic in topic.SubTopics)
+                                    {
+                                        <li>@subTopic.Title</li>
+                                    }
+                                </ul>
+                            </ul>
+                        }
+                    </div>
+                    <div style="
+                        display: flex;
+                        column-gap: 10px;
+                        align-items: center;
+                        margin-top: 1em;
+                                  ">
+                        <h6 style="font-weight: 700; margin: 0">Hosted by @tr.Admin.FirstName @tr.Admin.LastName</h6>
+                        <img src=@($"https://localhost:7095/{tr.Admin.Image}")
+                             style="
+                                  max-width: 2em;
+                                  max-height: 2em;
+                                  object-fit: cover;
+                                  aspect-ratio: 1/1;
+                                  border-radius: 50%;
+                                            " />
+                    </div>
                 </div>
-            </div>
+        
             <div class="image-container">
                 @if (!string.IsNullOrWhiteSpace(tr.Image))
                 {
@@ -85,9 +94,9 @@
                        style="color: #febe3e; font-size: 30px"></i>
                 </button>
             </div>
-        }
+        </div>
     }
-</div>
+}
 
 @code {
     [Parameter] public int TrainingId { get; set; }
@@ -102,8 +111,6 @@
             navigate.NavigateTo($"/introtrainingsview/{trainingId}/{firstTopicId}");
         }
     }
-
-
 
     protected override async Task OnParametersSetAsync()
     {

@@ -22,6 +22,22 @@ namespace KnowledgeSiteApp.Backend.Controllers
             return Ok(rating);
         }
 
+        [HttpGet("average/{trainingId}")]
+        public async Task<IActionResult> GetAverageRating(int trainingId)
+        {
+            var averageRating = await service.GetAverageRatingForTraining(trainingId);
+
+            return Ok(new { AverageRating = averageRating });
+        }
+
+        [HttpGet("average-by-admin/{adminId}")]
+        public async Task<IActionResult> GetAverageRatingsByAdmin(int adminId)
+        {
+            var averageRatings = await service.GetAverageRatingsByAdminId(adminId);
+
+            return Ok(averageRatings);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
