@@ -12,12 +12,56 @@
     <link href="_content/Blazor.Bootstrap/blazor.bootstrap.css" rel="stylesheet" />
     <link href="css/app.css" rel="stylesheet" />
     <link href="KnowledgeSiteApp.Frontend.styles.css" rel="stylesheet" />
+    <style>
+        /* Add styles specifically for the loading screen */
+        #loading-screen {
+            position: fixed; /* Use fixed positioning */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); /* This will center the div */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #loading-logo {
+            width: 150px; 
+            height: auto; 
+            animation: pulse 2s infinite;
+        }
+
+        #loading-text {
+            font-size: 1.5em; 
+            margin-top: 20px;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.7;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
 
 </head>
 
 <body>
     <div id="app">
-        Loading...
+        <div id="loading-screen">
+            <img id="loading-logo" src="origami bold.png" alt="LearnNest Logo">
+            <p id="loading-text">Loading LearnNest...</p>
+        </div>
     </div>
 
     <script src="_framework/blazor.webassembly.js"></script>

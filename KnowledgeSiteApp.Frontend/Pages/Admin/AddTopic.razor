@@ -96,7 +96,7 @@
     {
         toastService.ClearAll();
 
-        if (newTopic.Title != null && newTopic.Description != null && newTopic.YouTubeUrl != null && uploadedResourceFiles != null && uploadedVideoFiles != null)
+        if (newTopic.Title != null && newTopic.Description != null && newTopic.YouTubeUrl != null && uploadedResourceFiles != null)
         {
             newTopic.TrainingId = TrainingId;
             var response = await SendAuthorizedRequest(HttpMethod.Post, "https://localhost:7095/api/Topic", JsonContent.Create(newTopic));
@@ -119,23 +119,23 @@
                 toastService.ShowError("An error occured while adding the topic. Please try again later.");
             }
         }
-        else if (newTopic.Title == null && newTopic.Description != null && newTopic.YouTubeUrl != null && uploadedResourceFiles != null && uploadedVideoFiles != null)
+        else if (newTopic.Title == null && newTopic.Description != null && newTopic.YouTubeUrl != null && uploadedResourceFiles != null)
         {
             toastService.ShowError("Please input Title.");
         }
-        else if (newTopic.Title != null && newTopic.Description == null && newTopic.YouTubeUrl != null && uploadedResourceFiles != null && uploadedVideoFiles != null)
+        else if (newTopic.Title != null && newTopic.Description == null && newTopic.YouTubeUrl != null && uploadedResourceFiles != null)
         {
             toastService.ShowError("Please input Description.");
         }
-        else if (newTopic.Title != null && newTopic.Description != null && newTopic.YouTubeUrl == null && uploadedResourceFiles != null && uploadedVideoFiles != null)
+        else if (newTopic.Title != null && newTopic.Description != null && newTopic.YouTubeUrl == null && uploadedResourceFiles != null)
         {
             toastService.ShowError("Please input YouTubeUrl.");
         }
-        else if (newTopic.Title != null && newTopic.Description != null && newTopic.YouTubeUrl != null && uploadedResourceFiles == null && uploadedVideoFiles != null)
+        else if (newTopic.Title != null && newTopic.Description != null && newTopic.YouTubeUrl != null && uploadedResourceFiles == null)
         {
             toastService.ShowError("Please upload Resources.");
         }
-        else if (newTopic.Title != null && newTopic.Description != null && newTopic.YouTubeUrl != null && uploadedResourceFiles != null && uploadedVideoFiles == null)
+        else if (newTopic.Title != null && newTopic.Description != null && newTopic.YouTubeUrl != null && uploadedResourceFiles != null)
         {
             toastService.ShowError("Please upload Video.");
         }
