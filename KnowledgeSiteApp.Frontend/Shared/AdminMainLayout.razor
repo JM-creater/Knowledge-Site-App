@@ -1,5 +1,6 @@
 ﻿@inherits LayoutComponentBase
-@inject AdminService adminService
+@inject NavigationManager navigate
+@inject AdminService service
 
 <div class="bb-page">
     <Sidebar @ref="sidebar"
@@ -9,7 +10,7 @@
 
     <main>
         <div class="bb-top-row px-4 d-flex justify-content-end">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+            <a style="cursor: pointer;" @onclick="Logout" target="_blank">Logout</a>
         </div>
 
         <article class="content px-4">
@@ -26,7 +27,7 @@
 
     private async Task<SidebarDataProviderResult> SidebarDataProvider(SidebarDataProviderRequest request)
     {
-        var userId = await adminService.GetUserIdAsync() ?? 0;
+        var userId = await service.GetUserIdAsync() ?? 0;
         if (navItems is null)
             navItems = await GetNavItems(userId);
 
@@ -44,6 +45,12 @@
             new NavItem { Id = "5", Href = "/categoryMain", IconName = IconName.List, Text = "View Category" },
         };
 
+    }
+
+    private async Task Logout()
+    {
+        await service.Logout();
+        navigate.NavigateTo("/login");
     }
 }
 

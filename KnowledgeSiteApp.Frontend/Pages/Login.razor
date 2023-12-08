@@ -147,6 +147,8 @@ else
             if (result.IsSuccessStatusCode)
             {
                 toastService.ShowSuccess("A password reset link has been sent to your email. Please check your inbox to continue.");
+                await Task.Delay(3000);
+                RefreshPage();
             }
             else if (result.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
@@ -185,4 +187,10 @@ else
             await ForgotPassword();
         }
     }
+
+    private void RefreshPage()
+    {
+        navigate.NavigateTo(navigate.Uri, forceLoad: true);
+    }
+
 }
