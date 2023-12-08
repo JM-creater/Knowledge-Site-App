@@ -100,7 +100,7 @@
         var nextTopic = GetNextTopic(TrainingId, SubTopicId);
         if (nextTopic != null)
         {
-            navigate.NavigateTo($"/introtrainingsview/{nextTopic.TopicId}");
+            navigate.NavigateTo($"/introtrainingsview/{nextTopic.TrainingId}/{nextTopic.TopicId}");
             return;
         }
 

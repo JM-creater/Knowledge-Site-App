@@ -2,6 +2,7 @@
 using KnowledgeSiteApp.Backend.Core.Dto;
 using KnowledgeSiteApp.Backend.Service;
 using KnowledgeSiteApp.Models.Dto;
+using KnowledgeSiteApp.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace KnowledgeSiteApp.Backend.Controllers
@@ -53,6 +54,18 @@ namespace KnowledgeSiteApp.Backend.Controllers
             var topic = await service.GetTopicsByTrainingId(trainingId);
 
             return Ok(topic);
+        }
+
+        [HttpGet("ByTraining/{trainingId}")]
+        public async Task<ActionResult<List<Topic>>> GetTopicsByTraining(int trainingId)
+        {
+            var topics = await service.GetTopicsByTrainingIdAsync(trainingId);
+
+            if (topics == null || !topics.Any())
+            {
+                return NotFound();
+            }
+            return Ok(topics);
         }
 
         [HttpGet("{topicId}")]
