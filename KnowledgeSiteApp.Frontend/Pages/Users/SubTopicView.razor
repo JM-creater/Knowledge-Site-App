@@ -2,7 +2,7 @@
 @inject HttpClient http
 @inject IJSRuntime js
 @inject NavigationManager navigate
-@layout UserMainLayout
+@layout UserCategoriesLayout
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -11,7 +11,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-@* <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script> *@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
 
 
@@ -56,7 +55,14 @@
 
 @code {
     [Parameter] public int SubTopicId { get; set; }
+    private int TrainingId { get; set; }
     private SubTopic selectedSubTopic { get; set; }
+    private List<Training> trainings { get; set; } = new List<Training>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchSubTopicDetails(SubTopicId);
+    }
 
     private async Task FetchSubTopicDetails(int subTopicId)
     {
@@ -64,35 +70,84 @@
 
         if (response.IsSuccessStatusCode)
         {
-            var trainings = await response.Content.ReadFromJsonAsync<Training[]>();
-            selectedSubTopic = trainings.SelectMany(t => t.Topics)
-                                        .SelectMany(tp => tp.SubTopics)
-                                        .FirstOrDefault(st => st.Id == subTopicId);
+            trainings = await response.Content.ReadFromJsonAsync<List<Training>>();
 
-            StateHasChanged();
+            var selectedSubTopicTraining = trainings.FirstOrDefault(t =>
+                t.Topics.Any(topic =>
+                    topic.SubTopics.Any(st => st.Id == subTopicId)));
+
+            if (selectedSubTopicTraining != null)
+            {
+                TrainingId = selectedSubTopicTraining.Id;
+                selectedSubTopic = selectedSubTopicTraining.Topics
+                                   .SelectMany(tp => tp.SubTopics)
+                                   .FirstOrDefault(st => st.Id == subTopicId);
+                StateHasChanged();
+            }
         }
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        await FetchSubTopicDetails(SubTopicId);
     }
 
     private async Task NavigateForward()
     {
-        int nextSubTopicId = SubTopicId + 1;
-        navigate.NavigateTo($"/subtopicview/{nextSubTopicId}");
+        var nextSubTopic = GetNextSubTopic(SubTopicId);
+        if (nextSubTopic != null)
+        {
+            navigate.NavigateTo($"/subtopicview/{nextSubTopic.Id}");
+            await FetchSubTopicDetails(nextSubTopic.Id);
+            return;
+        }
 
-        await FetchSubTopicDetails(nextSubTopicId);
+        var nextTopic = GetNextTopic(TrainingId, SubTopicId);
+        if (nextTopic != null)
+        {
+            navigate.NavigateTo($"/introtrainingsview/{nextTopic.TopicId}");
+            return;
+        }
+
+        navigate.NavigateTo($"/rating/{TrainingId}");
+    }
+
+    private Topic GetNextTopic(int currentTrainingId, int currentSubTopicId)
+    {
+        var currentTraining = trainings.FirstOrDefault(t => t.Id == currentTrainingId);
+        if (currentTraining != null)
+        {
+            var topics = currentTraining.Topics.OrderBy(t => t.TopicId).ToList();
+            var currentTopicIndex = topics.FindIndex(t => t.SubTopics.Any(st => st.Id == currentSubTopicId));
+            if (currentTopicIndex != -1 && currentTopicIndex < topics.Count - 1)
+            {
+                return topics[currentTopicIndex + 1];
+            }
+        }
+        return null;
+    }
+
+    private SubTopic GetNextSubTopic(int currentSubTopicId)
+    {
+        foreach (var training in trainings)
+        {
+            foreach (var topic in training.Topics)
+            {
+                var subTopicsList = topic.SubTopics.ToList();
+                var subTopicIndex = subTopicsList.FindIndex(st => st.Id == currentSubTopicId);
+                if (subTopicIndex != -1)
+                {
+                    if (subTopicIndex < subTopicsList.Count - 1)
+                    {
+                        return subTopicsList[subTopicIndex + 1];
+                    }
+                    else
+                    {
+                        break; 
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     private async Task NavigateBack()
     {
-        int previousSubTopicId = SubTopicId - 1;
-        if (previousSubTopicId >= 0)
-        {
-            navigate.NavigateTo($"/subtopicview/{previousSubTopicId}");
-            await FetchSubTopicDetails(previousSubTopicId);
-        }
+        await js.InvokeVoidAsync("history.back");
     }
 }

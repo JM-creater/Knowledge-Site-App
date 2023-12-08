@@ -4,65 +4,48 @@
 
 .button {
     display: block;
-    border-radius: 0%;
+    border-radius: 6.5px;
     font-weight: 700;
-    border-color: transparent;
     padding: 15px;
     background-color: #862b0d;
     margin-top: 10%;
     margin-bottom: 5.5%;
-    margin-left: 30%;
     margin-right: auto;
     width: 40%;
-    border-radius: 6.5px;
 }
 
     .button:hover {
         background-color: #862b0d;
     }
 
-.content-link-right {
+.content-link {
     display: block;
-    padding-right: 22.5%;
     margin-top: 2.5%;
     margin-left: auto;
     margin-right: auto;
-    text-align: right;
-    text-decoration: none;
     font-weight: 700;
     font-size: 10pt;
     color: black;
+    text-decoration: none;
 }
 
-    .content-link-right:hover {
-        display: block;
+    .content-link:hover {
         text-decoration: underline;
-        font-weight: 700;
         color: #862b0d;
     }
+
+.content-link-right {
+    padding-right: 22.5%;
+    text-align: right;
+}
 
 .content-link-center {
-    display: block;
     padding-top: 5px;
     padding-bottom: 25px;
-    margin-top: 2.5%;
-    margin-left: auto;
-    margin-right: auto;
     text-align: center;
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 10pt;
-    color: black;
 }
 
-    .content-link-center:hover {
-        display: block;
-        text-decoration: underline;
-        font-weight: 700;
-        color: #862b0d;
-    }
-
-.login-form {
+.registration-form, .login-form {
     display: block;
     margin-left: auto;
     margin-right: auto;
@@ -70,6 +53,7 @@
     border-radius: 14.5px;
     width: 35%;
     border: 1px solid #efebe0;
+    overflow: hidden;
 }
 
 .header {
@@ -80,20 +64,20 @@
     margin-bottom: 3px;
 }
 
-.login_logo_image {
+.login_logo_image, .change_password_logo_image {
     display: block;
     margin-left: auto;
     margin-right: auto;
-    width: 25dvh;
-    height: 25dvh;
+}
+
+.login_logo_image {
+    width: 25vh;
+    height: 25vh;
 }
 
 .change_password_logo_image {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    width: 12.5dvh;
-    height: 12.5dvh;
+    width: 12.5vh;
+    height: 12.5vh;
 }
 
 .form-group-element {
@@ -103,13 +87,12 @@
 .form-control {
     display: block;
     font-size: 11pt;
-    width: 55%;
+    width: 100%;
     margin-left: auto;
     margin-right: auto;
     background: transparent;
     border: transparent;
     border-bottom: 2px solid #333333;
-    -webkit-box-shadow: none;
     box-shadow: none;
     border-radius: 0;
 }
@@ -118,6 +101,5 @@
         font-weight: 700;
         background: transparent;
         border-bottom: 2px solid #ffc95f;
-        -webkit-box-shadow: none;
         box-shadow: none;
     }

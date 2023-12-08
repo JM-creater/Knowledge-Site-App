@@ -10,6 +10,7 @@ namespace KnowledgeSiteApp.Backend.Service
         public Task<IEnumerable<Training>> GetAllTrainingByCategory(int? categoryId);
         public Task<List<Training>> GetAll();
         public Task<Training> GetById(int id);
+        public Task<List<Training>> GetByTrainingIdForUser(int id);
         public Task<List<Training>> GetTrainingByAdminId(int adminId);
         public Task<IEnumerable<Training>> SearchTraining(string search);
         public Task<Training> Update(int id, TrainingUpdateDto dto);

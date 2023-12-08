@@ -1,0 +1,114 @@
+﻿body {
+    background-color: #efebe0;
+    font-family: "Montserrat", sans-serif;
+    overflow: hidden;
+}
+
+.container-full {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2.5em;
+    height: 100vh;
+    text-align: center;
+}
+
+h2 {
+    color: #862b0d;
+    font-weight: 700;
+}
+
+h4,
+h5 {
+    font-weight: 600;
+    color: #862b0d;
+}
+
+.center-container {
+    background-color: #d9d9d9;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 5px solid #ffc95f;
+    border-radius: 20px;
+    width: 50vw;
+    padding: 1.5em;
+    margin: 2em 0;
+}
+
+/* Star Rating */
+
+.rating-container {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+    align-items: center;
+    padding: 0.5em;
+}
+
+    .rating-container input[type="radio"] {
+        display: none;
+    }
+
+    .rating-container label {
+        color: rgb(30, 30, 30);
+        font-size: 2rem;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+
+        .rating-container input[type="radio"]:checked ~ label,
+        .rating-container label:hover,
+        .rating-container label:hover ~ label {
+            color: #ffc95f;
+        }
+
+/* Comment */
+
+form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1em;
+    width: 80%;
+}
+
+.comment-input {
+    resize: none;
+    width: 100%;
+    max-width: 100%;
+    height: 25vh;
+    border: 5px solid #ffc95f;
+    border-radius: 20px;
+    padding: 15px;
+}
+
+    .comment-input:active,
+    .comment-input:focus {
+        outline: none;
+    }
+
+.btn-submit {
+    color: white;
+    background-color: #862b0d;
+    width: 120px;
+    height: 40px;
+}
+
+    .btn-submit:not(:disabled):not(.disabled):active,
+    .btn-submit:not(:disabled):not(.disabled):hover,
+    .btn-submit:not(:disabled):not(.disabled):focus {
+        background-color: #642009;
+        color: white;
+    }
+
+/* Responsive */
+
+@media (max-width: 60em) {
+    .center-container {
+        width: 90vw;
+    }
+}

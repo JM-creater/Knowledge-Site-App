@@ -16,12 +16,13 @@
                 IconType="IconType.FontAwesome"
                 SuccessClass="success-toast-override"
                 SuccessIcon="fa fa-thumbs-up"
-                ErrorIcon="fa fa-bug" />
+                ErrorIcon="fa fa-bug"
+                style="overflow: hidden" />
 
 <div class="centered-container">
-    <EditForm Model="@newUser" OnValidSubmit="@HandleAddAdmin" class="login-form">
+    <EditForm Model="@newUser" OnValidSubmit="@HandleAddAdmin" class="registration-form">
         <!-- Header -->
-        <div class="header" style="margin-top: 5px; margin-bottom: 5px">
+        <div class="header" style="margin-bottom: 5px">
             <table align="center">
                 <tr>
                     <td>
@@ -32,7 +33,7 @@
                            style="text-align: left">
                             LearnNest
                         </p>
-                        <p class="content-subtitle">Edit Admin Account</p>
+                        <p class="content-subtitle">Add Admin Account</p>
                     </td>
                 </tr>
             </table>
@@ -40,20 +41,23 @@
 
         <!-- Profile Picture -->
         <div class="form-group form-group-element"
-             style="align-items: baseline; margin-left: 30%">
-            <div style="margin-left: 5vh">
+             style="align-items: baseline;">
+            <div>
                 @if (!string.IsNullOrEmpty(uploadedImage))
                 {
                     <img src="@uploadedImage"
                          id="output"
                          style="
-                        display: inline-flex;
-                        width: 20vh;
+                         display: inline-flex;
+                        width: 15vh;
                         aspect-ratio: 1/1;
+                        align-content: center;
+                        margin-left: 35%;
+                        margin-right: auto;
                         object-fit: cover;
                         border-radius: 50%;
-                            "
-                    alt="Profile Picture" />
+                                    "
+                         alt="Profile Picture" />
                 }
                 else
                 {
@@ -61,17 +65,20 @@
                          id="output"
                          style="
                         display: inline-flex;
-                        width: 20vh;
+                        width: 15vh;
                         aspect-ratio: 1/1;
+                        align-content: center;
+                        margin-left: 35%;
+                        margin-right: auto;
                         object-fit: cover;
                         border-radius: 50%;
-                            "
+                                "
                          alt="Profile Picture" />
                 }
-                
+
             </div>
         </div>
-        <div class="form-group form-group-element" style="margin-left: 30%">
+        <div class="form-group form-group-element">
             <div style="margin-top: 5px; margin-bottom: 5px">
                 <InputFile id="file" style="font-family: inherit" OnChange="UploadImage" />
             </div>
@@ -134,7 +141,7 @@
 
         <!-- Login button only -->
         <div>
-            <button type="submit" class="btn button btn-primary">
+            <button type="submit" class="btn button btn-primary" style="margin-bottom: 10rem; width: 100%; margin-left: 0%">
                 Add Admin
             </button>
         </div>

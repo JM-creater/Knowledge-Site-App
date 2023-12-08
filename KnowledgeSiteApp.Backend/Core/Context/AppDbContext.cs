@@ -39,16 +39,16 @@ namespace KnowledgeSiteApp.Backend.Core.Context
            );
 
             modelBuilder.Entity<Training>()
-                .HasOne(t => t.Rating)
-                .WithMany() 
-                .HasForeignKey(t => t.RatingId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .HasMany(t => t.Ratings)
+                .WithOne(r => r.Training)
+                .HasForeignKey(r => r.TrainingId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Rating>()
-                .HasOne(t => t.Training)
-                .WithMany()
-                .HasForeignKey(t => t.TrainingId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .HasOne(r => r.Training) 
+                .WithMany(t => t.Ratings) 
+                .HasForeignKey(r => r.TrainingId) 
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Training>()
                 .HasMany(t => t.Topics)

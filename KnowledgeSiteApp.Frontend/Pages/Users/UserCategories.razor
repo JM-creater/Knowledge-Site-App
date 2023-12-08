@@ -1,4 +1,4 @@
-﻿@page "/usercategories"
+﻿@page "/"
 @inject HttpClient http
 @inject IJSRuntime js
 @inject NavigationManager navigate
@@ -10,13 +10,12 @@
 <link rel="stylesheet" type="text/css" href="css/categories-stylesheet.css" />
 
 <div class="container">
-    <h4>Welcome to LearnNest!</h4>
+    <h1 style="margin-top: 30px;">Welcome to LearnNest!</h1>
     <form class="search-container">
         <input type="text" placeholder="Search" @bind="searchTerm" @bind:event="oninput" />
         <i class="fa fa-search" @onclick="HandleSearch"></i>
     </form>
     <div class="category-container">
-
         @foreach (TrainingCategory ct in FilteredCategories)
         {
             <div class="category-box">
@@ -25,21 +24,20 @@
                 </button>
             </div>
         }
-
     </div>
 </div>
 
 @code {
     private TrainingCategory[] trainingcategory { get; set; } = Array.Empty<TrainingCategory>();
     private string searchTerm = string.Empty;
-    private string errorMessage;
+    private string errorMessage = string.Empty;
 
     private void NavigateToTraining(int categoryId)
     {
         navigate.NavigateTo($"/usertraining/{categoryId}");
     }
 
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnInitializedAsync()
     {
         var response = await SendAuthorizedRequest(HttpMethod.Get, "https://localhost:7095/api/TrainingCategory");
         if (response.IsSuccessStatusCode)

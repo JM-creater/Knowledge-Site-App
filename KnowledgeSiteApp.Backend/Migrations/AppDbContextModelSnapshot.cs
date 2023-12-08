@@ -163,9 +163,6 @@ namespace KnowledgeSiteApp.Backend.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("RatingId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
@@ -174,8 +171,6 @@ namespace KnowledgeSiteApp.Backend.Migrations
                     b.HasIndex("AdminId");
 
                     b.HasIndex("CategoryId");
-
-                    b.HasIndex("RatingId");
 
                     b.ToTable("Trainings");
                 });
@@ -260,7 +255,7 @@ namespace KnowledgeSiteApp.Backend.Migrations
                         new
                         {
                             Id = 1,
-                            DateCreated = new DateTime(2023, 12, 7, 20, 27, 38, 42, DateTimeKind.Local).AddTicks(1554),
+                            DateCreated = new DateTime(2023, 12, 8, 13, 46, 3, 605, DateTimeKind.Local).AddTicks(2205),
                             DateUpdated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin0123@gmail.com",
                             FirstName = "Admin",
@@ -275,9 +270,9 @@ namespace KnowledgeSiteApp.Backend.Migrations
             modelBuilder.Entity("KnowledgeSiteApp.Models.Entities.Rating", b =>
                 {
                     b.HasOne("KnowledgeSiteApp.Models.Entities.Training", "Training")
-                        .WithMany()
+                        .WithMany("Ratings")
                         .HasForeignKey("TrainingId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Training");
@@ -317,16 +312,9 @@ namespace KnowledgeSiteApp.Backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("KnowledgeSiteApp.Models.Entities.Rating", "Rating")
-                        .WithMany()
-                        .HasForeignKey("RatingId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.Navigation("Admin");
 
                     b.Navigation("Category");
-
-                    b.Navigation("Rating");
                 });
 
             modelBuilder.Entity("KnowledgeSiteApp.Models.Entities.TrainingCategory", b =>
@@ -347,6 +335,8 @@ namespace KnowledgeSiteApp.Backend.Migrations
 
             modelBuilder.Entity("KnowledgeSiteApp.Models.Entities.Training", b =>
                 {
+                    b.Navigation("Ratings");
+
                     b.Navigation("Topics");
                 });
 
